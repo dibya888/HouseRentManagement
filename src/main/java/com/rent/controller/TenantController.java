@@ -137,7 +137,7 @@ public class TenantController {
 
                 deleteBtn.setOnAction(e -> {
                     Tenant tenant = getTableView().getItems().get(getIndex());
-                    TenantDAO.deleteTenant(tenant.getId());
+                    TenantDAO.deleteTenantAndFreeFlat(tenant.getId());
                     loadTenants();
                 });
             }

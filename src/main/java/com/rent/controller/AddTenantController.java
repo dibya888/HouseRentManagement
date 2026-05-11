@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import javafx.scene.control.ComboBox;
+import com.rent.dao.FlatDAO;
 
 public class AddTenantController {
 
@@ -18,7 +20,7 @@ public class AddTenantController {
     @FXML private TextField emailField;
     @FXML private TextField nidField;
     @FXML private TextField addressField;
-    @FXML private TextField flatNoField;
+    @FXML private ComboBox<String> flatComboBox;
     @FXML private TextField rentField;
 
     @FXML private Label nidFileLabel;
@@ -29,6 +31,15 @@ public class AddTenantController {
 
     @FXML
     public void saveTenant() {
+        String selectedFlat = flatComboBox.getValue();
+
+        if (selectedFlat == null) {
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.WARNING,
+                    "Please select a flat"
+            ).show();
+            return;
+        }
 
         String sql = """
                 INSERT INTO tenants
@@ -49,7 +60,7 @@ public class AddTenantController {
 
             stmt.setString(5, addressField.getText());
 
-            stmt.setString(6, flatNoField.getText());
+            stmt.setString(6, selectedFlat);
 
             stmt.setDouble(7,
                     Double.parseDouble(rentField.getText()));
@@ -65,6 +76,7 @@ public class AddTenantController {
                             : null);
 
             stmt.executeUpdate();
+            FlatDAO.markFlatOccupied(selectedFlat);
 
             Stage stage =
                     (Stage) nameField.getScene().getWindow();
@@ -108,5 +120,12 @@ public class AddTenantController {
 
             docFileLabel.setText(file.getName());
         }
+    }
+
+    @FXML
+    public void initialize() {
+        flatComboBox.getItems().setAll(
+                FlatDAO.getAvailableFlatNumbers()
+        );
     }
 }

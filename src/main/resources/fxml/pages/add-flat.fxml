@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.AddFlatController"
+      spacing="15"
+      style="-fx-padding:20;">
+
+    <Label text="➕ Add Flat"
+           style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+
+    <GridPane hgap="10" vgap="10">
+
+        <Label text="Flat No:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="flatNoField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Bedrooms:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Bathrooms:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Kitchens:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Balconies:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Spinner fx:id="balconySpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Dining Rooms:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Spinner fx:id="diningSpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Living Rooms:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <Spinner fx:id="livingSpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+        <Label text="Rent:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <TextField fx:id="rentField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Save" onAction="#handleSave"
+                style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
+        <Button text="Cancel" onAction="#handleCancel"/>
+    </HBox>
+
+</VBox>

@@ -56,6 +56,24 @@ CREATE TABLE IF NOT EXISTS tenants (
 
             stmt.execute(tenantsSql);
 
+            // FLATS TABLE
+            String flatsSql = """
+CREATE TABLE IF NOT EXISTS flats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    flat_no TEXT NOT NULL UNIQUE,
+    bedrooms INTEGER,
+    bathrooms INTEGER,
+    kitchens INTEGER,
+    balconies INTEGER,
+    dining_rooms INTEGER,
+    living_rooms INTEGER,
+    rent REAL,
+    status TEXT
+)
+""";
+
+            stmt.execute(flatsSql);
+
             System.out.println("Database Ready");
 
         } catch (Exception e) {

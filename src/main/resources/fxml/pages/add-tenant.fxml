@@ -3,35 +3,110 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="12"
-      xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rent.controller.AddTenantController"
-      style="-fx-padding: 30; -fx-pref-width: 700; -fx-pref-height: 500;">
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.AddTenantController"
+            fitToWidth="true"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background:transparent;">
 
-    <Label text="Add New Tenant"
-           style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <content>
+        <VBox spacing="28"
+              style="-fx-padding: 32; -fx-pref-width: 720;">
 
-    <TextField fx:id="nameField" promptText="Name"/>
-    <TextField fx:id="phoneField" promptText="Phone"/>
-    <TextField fx:id="emailField" promptText="Email"/>
-    <TextField fx:id="nidField" promptText="NID Number"/>
-    <TextField fx:id="addressField" promptText="Permanent Address"/>
-    <TextField fx:id="flatNoField" promptText="Flat No"/>
-    <TextField fx:id="rentField" promptText="Rent"/>
+            <!-- TITLE -->
+            <Label text="👤 Add New Tenant"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
-    <Button text="📄 Upload NID"
-            onAction="#uploadNidFile"/>
+            <!-- BASIC INFO -->
+            <VBox spacing="16">
+                <Label text="Basic Information"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
 
-    <Label fx:id="nidFileLabel" text="No file selected" styleClass="file-label"/>
+                <GridPane hgap="20" vgap="12">
 
-    <Button text="📁 Upload Document"
-            onAction="#uploadDocFile"/>
+                    <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <Label text="Full Name" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="nameField" promptText="John Doe"/>
+                    </VBox>
 
-    <Label fx:id="docFileLabel" text="No file selected" styleClass="file-label"/>
+                    <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <Label text="Phone" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="phoneField" promptText="01XXXXXXXXX"/>
+                    </VBox>
 
-    <Button text="Save Tenant"
-            onAction="#saveTenant"
-            style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <Label text="Email" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="emailField" promptText="email@example.com"/>
+                    </VBox>
 
-</VBox>
+                    <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                        <Label text="NID Number" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="nidField" promptText="NID"/>
+                    </VBox>
+
+                    <VBox spacing="4" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                        <Label text="Address" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="addressField" promptText="Permanent Address"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+
+            <!-- FLAT INFO -->
+            <VBox spacing="16">
+                <Label text="Flat Assignment"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                <GridPane hgap="20" vgap="12">
+
+                    <VBox spacing="4" GridPane.columnIndex="0">
+                        <Label text="Select Flat" style="-fx-font-size:12px;"/>
+                        <ComboBox fx:id="flatComboBox" promptText="Available flats"/>
+                    </VBox>
+
+                    <VBox spacing="4" GridPane.columnIndex="1">
+                        <Label text="Monthly Rent" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="rentField" promptText="Rent amount"/>
+                    </VBox>
+
+                </GridPane>
+            </VBox>
+
+            <!-- DOCUMENTS -->
+            <VBox spacing="16">
+                <Label text="Documents"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                <GridPane hgap="20" vgap="12">
+
+                    <VBox spacing="6" GridPane.columnIndex="0">
+                        <Button text="📄 Upload NID" onAction="#uploadNidFile"/>
+                        <Label fx:id="nidFileLabel"
+                               text="No file selected"
+                               style="-fx-font-size:11px; -fx-text-fill:#94a3b8;"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1">
+                        <Button text="📁 Upload Document" onAction="#uploadDocFile"/>
+                        <Label fx:id="docFileLabel"
+                               text="No file selected"
+                               style="-fx-font-size:11px; -fx-text-fill:#94a3b8;"/>
+                    </VBox>
+
+                </GridPane>
+            </VBox>
+
+            <!-- ACTION -->
+            <HBox alignment="CENTER_RIGHT">
+                <Button text="Save Tenant"
+                        onAction="#saveTenant"
+                        style="-fx-background-color: #2563eb;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-pref-height: 44;
+                               -fx-pref-width: 160;"/>
+            </HBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

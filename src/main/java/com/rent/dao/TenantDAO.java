@@ -157,4 +157,46 @@ public class TenantDAO {
             e.printStackTrace();
         }
     }
+    public static void deleteTenantAndFreeFlat(int tenantId) {
+
+        String selectFlatSql = "SELECT flat_no FROM tenants WHERE id=?";
+        String deleteTenantSql = "DELETE FROM tenants WHERE id=?";
+        String updateFlatSql = "UPDATE flats SET status='Available' WHERE flat_no=?";
+
+        try (Connection conn = DBUtil.connect()) {
+
+            conn.setAutoCommit(false); // ✅ one transaction
+
+            String flatNo = null;
+
+            // 1️⃣ Get flat number
+            try (PreparedStatement ps = conn.prepareStatement(selectFlatSql)) {
+                ps.setInt(1, tenantId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        flatNo = rs.getString("flat_no");
+                    }
+                }
+            }
+
+            // 2️⃣ Delete tenant
+            try (PreparedStatement ps = conn.prepareStatement(deleteTenantSql)) {
+                ps.setInt(1, tenantId);
+                ps.executeUpdate();
+            }
+
+            // 3️⃣ Mark flat available (SAME connection)
+            if (flatNo != null && !flatNo.isBlank()) {
+                try (PreparedStatement ps = conn.prepareStatement(updateFlatSql)) {
+                    ps.setString(1, flatNo);
+                    ps.executeUpdate();
+                }
+            }
+
+            conn.commit(); // ✅ commit both operations
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

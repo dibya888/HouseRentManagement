@@ -28,6 +28,51 @@
     -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 10, 0, 0, 2);
 }
 
+/* ComboBox - match TextField */
+.combo-box {
+    -fx-background-color: #1e293b;
+    -fx-border-color: #334155;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 4;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 10, 0, 0, 2);
+}
+
+/* ComboBox text */
+.combo-box .text-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+/* Drop-down arrow button */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #94a3b8;
+}
+
+/* Drop-down list */
+.combo-box-popup .list-view {
+    -fx-background-color: #1e293b;
+    -fx-border-color: #334155;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #2563eb;
+}
+
 /* Save button */
 .button {
     -fx-background-color: #3b82f6;
@@ -41,4 +86,18 @@
 
 .button:hover {
     -fx-background-color: #2563eb;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box:editable .text-field,
+.combo-box .label {
+    -fx-text-fill: #94a3b8;
+}
+
+.combo-box .list-cell:selected {
+    -fx-text-fill: white;
 }
