@@ -11,17 +11,16 @@
     <left>
         <VBox spacing="10"
               prefWidth="220"
-              style="-fx-background-color: #111827;
-                 -fx-padding: 20;">
+              style="-fx-background-color: #111827; -fx-padding: 20;">
 
             <!-- App Title -->
             <Label text="🏠 Rent Manager"
                    style="-fx-text-fill: white;
-                      -fx-font-size: 18px;
-                      -fx-font-weight: bold;
-                      -fx-padding: 10 0 20 0;"/>
+                          -fx-font-size: 18px;
+                          -fx-font-weight: bold;
+                          -fx-padding: 10 0 20 0;"/>
 
-            <!-- MENU BUTTONS -->
+            <!-- MENU -->
             <Button text="📊 Dashboard"
                     fx:id="btnDashboard"
                     onAction="#showDashboard"
@@ -52,15 +51,17 @@
                     maxWidth="Infinity"
                     styleClass="sidebar-btn"/>
 
+            <!-- Logout -->
             <Button text="🚪 Logout"
                     fx:id="btnLogout"
                     onAction="#handleLogout"
                     maxWidth="Infinity"
                     styleClass="sidebar-btn"/>
+
         </VBox>
     </left>
 
-    <!-- MAIN CONTENT AREA (IMPORTANT) -->
+    <!-- MAIN AREA -->
     <center>
         <StackPane fx:id="contentArea"
                    style="-fx-background-color: #F4F6F7;"/>

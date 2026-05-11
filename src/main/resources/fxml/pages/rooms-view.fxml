@@ -9,6 +9,6 @@
       style="-fx-padding: 20;">
 
     <Label text="Room Management"
-           style="-fx-font-size: 20px;"/>
+           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
 </VBox>

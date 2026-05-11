@@ -1,0 +1,44 @@
+.root {
+    -fx-background-color: #0f172a;
+    -fx-font-family: "Segoe UI";
+}
+
+/* Title */
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Input fields */
+.text-field {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #94a3b8;
+
+    -fx-border-color: #334155;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+
+    -fx-padding: 10;
+}
+
+.text-field:focused {
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 10, 0, 0, 2);
+}
+
+/* Save button */
+.button {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+    -fx-background-radius: 10;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2563eb;
+}

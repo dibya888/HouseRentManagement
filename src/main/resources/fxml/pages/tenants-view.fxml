@@ -14,16 +14,31 @@
             <Label text="Tenants"
                    style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
+            <!-- Actions -->
+            <HBox spacing="10" style="-fx-padding: 10;">
+
+                <Button text="➕ Add Tenant"
+                        onAction="#openAddTenantForm"
+                        style="-fx-background-color: #16a34a; -fx-text-fill: white;"/>
+
+                <Button text="🔄 Refresh"
+                        onAction="#loadTenants"/>
+
+            </HBox>
+
             <!-- TABLE -->
             <TableView fx:id="tenantTable">
 
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+                    <TableColumn fx:id="colName" text="Name" prefWidth="140"/>
                     <TableColumn fx:id="colPhone" text="Phone" prefWidth="120"/>
                     <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
                     <TableColumn fx:id="colNid" text="NID" prefWidth="120"/>
-                    <TableColumn fx:id="colAddress" text="Address" prefWidth="200"/>
+                    <TableColumn fx:id="colAddress" text="Address" prefWidth="180"/>
+                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
+                    <TableColumn fx:id="colRent" text="Rent" prefWidth="100"/>
+                    <TableColumn fx:id="colAction" text="Actions" prefWidth="180"/>
                 </columns>
 
             </TableView>

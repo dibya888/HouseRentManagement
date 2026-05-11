@@ -20,6 +20,10 @@ public class SceneManager {
 
             Scene scene = new Scene(loader.load(), 900, 600);
 
+            scene.getStylesheets().add(
+                    SceneManager.class.getResource("/css/style.css").toExternalForm()
+            );
+
             stage.setScene(scene);
             stage.setTitle(title);
             stage.show();

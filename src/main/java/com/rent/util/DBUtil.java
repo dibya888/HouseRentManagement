@@ -6,7 +6,8 @@ import java.sql.Statement;
 
 public class DBUtil {
 
-    private static final String URL = "jdbc:sqlite:src/main/resources/database/rent.db";
+    private static final String URL =
+            "jdbc:sqlite:src/main/resources/database/rent.db";
 
     public static Connection connect() {
         try {
@@ -18,36 +19,40 @@ public class DBUtil {
     }
 
     public static void init() {
+
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
             // USERS TABLE
-            String usersSql = """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE,
-                password TEXT
-            )
-        """;
-
-            stmt.execute(usersSql);
-
             stmt.execute("""
-            INSERT OR IGNORE INTO users(username, password)
-            VALUES ('admin', '1234');
-        """);
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE,
+                    password TEXT
+                )
+            """);
 
-            // TENANTS TABLE (🔥 ADD THIS)
+            // Default admin user
+            stmt.execute("""
+                INSERT OR IGNORE INTO users(username, password)
+                VALUES ('admin', '1234');
+            """);
+
+            // TENANTS TABLE
             String tenantsSql = """
-            CREATE TABLE IF NOT EXISTS tenants (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT,
-                nid TEXT,
-                address TEXT
-            )
-        """;
+CREATE TABLE IF NOT EXISTS tenants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    nid TEXT,
+    address TEXT,
+    flat_no TEXT,       -- changed from flatNo to flat_no
+    rent REAL,
+    nid_path TEXT,
+    doc_path TEXT
+)
+""";
 
             stmt.execute(tenantsSql);
 
@@ -56,5 +61,10 @@ public class DBUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // Optional: Test main
+    public static void main(String[] args) {
+        init();
     }
 }

@@ -5,35 +5,41 @@
 
 <VBox spacing="20"
       alignment="CENTER"
-      style="-fx-padding: 40; -fx-background-color: #f4f6f7;"
+      style="-fx-padding: 40; -fx-background-color: #0f172a;"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.LoginController">
 
     <Label text="HOUSE RENT SYSTEM"
-           style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" />
 
     <TextField fx:id="usernameField"
                promptText="Enter Username"
                maxWidth="300"
-               style="-fx-font-size: 14px; -fx-padding: 8;"/>
+               style="-fx-font-size: 14px; -fx-padding: 10;
+                      -fx-background-color: #1e293b;
+                      -fx-text-fill: white;
+                      -fx-prompt-text-fill: #94a3b8;
+                      -fx-background-radius: 8;"/>
 
     <PasswordField fx:id="passwordField"
                    promptText="Enter Password"
                    maxWidth="300"
-                   style="-fx-font-size: 14px; -fx-padding: 8;"/>
+                   style="-fx-font-size: 14px; -fx-padding: 10;
+                          -fx-background-color: #1e293b;
+                          -fx-text-fill: white;
+                          -fx-prompt-text-fill: #94a3b8;
+                          -fx-background-radius: 8;"/>
 
     <Button text="LOGIN"
             fx:id="loginButton"
             onAction="#handleLogin"
             maxWidth="300"
-            style="
-            -fx-background-color: #2E86C1;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-padding: 10;
-            -fx-background-radius: 8;
-        "/>
+            style="-fx-background-color: #2563eb;
+                   -fx-text-fill: white;
+                   -fx-font-size: 14px;
+                   -fx-padding: 10;
+                   -fx-background-radius: 8;"/>
 
     <Label fx:id="messageLabel"
            textFill="red"/>

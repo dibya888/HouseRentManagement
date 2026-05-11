@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.AddTenantController"
+      style="-fx-padding: 30; -fx-pref-width: 700; -fx-pref-height: 500;">
+
+    <Label text="Add New Tenant"
+           style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="nameField" promptText="Name"/>
+    <TextField fx:id="phoneField" promptText="Phone"/>
+    <TextField fx:id="emailField" promptText="Email"/>
+    <TextField fx:id="nidField" promptText="NID Number"/>
+    <TextField fx:id="addressField" promptText="Permanent Address"/>
+    <TextField fx:id="flatNoField" promptText="Flat No"/>
+    <TextField fx:id="rentField" promptText="Rent"/>
+
+    <Button text="📄 Upload NID"
+            onAction="#uploadNidFile"/>
+
+    <Label fx:id="nidFileLabel" text="No file selected" styleClass="file-label"/>
+
+    <Button text="📁 Upload Document"
+            onAction="#uploadDocFile"/>
+
+    <Label fx:id="docFileLabel" text="No file selected" styleClass="file-label"/>
+
+    <Button text="Save Tenant"
+            onAction="#saveTenant"
+            style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+</VBox>

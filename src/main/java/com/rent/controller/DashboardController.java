@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Node;
-
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
@@ -47,10 +46,14 @@ public class DashboardController {
     }
 
     private void loadPage(String fxmlPath) {
+
         try {
-            Node page = FXMLLoader.load(
+
+            FXMLLoader loader = new FXMLLoader(
                     getClass().getResource(fxmlPath)
             );
+
+            Node page = loader.load();
 
             contentArea.getChildren().clear();
             contentArea.getChildren().add(page);
@@ -59,30 +62,43 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
+
+    @FXML
     public void handleLogout(ActionEvent event) {
+
         try {
-            // 1. Clear session
-            Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
+
+            // clear saved login
+            Preferences prefs =
+                    Preferences.userNodeForPackage(LoginController.class);
+
             prefs.remove("loggedInUser");
 
-            // 2. Load login screen
+            // load login page
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/login.fxml")
             );
 
             Scene scene = new Scene(loader.load(), 900, 600);
 
-            // 3. Get current stage
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene().getWindow();
+            // load css again
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
+            );
 
+            // current window
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setTitle("Rent Management - Login");
             stage.setScene(scene);
-            stage.setTitle("Login");
             stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
