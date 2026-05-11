@@ -31,8 +31,8 @@ public class DashboardController {
     }
 
     @FXML
-    public void showRooms() {
-        loadPage("/fxml/pages/rooms-view.fxml");
+    public void showFlats() {
+        loadPage("/fxml/pages/flats-view.fxml");
     }
 
     @FXML

@@ -28,7 +28,7 @@
 
             <content>
                 <VBox spacing="16"
-                      style="-fx-padding:20; -fx-background-color:#f8fafc;">
+                      style="-fx-padding:20; -fx-background-color:transparent;">
 
                     <!-- Personal Info Card -->
                     <VBox spacing="10"
@@ -71,17 +71,28 @@
 
                     <!-- Documents Card -->
                     <VBox spacing="10"
+                          fx:id="documentsBox"
                           style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+
                         <Label text="Documents"
                                style="-fx-font-size:14px; -fx-font-weight:bold;"/>
 
-                        <Label fx:id="nidPathLabel"/>
-                        <Button text="Open NID File"
-                                onAction="#openNidFile"/>
+                        <!-- NID -->
+                        <VBox fx:id="nidBox" spacing="4">
+                            <Label fx:id="nidPathLabel"/>
+                            <Button fx:id="openNidBtn"
+                                    text="Open NID File"
+                                    onAction="#openNidFile"/>
+                        </VBox>
 
-                        <Label fx:id="docPathLabel"/>
-                        <Button text="Open Document"
-                                onAction="#openDocFile"/>
+                        <!-- Document -->
+                        <VBox fx:id="docBox" spacing="4">
+                            <Label fx:id="docPathLabel"/>
+                            <Button fx:id="openDocBtn"
+                                    text="Open Document"
+                                    onAction="#openDocFile"/>
+                        </VBox>
+
                     </VBox>
 
                 </VBox>

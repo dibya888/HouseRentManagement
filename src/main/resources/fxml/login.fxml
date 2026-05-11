@@ -3,6 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <VBox spacing="20"
       alignment="CENTER"
       style="-fx-padding: 40; -fx-background-color: #0f172a;"
@@ -10,8 +12,13 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.LoginController">
 
-    <Label text="HOUSE RENT SYSTEM"
-           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" />
+    <!-- App Logo -->
+    <ImageView fitWidth="160"
+               preserveRatio="true">
+        <image>
+            <Image url="@/images/app-logo.png" />
+        </image>
+    </ImageView>
 
     <TextField fx:id="usernameField"
                promptText="Enter Username"

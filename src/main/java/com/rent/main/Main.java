@@ -5,6 +5,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+
 
 import java.util.prefs.Preferences;
 
@@ -32,7 +34,7 @@ public class Main extends Application {
                     getClass().getResource("/fxml/dashboard.fxml")
             );
 
-            stage.setTitle("Rent Management - Dashboard");
+            stage.setTitle("Rent Management System");
 
         } else {
 
@@ -51,12 +53,24 @@ public class Main extends Application {
                         .toExternalForm()
         );
 
+
+        stage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+        );
+
+
         stage.setScene(scene);
-
         stage.setResizable(true);
-        stage.centerOnScreen();
 
+        if (loggedUser != null && !loggedUser.isEmpty()) {
+            // ✅ Auto-login → Dashboard → MAXIMIZED
+            stage.setMaximized(true);
+        }
+        stage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+        );
         stage.show();
+
     }
 
     public static void main(String[] args) {

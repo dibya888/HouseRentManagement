@@ -8,6 +8,12 @@ import javafx.stage.Stage;
 import java.awt.Desktop;
 import java.io.File;
 
+import javafx.scene.layout.VBox;
+
+import javafx.scene.control.Button;
+
+
+
 public class ViewTenantController {
 
     @FXML private Label nameLabel;
@@ -19,6 +25,11 @@ public class ViewTenantController {
     @FXML private Label addressLabel;
     @FXML private Label nidPathLabel;
     @FXML private Label docPathLabel;
+    @FXML private VBox documentsBox;
+    @FXML private VBox nidBox;
+    @FXML private VBox docBox;
+    @FXML private Button openNidBtn;
+    @FXML private Button openDocBtn;
 
     private Tenant tenant;
 
@@ -33,8 +44,29 @@ public class ViewTenantController {
         rentLabel.setText("৳ " + t.getRent());
         addressLabel.setText(t.getAddress());
 
-        nidPathLabel.setText(t.getNidPath());
-        docPathLabel.setText(t.getDocPath());
+        // --- NID handling ---
+        if (t.getNidPath() == null || t.getNidPath().isBlank()) {
+            nidBox.setManaged(false);
+            nidBox.setVisible(false);
+        } else {
+            nidPathLabel.setText(t.getNidPath());
+        }
+
+        // --- Document handling ---
+        if (t.getDocPath() == null || t.getDocPath().isBlank()) {
+            docBox.setManaged(false);
+            docBox.setVisible(false);
+        } else {
+            docPathLabel.setText(t.getDocPath());
+        }
+
+        // --- Hide entire documents card if none exist ---
+        if ((t.getNidPath() == null || t.getNidPath().isBlank())
+                && (t.getDocPath() == null || t.getDocPath().isBlank())) {
+
+            documentsBox.setManaged(false);
+            documentsBox.setVisible(false);
+        }
     }
 
     @FXML
