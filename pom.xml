@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.rent</groupId>
+    <artifactId>HouseRentManagement</artifactId>
+    <version>1.0</version>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <javafx.version>21</javafx.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- JavaFX Controls -->
+        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>26.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- JavaFX FXML -->
+        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>26.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- SQLite -->
+        <!-- Source: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.53.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

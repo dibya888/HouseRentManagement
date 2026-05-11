@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.DashboardController">
+
+    <!-- TOP BAR -->
+    <top>
+        <HBox spacing="10"
+              style="-fx-background-color: #2E86C1; -fx-padding: 15;"
+              alignment="CENTER_LEFT">
+
+            <Label text="🏠 House Rent Dashboard"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="Admin"
+                   style="-fx-text-fill: white;"/>
+        </HBox>
+    </top>
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox spacing="15"
+              style="-fx-background-color: #1B2631; -fx-padding: 20;"
+              prefWidth="180">
+
+            <Label text="MENU"
+                   style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+
+            <Button text="Dashboard" style="-fx-pref-width: 140;"/>
+            <Button text="Tenants" style="-fx-pref-width: 140;"/>
+            <Button text="Rooms" style="-fx-pref-width: 140;"/>
+            <Button text="Rent" style="-fx-pref-width: 140;"/>
+            <Button text="Reports" style="-fx-pref-width: 140;"/>
+            <Button text="Settings" style="-fx-pref-width: 140;"/>
+        </VBox>
+    </left>
+
+    <!-- MAIN AREA -->
+    <center>
+        <VBox spacing="20"
+              style="-fx-padding: 20; -fx-background-color: #F4F6F7;">
+
+            <!-- CARDS -->
+            <HBox spacing="15">
+
+                <VBox style="-fx-background-color: white; -fx-padding: 15;"
+                      prefWidth="150">
+                    <Label text="Tenants"/>
+                    <Label text="120" style="-fx-font-size: 22px;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color: white; -fx-padding: 15;"
+                      prefWidth="150">
+                    <Label text="Rooms"/>
+                    <Label text="45" style="-fx-font-size: 22px;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color: white; -fx-padding: 15;"
+                      prefWidth="150">
+                    <Label text="Income"/>
+                    <Label text="৳ 1,20,000" style="-fx-font-size: 22px;"/>
+                </VBox>
+
+            </HBox>
+
+            <!-- TABLE PLACEHOLDER -->
+            <TableView prefHeight="300">
+                <columns>
+                    <TableColumn text="Tenant"/>
+                    <TableColumn text="Room"/>
+                    <TableColumn text="Rent"/>
+                    <TableColumn text="Status"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>
