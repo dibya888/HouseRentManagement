@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.rent.controller.ViewTenantController"
+            style="-fx-background-color:#f8fafc;">
+
+    <!-- Header -->
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10"
+              style="-fx-padding:20; -fx-background-color:white;">
+            <Label text="👤 Tenant Details"
+                   style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+        </HBox>
+    </top>
+
+    <!-- Scrollable Content -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    vbarPolicy="AS_NEEDED"
+                    hbarPolicy="NEVER"
+                    style="-fx-background-color:transparent;">
+
+            <content>
+                <VBox spacing="16"
+                      style="-fx-padding:20; -fx-background-color:#f8fafc;">
+
+                    <!-- Personal Info Card -->
+                    <VBox spacing="10"
+                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                        <Label text="Personal Information"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+
+                        <GridPane hgap="16" vgap="10">
+                            <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="nameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Phone:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="phoneLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="emailLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="NID:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Label fx:id="nidLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Flat & Rent Card -->
+                    <VBox spacing="10"
+                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                        <Label text="Flat &amp; Rent"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+
+                        <GridPane hgap="16" vgap="10">
+                            <Label text="Flat No:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="flatLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Rent:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="rentLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Address:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="addressLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Documents Card -->
+                    <VBox spacing="10"
+                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                        <Label text="Documents"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+
+                        <Label fx:id="nidPathLabel"/>
+                        <Button text="Open NID File"
+                                onAction="#openNidFile"/>
+
+                        <Label fx:id="docPathLabel"/>
+                        <Button text="Open Document"
+                                onAction="#openDocFile"/>
+                    </VBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT"
+              style="-fx-padding:20;">
+            <Button text="Close"
+                    onAction="#close"
+                    style="-fx-background-color:#e5e7eb;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -29,6 +29,11 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.scene.control.TextField;
+
+
 public class TenantController {
 
     @FXML
@@ -60,6 +65,12 @@ public class TenantController {
 
     @FXML
     private TableColumn<Tenant, Void> colAction;
+
+    @FXML
+    private TextField searchField;
+
+    private ObservableList<Tenant> masterList;
+    private FilteredList<Tenant> filteredList;
 
     @FXML
     public void initialize() {
@@ -103,22 +114,28 @@ public class TenantController {
     }
 
     private void addActionButtons() {
-
         colAction.setCellFactory(param -> new TableCell<>() {
 
+            private final Button viewBtn = new Button("View");
             private final Button editBtn = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
 
             {
-                editBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white;");
-                deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white;");
+                viewBtn.setStyle("-fx-background-color:#22c55e; -fx-text-fill:white;");
+                editBtn.setStyle("-fx-background-color:#3b82f6; -fx-text-fill:white;");
+                deleteBtn.setStyle("-fx-background-color:#ef4444; -fx-text-fill:white;");
 
-                editBtn.setOnAction(event -> {
+                viewBtn.setOnAction(e -> {
+                    Tenant tenant = getTableView().getItems().get(getIndex());
+                    openViewTenant(tenant);
+                });
+
+                editBtn.setOnAction(e -> {
                     Tenant tenant = getTableView().getItems().get(getIndex());
                     openEditForm(tenant);
                 });
 
-                deleteBtn.setOnAction(event -> {
+                deleteBtn.setOnAction(e -> {
                     Tenant tenant = getTableView().getItems().get(getIndex());
                     TenantDAO.deleteTenant(tenant.getId());
                     loadTenants();
@@ -128,12 +145,10 @@ public class TenantController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    HBox box = new HBox(10, editBtn, deleteBtn);
-                    setGraphic(box);
+                    setGraphic(new HBox(8, viewBtn, editBtn, deleteBtn));
                 }
             }
         });
@@ -157,6 +172,28 @@ public class TenantController {
             stage.showAndWait();
 
             loadTenants();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openViewTenant(Tenant tenant) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/pages/view-tenant.fxml")
+            );
+            Parent root = loader.load();
+
+            ViewTenantController controller = loader.getController();
+            controller.setTenant(tenant);
+
+            Stage stage = new Stage();
+            stage.setTitle("Tenant Details");
+            stage.setScene(new Scene(root, 700, 600));
+            stage.setResizable(true);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -205,13 +242,32 @@ public class TenantController {
 
     @FXML
     public void loadTenants() {
+        masterList = FXCollections.observableArrayList(
+                TenantDAO.getAllTenants()
+        );
 
-        ObservableList<Tenant> tenantList =
-                FXCollections.observableArrayList(
-                        TenantDAO.getAllTenants()
-                );
+        filteredList = new FilteredList<>(masterList, p -> true);
 
-        tenantTable.setItems(tenantList);
+        SortedList<Tenant> sortedList = new SortedList<>(filteredList);
+        sortedList.comparatorProperty().bind(
+                tenantTable.comparatorProperty()
+        );
+
+        tenantTable.setItems(sortedList);
+    }
+
+    @FXML
+    private void onSearch() {
+        String keyword = searchField.getText().toLowerCase();
+
+        filteredList.setPredicate(tenant -> {
+            if (keyword.isEmpty()) return true;
+
+            return tenant.getName().toLowerCase().contains(keyword)
+                    || tenant.getPhone().toLowerCase().contains(keyword)
+                    || tenant.getNid().toLowerCase().contains(keyword)
+                    || tenant.getFlatNo().toLowerCase().contains(keyword);
+        });
     }
 
     @FXML

@@ -26,6 +26,13 @@
 
             </HBox>
 
+            <!-- Search Bar -->
+            <TextField fx:id="searchField"
+                       promptText="🔍 Search by name, phone, NID, flat..."
+                       onKeyReleased="#onSearch"
+                       prefWidth="350"/>
+
+
             <!-- TABLE -->
             <TableView fx:id="tenantTable">
 
