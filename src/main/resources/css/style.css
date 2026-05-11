@@ -1,0 +1,23 @@
+/* SIDEBAR BUTTON BASE */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 15;
+    -fx-background-radius: 10;
+}
+
+/* HOVER EFFECT */
+.sidebar-btn:hover {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+/* ACTIVE BUTTON STYLE (we will use this later) */
+.sidebar-btn-active {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.TenantController">
+
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+            <!-- Title -->
+            <Label text="Tenants"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <!-- TABLE -->
+            <TableView fx:id="tenantTable">
+
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+                    <TableColumn fx:id="colPhone" text="Phone" prefWidth="120"/>
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
+                    <TableColumn fx:id="colNid" text="NID" prefWidth="120"/>
+                    <TableColumn fx:id="colAddress" text="Address" prefWidth="200"/>
+                </columns>
+
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

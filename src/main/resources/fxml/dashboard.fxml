@@ -7,79 +7,63 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.rent.controller.DashboardController">
 
-    <!-- TOP BAR -->
-    <top>
-        <HBox spacing="10"
-              style="-fx-background-color: #2E86C1; -fx-padding: 15;"
-              alignment="CENTER_LEFT">
-
-            <Label text="🏠 House Rent Dashboard"
-                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-            <Region HBox.hgrow="ALWAYS"/>
-
-            <Label text="Admin"
-                   style="-fx-text-fill: white;"/>
-        </HBox>
-    </top>
-
     <!-- SIDEBAR -->
     <left>
-        <VBox spacing="15"
-              style="-fx-background-color: #1B2631; -fx-padding: 20;"
-              prefWidth="180">
+        <VBox spacing="10"
+              prefWidth="220"
+              style="-fx-background-color: #111827;
+                 -fx-padding: 20;">
 
-            <Label text="MENU"
-                   style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+            <!-- App Title -->
+            <Label text="🏠 Rent Manager"
+                   style="-fx-text-fill: white;
+                      -fx-font-size: 18px;
+                      -fx-font-weight: bold;
+                      -fx-padding: 10 0 20 0;"/>
 
-            <Button text="Dashboard" style="-fx-pref-width: 140;"/>
-            <Button text="Tenants" style="-fx-pref-width: 140;"/>
-            <Button text="Rooms" style="-fx-pref-width: 140;"/>
-            <Button text="Rent" style="-fx-pref-width: 140;"/>
-            <Button text="Reports" style="-fx-pref-width: 140;"/>
-            <Button text="Settings" style="-fx-pref-width: 140;"/>
+            <!-- MENU BUTTONS -->
+            <Button text="📊 Dashboard"
+                    fx:id="btnDashboard"
+                    onAction="#showDashboard"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="👤 Tenants"
+                    fx:id="btnTenants"
+                    onAction="#showTenants"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="🏠 Rooms"
+                    fx:id="btnRooms"
+                    onAction="#showRooms"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="💰 Rent"
+                    fx:id="btnRent"
+                    onAction="#showRent"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="📈 Reports"
+                    fx:id="btnReports"
+                    onAction="#showReports"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="🚪 Logout"
+                    fx:id="btnLogout"
+                    onAction="#handleLogout"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
         </VBox>
     </left>
 
-    <!-- MAIN AREA -->
+    <!-- MAIN CONTENT AREA (IMPORTANT) -->
     <center>
-        <VBox spacing="20"
-              style="-fx-padding: 20; -fx-background-color: #F4F6F7;">
-
-            <!-- CARDS -->
-            <HBox spacing="15">
-
-                <VBox style="-fx-background-color: white; -fx-padding: 15;"
-                      prefWidth="150">
-                    <Label text="Tenants"/>
-                    <Label text="120" style="-fx-font-size: 22px;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color: white; -fx-padding: 15;"
-                      prefWidth="150">
-                    <Label text="Rooms"/>
-                    <Label text="45" style="-fx-font-size: 22px;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color: white; -fx-padding: 15;"
-                      prefWidth="150">
-                    <Label text="Income"/>
-                    <Label text="৳ 1,20,000" style="-fx-font-size: 22px;"/>
-                </VBox>
-
-            </HBox>
-
-            <!-- TABLE PLACEHOLDER -->
-            <TableView prefHeight="300">
-                <columns>
-                    <TableColumn text="Tenant"/>
-                    <TableColumn text="Room"/>
-                    <TableColumn text="Rent"/>
-                    <TableColumn text="Status"/>
-                </columns>
-            </TableView>
-
-        </VBox>
+        <StackPane fx:id="contentArea"
+                   style="-fx-background-color: #F4F6F7;"/>
     </center>
 
 </BorderPane>
