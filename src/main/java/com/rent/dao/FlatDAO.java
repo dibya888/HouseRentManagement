@@ -175,5 +175,18 @@ public class FlatDAO {
             e.printStackTrace();
         }
     }
+    public static double getRentByFlatNo(String flatNo) {
+        String sql = "SELECT rent FROM flats WHERE flat_no=?";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, flatNo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getDouble("rent");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 }

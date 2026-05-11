@@ -62,8 +62,10 @@ public class AddTenantController {
 
             stmt.setString(6, selectedFlat);
 
-            stmt.setDouble(7,
-                    Double.parseDouble(rentField.getText()));
+            double rent = FlatDAO.getRentByFlatNo(selectedFlat);  // rent from flats table
+
+            stmt.setDouble(7, rent);
+
 
             stmt.setString(8,
                     nidFile != null
@@ -127,5 +129,15 @@ public class AddTenantController {
         flatComboBox.getItems().setAll(
                 FlatDAO.getAvailableFlatNumbers()
         );
+
+        flatComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                double rent = FlatDAO.getRentByFlatNo(newVal);
+                rentField.setText(String.valueOf(rent));
+            } else {
+                rentField.clear();
+            }
+        });
+
     }
 }
