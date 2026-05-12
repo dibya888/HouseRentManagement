@@ -3,6 +3,7 @@ package com.rent.dao;
 import com.rent.model.ReportRow;
 import com.rent.model.ReportSummary;
 import com.rent.util.DBUtil;
+import com.rent.dao.RepairDAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +20,16 @@ public class ReportDAO {
 
         String currentMonth = YearMonth.now().toString();
         String currentYear = String.valueOf(Year.now().getValue());
+
+
+        double totalRepair = RepairDAO.getTotalRepairCost();
+        double monthRepair = RepairDAO.getMonthRepairCost(currentMonth);
+        double yearRepair = RepairDAO.getYearRepairCost(currentYear);
+
+        double ownerPaidRepair = RepairDAO.getOwnerPaidTotalRepairCost();
+        double tenantPaidRepair = RepairDAO.getTenantPaidTotalRepairCost();
+
+
 
         try (Connection conn = DBUtil.connect()) {
 
@@ -47,6 +58,18 @@ public class ReportDAO {
 
             summary.setTotalTenants(getInt(conn,
                     "SELECT COUNT(*) FROM tenants"));
+
+
+            summary.setTotalRepairCost(totalRepair);
+            summary.setMonthRepairCost(monthRepair);
+            summary.setYearRepairCost(yearRepair);
+
+            summary.setOwnerPaidRepairCost(ownerPaidRepair);
+            summary.setTenantPaidRepairCost(tenantPaidRepair);
+
+            summary.setNetProfit(summary.getTotalIncome() - ownerPaidRepair);
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -340,6 +363,55 @@ public class ReportDAO {
                         rs.getDouble("paid_amount"),
                         rs.getDouble("due_amount"),
                         rs.getString("status")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public static List<ReportRow> getRepairReportRows() {
+        List<ReportRow> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                repair_date,
+                flat_no,
+                category,
+                description,
+                cost,
+                paid_by,
+                status
+            FROM repairs
+            ORDER BY repair_date DESC, id DESC
+            """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                String repairDate = rs.getString("repair_date");
+                String month = "";
+
+                if (repairDate != null && repairDate.length() >= 7) {
+                    month = repairDate.substring(0, 7);
+                }
+
+                list.add(new ReportRow(
+                        "Repair - " + rs.getString("category"),
+                        month,
+                        repairDate,
+                        rs.getString("flat_no"),
+                        rs.getString("description"),
+                        rs.getDouble("cost"),
+                        0,
+                        0,
+                        rs.getString("status"),
+                        rs.getString("paid_by")
                 ));
             }
 

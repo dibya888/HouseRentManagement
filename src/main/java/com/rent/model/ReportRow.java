@@ -12,8 +12,19 @@ public class ReportRow {
     private double due;
     private String status;
 
+    // Used for extra report info.
+    // For Repair Report, this will store Paid By: Owner/Tenant
+    private String extraInfo;
+
     public ReportRow(String title, String month, String date, String flatNo, String tenant,
                      double total, double paid, double due, String status) {
+
+        this(title, month, date, flatNo, tenant, total, paid, due, status, "");
+    }
+
+    public ReportRow(String title, String month, String date, String flatNo, String tenant,
+                     double total, double paid, double due, String status, String extraInfo) {
+
         this.title = title;
         this.month = month;
         this.date = date;
@@ -23,6 +34,7 @@ public class ReportRow {
         this.paid = paid;
         this.due = due;
         this.status = status;
+        this.extraInfo = extraInfo;
     }
 
     public String getTitle() {
@@ -59,5 +71,9 @@ public class ReportRow {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
     }
 }

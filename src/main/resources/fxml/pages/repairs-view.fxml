@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.RepairController"
+            style="-fx-background-color:#f4f6f7;">
+
+    <center>
+        <VBox spacing="14" style="-fx-padding:20;">
+
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="🛠 Repairs / Maintenance"
+                       style="-fx-font-size:22px; -fx-font-weight:bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="➕ Add Repair"
+                        onAction="#openAddRepair"
+                        style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+                <Button text="🔄 Refresh"
+                        onAction="#loadRepairs"/>
+            </HBox>
+
+            <!-- Filters -->
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
+
+                <TextField fx:id="searchField"
+                           promptText="🔍 Search by flat, category, description..."
+                           onKeyReleased="#onSearch"
+                           prefWidth="300"/>
+
+                <Label text="Paid By:"/>
+                <ComboBox fx:id="paidByFilterCombo" prefWidth="120"/>
+
+                <Label text="Status:"/>
+                <ComboBox fx:id="statusFilterCombo" prefWidth="130"/>
+
+                <Label text="From:"/>
+                <DatePicker fx:id="fromDatePicker" prefWidth="140"/>
+
+                <Label text="To:"/>
+                <DatePicker fx:id="toDatePicker" prefWidth="140"/>
+
+                <Button text="Clear"
+                        onAction="#clearFilters"
+                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <!-- Summary Cards -->
+            <FlowPane hgap="14"
+                      vgap="14"
+                      prefWrapLength="1100">
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="210">
+                    <Label text="Total Repair Cost" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="210">
+                    <Label text="This Month Repair" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="monthRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="210">
+                    <Label text="This Year Repair" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="yearRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="210">
+                    <Label text="Owner Paid" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="ownerPaidLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="210">
+                    <Label text="Tenant Paid" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="tenantPaidLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+            </FlowPane>
+
+            <!-- Repairs Table -->
+            <TableView fx:id="repairTable">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
+                    <TableColumn fx:id="colRepairDate" text="Date" prefWidth="110"/>
+                    <TableColumn fx:id="colCategory" text="Category" prefWidth="130"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="220"/>
+                    <TableColumn fx:id="colCost" text="Cost" prefWidth="100"/>
+                    <TableColumn fx:id="colPaidBy" text="Paid By" prefWidth="100"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="110"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="170"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

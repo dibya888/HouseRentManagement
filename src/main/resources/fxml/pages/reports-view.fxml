@@ -76,6 +76,53 @@
                 </VBox>
 
                 <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Label text="Total Repair Cost" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <Label text="This Month Repair" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="monthRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="3">
+                    <Label text="Owner Paid Repairs" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="ownerRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <Label text="Tenant Paid Repairs" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="tenantRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <Label text="This Year Repair" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="yearRepairLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="3" GridPane.rowIndex="2">
+                    <Label text="Net Profit" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="netProfitLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
                       GridPane.columnIndex="2" GridPane.rowIndex="0">
                     <Label text="This Year Income" style="-fx-text-fill:#6b7280;"/>
                     <Label fx:id="yearIncomeLabel"
@@ -122,6 +169,21 @@
                            text="0"
                            style="-fx-font-size:20px; -fx-font-weight:bold;"/>
                 </VBox>
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="220">
+                    <Label text="Owner Paid" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="ownerPaidLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      prefWidth="220">
+                    <Label text="Tenant Paid" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="tenantPaidLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
 
             </GridPane>
 
@@ -134,6 +196,7 @@
                     <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
                     <TableColumn fx:id="colTenant" text="Tenant" prefWidth="160"/>
                     <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
+                    <TableColumn fx:id="colExtra" text="Info" prefWidth="120" visible="false"/>
                     <TableColumn fx:id="colPaid" text="Paid" prefWidth="120"/>
                     <TableColumn fx:id="colDue" text="Due" prefWidth="120"/>
                     <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>

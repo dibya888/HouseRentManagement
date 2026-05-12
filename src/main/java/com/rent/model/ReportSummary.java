@@ -12,6 +12,13 @@ public class ReportSummary {
     private int availableFlats;
     private int totalTenants;
 
+    private double totalRepairCost;
+    private double monthRepairCost;
+    private double yearRepairCost;
+    private double netProfit;
+    private double ownerPaidRepairCost;
+    private double tenantPaidRepairCost;
+
     public double getTotalIncome() {
         return totalIncome;
     }
@@ -74,5 +81,52 @@ public class ReportSummary {
 
     public void setTotalTenants(int totalTenants) {
         this.totalTenants = totalTenants;
+    }
+
+    public double getTotalRepairCost() {
+        return totalRepairCost;
+    }
+
+    public void setTotalRepairCost(double totalRepairCost) {
+        this.totalRepairCost = totalRepairCost;
+    }
+
+    public double getMonthRepairCost() {
+        return monthRepairCost;
+    }
+
+    public void setMonthRepairCost(double monthRepairCost) {
+        this.monthRepairCost = monthRepairCost;
+    }
+
+    public double getYearRepairCost() {
+        return yearRepairCost;
+    }
+
+    public void setYearRepairCost(double yearRepairCost) {
+        this.yearRepairCost = yearRepairCost;
+    }
+
+    public double getNetProfit() {
+        return netProfit;
+    }
+
+    public void setNetProfit(double netProfit) {
+        this.netProfit = netProfit;
+    }
+    public double getOwnerPaidRepairCost() {
+        return ownerPaidRepairCost;
+    }
+
+    public void setOwnerPaidRepairCost(double ownerPaidRepairCost) {
+        this.ownerPaidRepairCost = ownerPaidRepairCost;
+    }
+
+    public double getTenantPaidRepairCost() {
+        return tenantPaidRepairCost;
+    }
+
+    public void setTenantPaidRepairCost(double tenantPaidRepairCost) {
+        this.tenantPaidRepairCost = tenantPaidRepairCost;
     }
 }

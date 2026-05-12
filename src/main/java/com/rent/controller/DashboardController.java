@@ -47,6 +47,11 @@ public class DashboardController {
     }
 
     @FXML
+    public void showRepairs() {
+        loadPage("/fxml/pages/repairs-view.fxml");
+    }
+
+    @FXML
     public void showReports() {
         loadPage("/fxml/pages/reports-view.fxml");
     }

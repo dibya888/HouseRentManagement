@@ -48,6 +48,12 @@
                     maxWidth="Infinity"
                     styleClass="sidebar-btn"/>
 
+            <Button text="🛠 Repairs"
+                    fx:id="btnRepairs"
+                    onAction="#showRepairs"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"/>
+
             <Button text="📈 Reports"
                     fx:id="btnReports"
                     onAction="#showReports"

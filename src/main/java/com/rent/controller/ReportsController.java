@@ -11,6 +11,7 @@ import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import java.time.LocalDate;
+import com.rent.dao.RepairDAO;
 
 public class ReportsController {
 
@@ -40,6 +41,14 @@ public class ReportsController {
     @FXML private TableColumn<ReportRow, Double> colDue;
     @FXML private TableColumn<ReportRow, String> colStatus;
 
+    @FXML private Label totalRepairLabel;
+    @FXML private Label monthRepairLabel;
+    @FXML private Label yearRepairLabel;
+    @FXML private Label netProfitLabel;
+    @FXML private Label ownerRepairLabel;
+    @FXML private Label tenantRepairLabel;
+    @FXML private TableColumn<ReportRow, String> colExtra;
+
     private final ObservableList<ReportRow> reportList =
             FXCollections.observableArrayList();
 
@@ -66,7 +75,7 @@ public class ReportsController {
                 "Yearly Income",
                 "Due Rent",
                 "Tenant-wise Report",
-                "Repair Report Later"
+                "Repair Report"
         ));
 
         reportTypeCombo.getSelectionModel().selectFirst();
@@ -83,6 +92,7 @@ public class ReportsController {
         colFlatNo.setCellValueFactory(new PropertyValueFactory<>("flatNo"));
         colTenant.setCellValueFactory(new PropertyValueFactory<>("tenant"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
+        colExtra.setCellValueFactory(new PropertyValueFactory<>("extraInfo"));
         colPaid.setCellValueFactory(new PropertyValueFactory<>("paid"));
         colDue.setCellValueFactory(new PropertyValueFactory<>("due"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
@@ -110,6 +120,8 @@ public class ReportsController {
     }
 
     private void loadReportRows() {
+        updateColumnTitles();
+
         String type = reportTypeCombo.getValue();
 
         if (type == null || type.equals("All Reports")) {
@@ -133,6 +145,9 @@ public class ReportsController {
             case "Due Rent" ->
                     reportList.setAll(ReportDAO.getDueRentSummaryRows());
 
+            case "Repair Report" ->
+                    reportList.setAll(ReportDAO.getRepairReportRows());
+
             default ->
                     reportList.setAll(ReportDAO.getAllReportRows());
         }
@@ -149,13 +164,28 @@ public class ReportsController {
 
     @FXML
     private void exportPdf() {
+        loadReportRows();
+        applyReportFilter();
+
         ReportSummary summary = buildSummaryFromFilteredRows();
 
         javafx.collections.ObservableList<ReportRow> exportRows =
-                javafx.collections.FXCollections.observableArrayList(filteredList);
+                javafx.collections.FXCollections.observableArrayList();
+
+        if (filteredList != null) {
+            exportRows.addAll(filteredList);
+        }
+
+        if (exportRows.isEmpty()) {
+            new Alert(Alert.AlertType.WARNING,
+                    "No report rows found to export. Please click Generate or check filters.").show();
+            return;
+        }
 
         ReportPdfExporter.exportReport(summary, exportRows);
     }
+
+
 
     @FXML
     private void exportExcel() {
@@ -270,6 +300,10 @@ public class ReportsController {
                 return row.getTenant() != null && !row.getTenant().isBlank();
             }
 
+            if (type.equals("Repair Report")) {
+                return row.getTitle() != null && row.getTitle().startsWith("Repair");
+            }
+
             return true;
         });
 
@@ -313,12 +347,32 @@ public class ReportsController {
             }
         }
 
+        double totalRepair = RepairDAO.getTotalRepairCost();
+        double monthRepair = RepairDAO.getMonthRepairCost(currentMonth);
+        double yearRepair = RepairDAO.getYearRepairCost(currentYear);
+
+        double ownerPaidRepair = RepairDAO.getOwnerPaidTotalRepairCost();
+        double tenantPaidRepair = RepairDAO.getTenantPaidTotalRepairCost();
+
         ReportSummary base = ReportDAO.getSummary();
 
         summary.setTotalIncome(totalIncome);
         summary.setMonthIncome(monthIncome);
         summary.setYearIncome(yearIncome);
         summary.setTotalDue(totalDue);
+
+        summary.setTotalRepairCost(totalRepair);
+        summary.setMonthRepairCost(monthRepair);
+        summary.setYearRepairCost(yearRepair);
+
+        summary.setOwnerPaidRepairCost(ownerPaidRepair);
+        summary.setTenantPaidRepairCost(tenantPaidRepair);
+
+        /*
+         * Net Profit should be based on real rent income,
+         * not selected table rows.
+         */
+        summary.setNetProfit(base.getTotalIncome() - ownerPaidRepair);
 
         summary.setTotalFlats(base.getTotalFlats());
         summary.setOccupiedFlats(base.getOccupiedFlats());
@@ -352,9 +406,69 @@ public class ReportsController {
             }
         }
 
+        double totalRepair = RepairDAO.getTotalRepairCost();
+        double monthRepair = RepairDAO.getMonthRepairCost(currentMonth);
+        double yearRepair = RepairDAO.getYearRepairCost(currentYear);
+
+        double ownerPaidRepair = RepairDAO.getOwnerPaidTotalRepairCost();
+        double tenantPaidRepair = RepairDAO.getTenantPaidTotalRepairCost();
+
+        /*
+         * Important:
+         * Net Profit should use overall rent income,
+         * not only currently visible table rows.
+         */
+        double overallRentIncome = ReportDAO.getSummary().getTotalIncome();
+        double netProfit = overallRentIncome - ownerPaidRepair;
+
         totalIncomeLabel.setText(money(totalIncome));
         monthIncomeLabel.setText(money(monthIncome));
         yearIncomeLabel.setText(money(yearIncome));
         totalDueLabel.setText(money(totalDue));
+
+        totalRepairLabel.setText(money(totalRepair));
+        monthRepairLabel.setText(money(monthRepair));
+        yearRepairLabel.setText(money(yearRepair));
+
+        ownerRepairLabel.setText(money(ownerPaidRepair));
+        tenantRepairLabel.setText(money(tenantPaidRepair));
+
+        netProfitLabel.setText(money(netProfit));
+    }
+    private void updateColumnTitles() {
+        String type = reportTypeCombo.getValue();
+
+        if ("Repair Report".equals(type)) {
+
+            colTitle.setText("Repair Type");
+            colMonth.setText("Month");
+            colDate.setText("Repair Date");
+            colFlatNo.setText("Flat No");
+            colTenant.setText("Description");
+            colTotal.setText("Repair Cost");
+            colExtra.setText("Paid By");
+            colStatus.setText("Status");
+
+            colExtra.setVisible(true);
+            colPaid.setVisible(false);
+            colDue.setVisible(false);
+
+        } else {
+
+            colTitle.setText("Title");
+            colMonth.setText("Month");
+            colDate.setText("Date");
+            colFlatNo.setText("Flat No");
+            colTenant.setText("Tenant");
+            colTotal.setText("Total");
+            colExtra.setText("Info");
+            colPaid.setText("Paid");
+            colDue.setText("Due");
+            colStatus.setText("Status");
+
+            colExtra.setVisible(false);
+            colPaid.setVisible(true);
+            colDue.setVisible(true);
+        }
     }
 }
