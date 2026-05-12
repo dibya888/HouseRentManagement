@@ -37,7 +37,7 @@ public class DashboardController {
 
     @FXML
     public void showRent() {
-        loadPage("/fxml/pages/dashboard-view.fxml");
+        loadPage("/fxml/pages/rent-view.fxml");
     }
 
     @FXML

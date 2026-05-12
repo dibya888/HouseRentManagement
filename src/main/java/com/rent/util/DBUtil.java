@@ -75,6 +75,89 @@ CREATE TABLE IF NOT EXISTS flats (
 
             stmt.execute(flatsSql);
 
+            // BILL DEFAULTS (GLOBAL – applies to all future billing)
+            String billDefaultsSql = """
+CREATE TABLE IF NOT EXISTS bill_defaults (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    electricity REAL DEFAULT 0,
+    gas REAL DEFAULT 0,
+    water REAL DEFAULT 0
+)
+""";
+            stmt.execute(billDefaultsSql);
+
+// Ensure single default row always exists
+            stmt.execute("""
+INSERT OR IGNORE INTO bill_defaults (id, electricity, gas, water)
+VALUES (1, 0, 0, 0)
+""");
+// CURRENT DUE RENT (only DUE/PARTIAL/LATE rows live here)
+            String rentCurrentSql = """
+CREATE TABLE IF NOT EXISTS rent_current (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+  tenant_id INTEGER NOT NULL,
+  flat_no TEXT NOT NULL,
+  bill_month TEXT NOT NULL,          -- YYYY-MM
+
+  house_rent REAL NOT NULL DEFAULT 0,
+  electricity REAL NOT NULL DEFAULT 0,
+  water REAL NOT NULL DEFAULT 0,
+  gas REAL NOT NULL DEFAULT 0,
+  other_bills REAL NOT NULL DEFAULT 0,
+  fine REAL NOT NULL DEFAULT 0,
+  discount REAL NOT NULL DEFAULT 0,
+
+  total REAL NOT NULL DEFAULT 0,
+
+  paid_amount REAL NOT NULL DEFAULT 0,
+  payment_date TEXT,                -- YYYY-MM-DD
+  due_date TEXT,                    -- YYYY-MM-DD
+
+  status TEXT NOT NULL DEFAULT 'DUE', -- DUE/PARTIAL/LATE
+  notes TEXT,
+
+  UNIQUE(tenant_id, bill_month),
+  FOREIGN KEY(tenant_id) REFERENCES tenants(id),
+  FOREIGN KEY(flat_no) REFERENCES flats(flat_no)
+)
+""";
+            stmt.execute(rentCurrentSql);
+
+// ARCHIVE (paid/cleared rows moved here)
+            String rentArchiveSql = """
+CREATE TABLE IF NOT EXISTS rent_archive (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+  original_id INTEGER,
+  tenant_id INTEGER NOT NULL,
+  flat_no TEXT NOT NULL,
+  bill_month TEXT NOT NULL,
+
+  house_rent REAL NOT NULL DEFAULT 0,
+  electricity REAL NOT NULL DEFAULT 0,
+  water REAL NOT NULL DEFAULT 0,
+  gas REAL NOT NULL DEFAULT 0,
+  other_bills REAL NOT NULL DEFAULT 0,
+  fine REAL NOT NULL DEFAULT 0,
+  discount REAL NOT NULL DEFAULT 0,
+
+  total REAL NOT NULL DEFAULT 0,
+
+  paid_amount REAL NOT NULL DEFAULT 0,
+  payment_date TEXT,
+  due_date TEXT,
+
+  status TEXT NOT NULL DEFAULT 'PAID',
+  notes TEXT,
+
+  archived_at TEXT NOT NULL,         -- YYYY-MM-DD HH:MM:SS
+  FOREIGN KEY(tenant_id) REFERENCES tenants(id),
+  FOREIGN KEY(flat_no) REFERENCES flats(flat_no)
+)
+""";
+            stmt.execute(rentArchiveSql);
+
             System.out.println("Database Ready");
 
         } catch (Exception e) {

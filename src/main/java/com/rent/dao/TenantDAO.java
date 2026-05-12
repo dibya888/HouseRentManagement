@@ -157,6 +157,35 @@ public class TenantDAO {
             e.printStackTrace();
         }
     }
+
+    public static Tenant getTenantById(int id) {
+        String sql = "SELECT * FROM tenants WHERE id=?";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Tenant t = new Tenant();
+                    t.setId(rs.getInt("id"));
+                    t.setName(rs.getString("name"));
+                    t.setPhone(rs.getString("phone"));
+                    t.setEmail(rs.getString("email"));
+                    t.setNid(rs.getString("nid"));
+                    t.setAddress(rs.getString("address"));
+                    t.setFlatNo(rs.getString("flat_no"));
+                    t.setRent(rs.getDouble("rent"));
+                    t.setNidPath(rs.getString("nid_path"));
+                    t.setDocPath(rs.getString("doc_path"));
+                    return t;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void deleteTenantAndFreeFlat(int tenantId) {
 
         String selectFlatSql = "SELECT flat_no FROM tenants WHERE id=?";

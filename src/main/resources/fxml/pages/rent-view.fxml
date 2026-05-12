@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.RentController">
+
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="💰 Rent (Due List)"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="📌 Bills"
+                        onAction="#openBills"
+                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+                <Button text="🗃 Archive"
+                        onAction="#openArchive"
+                        style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+                <Button text="🔄 Refresh"
+                        onAction="#loadRentRows"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Bill Month:"/>
+                <DatePicker fx:id="monthPicker" prefWidth="160"/>
+                <Button text="All"
+                        onAction="#clearMonthFilter"/>
+
+
+                <Button text="Generate Month"
+                        onAction="#generateMonth"
+                        style="-fx-background-color:#16a34a; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <TextField fx:id="searchField"
+                           promptText="🔍 Search by tenant / phone / flat..."
+                           onKeyReleased="#onSearch"
+                           prefWidth="320"/>
+            </HBox>
+
+            <TableView fx:id="rentTable">
+                <columns>
+                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="90"/>
+                    <TableColumn fx:id="colTenantName" text="Tenant" prefWidth="140"/>
+                    <TableColumn fx:id="colPhone" text="Phone" prefWidth="120"/>
+                    <TableColumn fx:id="colBillMonth" text="Bill Month" prefWidth="90"/>
+
+                    <TableColumn fx:id="colHouseRent" text="House Rent" prefWidth="95"/>
+                    <TableColumn fx:id="colElectricity" text="Electricity" prefWidth="95"/>
+                    <TableColumn fx:id="colWater" text="Water" prefWidth="85"/>
+                    <TableColumn fx:id="colGas" text="Gas" prefWidth="75"/>
+                    <TableColumn fx:id="colOther" text="Other" prefWidth="85"/>
+                    <TableColumn fx:id="colFine" text="Fine" prefWidth="75"/>
+                    <TableColumn fx:id="colDiscount" text="Discount" prefWidth="85"/>
+
+                    <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="180"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

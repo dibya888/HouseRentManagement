@@ -184,6 +184,50 @@ public class FlatDAO {
         }
     }
 
+    public static List<String> getOccupiedFlatNumbers() {
+        List<String> flats = new ArrayList<>();
+        String sql = "SELECT flat_no FROM flats WHERE status = 'Occupied' ORDER BY flat_no";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                flats.add(rs.getString("flat_no"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flats;
+    }
+
+    public static Flat getFlatByFlatNo(String flatNo) {
+        String sql = "SELECT * FROM flats WHERE flat_no=?";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, flatNo);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Flat(
+                            rs.getString("flat_no"),
+                            rs.getString("meter_no"),
+                            rs.getInt("bedrooms"),
+                            rs.getInt("bathrooms"),
+                            rs.getInt("kitchens"),
+                            rs.getInt("balconies"),
+                            rs.getInt("dining_rooms"),
+                            rs.getInt("living_rooms"),
+                            rs.getDouble("rent"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void markFlatAvailable(String flatNo) {
 
         String sql = "UPDATE flats SET status='Available' WHERE flat_no=?";

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.ArchiveController">
+
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="🗃 Rent Archive"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="🔄 Refresh" onAction="#loadArchive"/>
+            </HBox>
+
+            <TableView fx:id="archiveTable">
+                <columns>
+                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="90"/>
+                    <TableColumn fx:id="colTenantName" text="Tenant" prefWidth="140"/>
+                    <TableColumn fx:id="colPhone" text="Phone" prefWidth="120"/>
+                    <TableColumn fx:id="colBillMonth" text="Bill Month" prefWidth="90"/>
+                    <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="160"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>
