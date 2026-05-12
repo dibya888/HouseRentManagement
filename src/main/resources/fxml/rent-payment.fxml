@@ -6,32 +6,74 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.RentPaymentController"
-      spacing="12"
-      style="-fx-padding:20;">
+      spacing="16"
+      minWidth="520"
+      prefWidth="560"
+      maxWidth="600"
+      style="-fx-padding:24; -fx-background-color:#f8fafc;">
 
-    <Label fx:id="titleLabel"
-           style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+    <!-- HEADER -->
+    <Label text="💳 Rent Payment"
+           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           alignment="CENTER"
+           maxWidth="Infinity"/>
 
-    <Separator/>
+    <!-- INFO CARD -->
+    <VBox spacing="8"
+          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+        <Label fx:id="tenantNameLabel" style="-fx-font-size:14px;"/>
+        <Label fx:id="flatLabel"/>
+        <Label fx:id="monthLabel"/>
+    </VBox>
 
-    <GridPane hgap="12" vgap="10">
-        <Label text="Electricity:" GridPane.rowIndex="0"/><TextField fx:id="electricityField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-        <Label text="Water:" GridPane.rowIndex="1"/><TextField fx:id="waterField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-        <Label text="Gas:" GridPane.rowIndex="2"/><TextField fx:id="gasField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <!-- PAYMENT FORM -->
+    <VBox spacing="12"
+          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
 
-        <Label text="Other Bills:" GridPane.rowIndex="3"/><TextField fx:id="otherField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-        <Label text="Fine:" GridPane.rowIndex="4"/><TextField fx:id="fineField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-        <Label text="Discount:" GridPane.rowIndex="5"/><TextField fx:id="discountField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <GridPane hgap="14" vgap="10">
+            <Label text="Electricity:"/>
+            <TextField fx:id="electricityField" GridPane.columnIndex="1"/>
 
-        <Label text="Paid Amount:" GridPane.rowIndex="6"/><TextField fx:id="paidAmountField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-        <Label text="Payment Date:" GridPane.rowIndex="7"/><DatePicker fx:id="paymentDatePicker" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
-    </GridPane>
+            <Label text="Water:" GridPane.rowIndex="1"/>
+            <TextField fx:id="waterField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-    <Separator/>
+            <Label text="Gas:" GridPane.rowIndex="2"/>
+            <TextField fx:id="gasField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
+            <Label text="Other Bills:" GridPane.rowIndex="3"/>
+            <TextField fx:id="otherField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Fine:" GridPane.rowIndex="4"/>
+            <TextField fx:id="fineField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Discount:" GridPane.rowIndex="5"/>
+            <TextField fx:id="discountField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Separator GridPane.rowIndex="6" GridPane.columnSpan="2"/>
+
+            <Label text="Total:" GridPane.rowIndex="7" style="-fx-font-weight:bold;"/>
+            <Label fx:id="totalLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"
+                   style="-fx-font-weight:bold;"/>
+
+            <Label text="Paid Amount:" GridPane.rowIndex="8"/>
+            <TextField fx:id="paidAmountField"
+                       GridPane.rowIndex="8"
+                       GridPane.columnIndex="1"
+                       editable="false"
+                       style="-fx-background-color:#e5e7eb;"/>
+
+            <Label text="Payment Date:" GridPane.rowIndex="9"/>
+            <DatePicker fx:id="paymentDatePicker"
+                        GridPane.rowIndex="9"
+                        GridPane.columnIndex="1"/>
+        </GridPane>
+    </VBox>
+
+    <!-- ACTIONS -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancel" onAction="#close"/>
-        <Button text="Save Payment" onAction="#save"
+        <Button text="Save Payment"
+                onAction="#save"
                 style="-fx-background-color:#16a34a; -fx-text-fill:white; -fx-font-weight:bold;"/>
     </HBox>
 
