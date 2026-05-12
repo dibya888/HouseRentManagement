@@ -255,5 +255,42 @@ public class FlatDAO {
         }
         return 0;
     }
+    public static boolean saveFlatWithProperty(Flat flat, int propertyId) {
+
+        String updatePropertySql = "UPDATE flats SET property_id=? WHERE flat_no=?";
+
+        try (Connection conn = DBUtil.connect()) {
+            conn.setAutoCommit(false);
+
+            // 1) insert flat (existing INSERT_SQL)
+            try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
+                stmt.setString(1, flat.getFlatNo());
+                stmt.setString(2, flat.getMeterNo());
+                stmt.setInt(3, flat.getBedrooms());
+                stmt.setInt(4, flat.getBathrooms());
+                stmt.setInt(5, flat.getKitchens());
+                stmt.setInt(6, flat.getBalconies());
+                stmt.setInt(7, flat.getDiningrooms());
+                stmt.setInt(8, flat.getLivingrooms());
+                stmt.setDouble(9, flat.getRent());
+                stmt.setString(10, flat.getStatus());
+                stmt.executeUpdate();
+            }
+
+            // 2) set property_id
+            try (PreparedStatement ps = conn.prepareStatement(updatePropertySql)) {
+                ps.setInt(1, propertyId);
+                ps.setString(2, flat.getFlatNo());
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

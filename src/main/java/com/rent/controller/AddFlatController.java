@@ -2,13 +2,20 @@ package com.rent.controller;
 
 import com.rent.dao.FlatDAO;
 import com.rent.model.Flat;
+import com.rent.util.DBUtil;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 public class AddFlatController {
+
+    @FXML private ComboBox<PropertyOption> propertyComboBox;
 
     @FXML private TextField flatNoField;
     @FXML private TextField meterNoField;
@@ -29,16 +36,53 @@ public class AddFlatController {
         balconySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 5, 0));
         diningSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 3, 0));
         livingSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 3, 1));
+
+        loadProperties();
+    }
+
+    private void loadProperties() {
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT id, name, is_default FROM properties ORDER BY is_default DESC, id DESC"
+             );
+             ResultSet rs = ps.executeQuery()) {
+
+            var items = FXCollections.<PropertyOption>observableArrayList();
+            PropertyOption defaultOne = null;
+
+            while (rs.next()) {
+                PropertyOption p = new PropertyOption(rs.getInt("id"), rs.getString("name"));
+                items.add(p);
+                if (rs.getInt("is_default") == 1 && defaultOne == null) {
+                    defaultOne = p;
+                }
+            }
+
+            propertyComboBox.setItems(items);
+
+            if (defaultOne != null) {
+                propertyComboBox.getSelectionModel().select(defaultOne);
+            } else if (!items.isEmpty()) {
+                propertyComboBox.getSelectionModel().selectFirst();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void handleSave() {
 
-        // ✅ Validate all required fields including Meter No
+        if (propertyComboBox.getValue() == null) {
+            new Alert(Alert.AlertType.WARNING, "Please select a Property first.").show();
+            return;
+        }
+
         if (flatNoField.getText().isBlank()
                 || meterNoField.getText().isBlank()
                 || rentField.getText().isBlank()) {
-            System.out.println("Flat No, Meter No and Rent are required!");
+            new Alert(Alert.AlertType.WARNING, "Flat No, Meter No and Rent are required!").show();
             return;
         }
 
@@ -46,13 +90,13 @@ public class AddFlatController {
         try {
             rent = Double.parseDouble(rentField.getText().trim());
         } catch (NumberFormatException ex) {
-            System.out.println("Invalid rent value!");
+            new Alert(Alert.AlertType.ERROR, "Invalid rent value!").show();
             return;
         }
 
         Flat flat = new Flat(
                 flatNoField.getText().trim(),
-                meterNoField.getText().trim(),   // ✅ METER NO (2nd arg)
+                meterNoField.getText().trim(),
                 bedroomSpinner.getValue(),
                 bathroomSpinner.getValue(),
                 kitchenSpinner.getValue(),
@@ -63,16 +107,16 @@ public class AddFlatController {
                 "Available"
         );
 
-        boolean success = FlatDAO.saveFlat(flat);
+        int propertyId = propertyComboBox.getValue().id;
+
+        boolean success = FlatDAO.saveFlatWithProperty(flat, propertyId);
 
         if (success) {
-            System.out.println("✅ Flat saved successfully.");
             close();
         } else {
-            System.out.println("❌ Failed to save flat.");
+            new Alert(Alert.AlertType.ERROR, "Failed to save flat.").show();
         }
     }
-
 
     @FXML
     private void handleCancel() {
@@ -82,5 +126,21 @@ public class AddFlatController {
     private void close() {
         Stage stage = (Stage) flatNoField.getScene().getWindow();
         stage.close();
+    }
+
+    // ComboBox item
+    public static class PropertyOption {
+        final int id;
+        final String name;
+
+        PropertyOption(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

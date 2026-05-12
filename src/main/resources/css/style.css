@@ -21,3 +21,15 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
+
+.page-back-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-padding: 6 12;
+}
+
+.page-back-btn:hover {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #f9fafb;
+}

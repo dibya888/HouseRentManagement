@@ -35,6 +35,10 @@
 
             <!-- Identity -->
             <TableColumn fx:id="colFlatNo" text="Flat No" minWidth="90"/>
+
+            <!-- ✅ NEW: Property -->
+            <TableColumn fx:id="colProperty" text="Property" minWidth="160"/>
+
             <TableColumn fx:id="colMeterNo" text="Meter No" minWidth="110"/>
 
             <!-- Structure -->

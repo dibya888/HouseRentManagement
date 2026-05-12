@@ -3,7 +3,10 @@ package com.rent.controller;
 import com.rent.dao.RentDAO;
 import com.rent.model.RentRow;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
@@ -53,15 +56,17 @@ public class RentPaymentController {
     }
 
     private void setupAutoCalculation() {
-        electricityField.textProperty().addListener((a,b,c)->recalcTotal());
-        waterField.textProperty().addListener((a,b,c)->recalcTotal());
-        gasField.textProperty().addListener((a,b,c)->recalcTotal());
-        otherField.textProperty().addListener((a,b,c)->recalcTotal());
-        fineField.textProperty().addListener((a,b,c)->recalcTotal());
-        discountField.textProperty().addListener((a,b,c)->recalcTotal());
+        electricityField.textProperty().addListener((a, b, c) -> recalcTotal());
+        waterField.textProperty().addListener((a, b, c) -> recalcTotal());
+        gasField.textProperty().addListener((a, b, c) -> recalcTotal());
+        otherField.textProperty().addListener((a, b, c) -> recalcTotal());
+        fineField.textProperty().addListener((a, b, c) -> recalcTotal());
+        discountField.textProperty().addListener((a, b, c) -> recalcTotal());
     }
 
     private void recalcTotal() {
+        if (row == null) return;
+
         double total =
                 row.getHouseRent()
                         + d(electricityField)
@@ -72,7 +77,7 @@ public class RentPaymentController {
                         - d(discountField);
 
         totalLabel.setText("৳ " + String.format("%.2f", total));
-        paidAmountField.setText(String.valueOf(total));
+        paidAmountField.setText(String.valueOf(total)); // not editable in FXML
     }
 
     private double d(TextField f) {
@@ -97,14 +102,40 @@ public class RentPaymentController {
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Payment Saved");
-        confirm.setHeaderText("Print receipt?");
+        confirm.setHeaderText("✅ Payment saved successfully");
         confirm.setContentText("Do you want to print the receipt now?");
+        confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
         Optional<ButtonType> res = confirm.showAndWait();
 
-        // YES → receipt logic later
-        // NO  → just close
+        if (res.isPresent() && res.get() == ButtonType.YES) {
+            openPrintOptions();
+        }
+
         close();
+    }
+
+    private void openPrintOptions() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/pages/print-options.fxml")
+            );
+
+            Stage stage = new Stage();
+            stage.setTitle("Print Receipt Options");
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(loader.load(), 360, 260);
+            stage.setScene(scene);
+
+            PrintOptionsController controller = loader.getController();
+            controller.setRentRow(row);
+
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

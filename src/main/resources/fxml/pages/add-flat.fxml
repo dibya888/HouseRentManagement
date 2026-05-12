@@ -14,32 +14,38 @@
 
     <GridPane hgap="10" vgap="10">
 
-        <Label text="Flat No:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="flatNoField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <!-- NEW -->
+        <Label text="Property:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="propertyComboBox"
+                  promptText="Select Property"
+                  GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-        <Label text="Meter No:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="meterNoField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label text="Flat No:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="flatNoField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="Bedrooms:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label text="Meter No:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="meterNoField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Bathrooms:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label text="Bedrooms:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Kitchens:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Label text="Bathrooms:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Balconies:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <Spinner fx:id="balconySpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Label text="Kitchens:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <Label text="Dining Rooms:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <Spinner fx:id="diningSpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <Label text="Balconies:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <Spinner fx:id="balconySpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-        <Label text="Living Rooms:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-        <Spinner fx:id="livingSpinner" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        <Label text="Dining Rooms:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <Spinner fx:id="diningSpinner" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-        <Label text="Rent:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-        <TextField fx:id="rentField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+        <Label text="Living Rooms:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+        <Spinner fx:id="livingSpinner" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+
+        <Label text="Rent:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+        <TextField fx:id="rentField" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
     </GridPane>
 

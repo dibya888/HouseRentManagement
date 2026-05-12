@@ -77,6 +77,12 @@ public class PropertyController {
         }
     }
 
+    @FXML
+    private void backToSettings() {
+        DashboardController.getInstance()
+                .showSettings();
+    }
+
     private void loadProperties() {
         propertyContainer.getChildren().clear();
 

@@ -14,42 +14,72 @@
 
     <GridPane hgap="10" vgap="10">
 
-        <Label text="Flat No:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="flatNoField" editable="false"
-                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <!-- ✅ PROPERTY -->
+        <Label text="Property:" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="propertyComboBox"
+                  promptText="Select Property"
+                  GridPane.rowIndex="0"
+                  GridPane.columnIndex="1"/>
 
-        <Label text="Meter No:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="meterNoField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label text="Flat No:" GridPane.rowIndex="1"/>
+        <TextField fx:id="flatNoField"
+                   editable="false"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="1"/>
 
-        <Label text="Bedrooms:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label text="Meter No:" GridPane.rowIndex="2"/>
+        <TextField fx:id="meterNoField"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="1"/>
 
-        <Label text="Bathrooms:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label text="Bedrooms:" GridPane.rowIndex="3"/>
+        <Spinner fx:id="bedroomSpinner"
+                 GridPane.rowIndex="3"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Kitchens:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Label text="Bathrooms:" GridPane.rowIndex="4"/>
+        <Spinner fx:id="bathroomSpinner"
+                 GridPane.rowIndex="4"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Balconies:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <Spinner fx:id="balconySpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Label text="Kitchens:" GridPane.rowIndex="5"/>
+        <Spinner fx:id="kitchenSpinner"
+                 GridPane.rowIndex="5"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Dining Rooms:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <Spinner fx:id="diningSpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <Label text="Balconies:" GridPane.rowIndex="6"/>
+        <Spinner fx:id="balconySpinner"
+                 GridPane.rowIndex="6"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Living Rooms:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-        <Spinner fx:id="livingSpinner" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        <Label text="Dining Rooms:" GridPane.rowIndex="7"/>
+        <Spinner fx:id="diningSpinner"
+                 GridPane.rowIndex="7"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Rent:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-        <TextField fx:id="rentField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+        <Label text="Living Rooms:" GridPane.rowIndex="8"/>
+        <Spinner fx:id="livingSpinner"
+                 GridPane.rowIndex="8"
+                 GridPane.columnIndex="1"/>
 
-        <Label text="Status:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="statusBox" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+        <Label text="Rent:" GridPane.rowIndex="9"/>
+        <TextField fx:id="rentField"
+                   GridPane.rowIndex="9"
+                   GridPane.columnIndex="1"/>
+
+        <Label text="Status:" GridPane.rowIndex="10"/>
+        <ComboBox fx:id="statusBox"
+                  GridPane.rowIndex="10"
+                  GridPane.columnIndex="1"/>
+
     </GridPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Update" onAction="#handleUpdate"
+        <Button text="Update"
+                onAction="#handleUpdate"
                 style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
-        <Button text="Cancel" onAction="#handleCancel"/>
+        <Button text="Cancel"
+                onAction="#handleCancel"/>
     </HBox>
 
 </VBox>

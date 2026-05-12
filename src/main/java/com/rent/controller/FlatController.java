@@ -2,28 +2,31 @@ package com.rent.controller;
 
 import com.rent.dao.FlatDAO;
 import com.rent.model.Flat;
+import com.rent.util.DBUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.stage.Stage;
-import javafx.scene.control.*;
-import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
-import java.util.Optional;
+import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Optional;
 
 public class FlatController {
 
     @FXML private TableView<Flat> flatTable;
 
     @FXML private TableColumn<Flat, String> colFlatNo;
+    @FXML private TableColumn<Flat, String> colProperty; // ✅ NEW
+    @FXML private TableColumn<Flat, String> colMeterNo;
     @FXML private TableColumn<Flat, Integer> colBeds;
     @FXML private TableColumn<Flat, Integer> colBaths;
     @FXML private TableColumn<Flat, Integer> colKitchen;
@@ -34,13 +37,28 @@ public class FlatController {
     @FXML private TableColumn<Flat, String> colStatus;
     @FXML private TableColumn<Flat, Void> colAction;
 
-    private final ObservableList<Flat> flatList =
-            FXCollections.observableArrayList();
+    private final ObservableList<Flat> flatList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
 
         colFlatNo.setCellValueFactory(new PropertyValueFactory<>("flatNo"));
+        colMeterNo.setCellValueFactory(new PropertyValueFactory<>("meterNo"));
+
+        // ✅ Property column via DB lookup (no model change)
+        colProperty.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow().getItem() == null) {
+                    setText(null);
+                } else {
+                    Flat f = getTableRow().getItem();
+                    setText(fetchPropertyName(f.getFlatNo()));
+                }
+            }
+        });
+
         colBeds.setCellValueFactory(new PropertyValueFactory<>("bedrooms"));
         colBaths.setCellValueFactory(new PropertyValueFactory<>("bathrooms"));
         colKitchen.setCellValueFactory(new PropertyValueFactory<>("kitchens"));
@@ -52,16 +70,38 @@ public class FlatController {
 
         flatTable.setItems(flatList);
         addActionButtons();
-
-        loadFlatsFromDB(); // ✅ initial load
+        loadFlatsFromDB();
     }
 
     private void loadFlatsFromDB() {
         flatList.clear();
         flatList.addAll(FlatDAO.getAllFlats());
     }
-    private void addActionButtons() {
 
+    // ✅ Lookup property name by flat_no
+    private String fetchPropertyName(String flatNo) {
+        String sql = """
+            SELECT p.name
+            FROM flats f
+            JOIN properties p ON f.property_id = p.id
+            WHERE f.flat_no = ?
+        """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, flatNo);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("name");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "-";
+    }
+
+    private void addActionButtons() {
         colAction.setCellFactory(param -> new TableCell<>() {
 
             private final Button viewBtn = new Button("View");
@@ -92,112 +132,73 @@ public class FlatController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(new HBox(8, viewBtn, editBtn, deleteBtn));
-                }
+                setGraphic(empty ? null : new HBox(8, viewBtn, editBtn, deleteBtn));
             }
         });
     }
 
     private void openViewFlat(Flat flat) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/pages/view-flat.fxml")
-            );
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/view-flat.fxml"));
             Stage stage = new Stage();
             stage.setTitle("Flat Details");
-
-            stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
-            );
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
             stage.setScene(new Scene(loader.load(), 420, 520));
             stage.initModality(Modality.APPLICATION_MODAL);
-
             ViewFlatController controller = loader.getController();
             controller.setFlat(flat);
-
             stage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-
-    private void deleteFlat(Flat flat) {
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Flat");
-        confirm.setHeaderText("Delete " + flat.getFlatNo() + "?");
-        confirm.setContentText("Are you sure you want to delete this flat?");
-
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-
-            boolean ok = FlatDAO.deleteFlat(flat.getFlatNo());
-
-            if (ok) {
-                loadFlatsFromDB();  // refresh
-            } else {
-                Alert err = new Alert(Alert.AlertType.ERROR, "Failed to delete flat!");
-                err.showAndWait();
-            }
         }
     }
 
     private void openEditFlat(Flat flat) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/pages/edit-flat.fxml")
-            );
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/edit-flat.fxml"));
             Stage stage = new Stage();
             stage.setTitle("Edit Flat");
-            stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
-            );
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
             stage.setScene(new Scene(loader.load(), 420, 520));
             stage.initModality(Modality.APPLICATION_MODAL);
-
             EditFlatController controller = loader.getController();
             controller.setFlat(flat);
-
             stage.showAndWait();
-
-            // ✅ refresh after update
             loadFlatsFromDB();
-
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void deleteFlat(Flat flat) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Flat");
+        confirm.setHeaderText("Delete " + flat.getFlatNo() + "?");
+        confirm.setContentText("Are you sure?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (FlatDAO.deleteFlat(flat.getFlatNo())) {
+                loadFlatsFromDB();
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Failed to delete flat!").show();
+            }
         }
     }
 
     @FXML
     private void handleAddFlat() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/pages/add-flat.fxml")
-            );
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/add-flat.fxml"));
             Stage stage = new Stage();
             stage.setTitle("Add Flat");
-            stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
-            );
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
             stage.setScene(new Scene(loader.load(), 400, 480));
             stage.setResizable(false);
-
-            // ✅ REFRESH TABLE WHEN WINDOW CLOSES
-            stage.setOnHidden(event -> loadFlatsFromDB());
-
+            stage.setOnHidden(e -> loadFlatsFromDB());
             stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
