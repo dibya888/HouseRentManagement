@@ -1,14 +1,231 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      spacing="20"
-      style="-fx-padding: 20;">
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.DashboardHomeController"
+            fitToWidth="true"
+            styleClass="dashboard-root">
 
-    <Label text="Dashboard Home"
-           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <content>
+        <VBox spacing="18"
+              style="-fx-padding:20; -fx-background-color:#f4f6f7;">
 
-</VBox>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+
+                <Label text="📊 Dashboard"
+                       styleClass="dashboard-title"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="🔄 Refresh"
+                        onAction="#loadDashboard"
+                        styleClass="dashboard-refresh-btn"/>
+            </HBox>
+
+            <!-- Summary Cards -->
+            <FlowPane hgap="14"
+                      vgap="14"
+                      prefWrapLength="1100">
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);">
+                    <Label text="Total Flats" styleClass="dashboard-card-title"/>
+                    <Label fx:id="totalFlatsLabel" text="0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #16a34a, #15803d);">
+                    <Label text="Occupied Flats" styleClass="dashboard-card-title"/>
+                    <Label fx:id="occupiedFlatsLabel" text="0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #0f766e, #115e59);">
+                    <Label text="Available Flats" styleClass="dashboard-card-title"/>
+                    <Label fx:id="availableFlatsLabel" text="0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #7c3aed, #6d28d9);">
+                    <Label text="Total Tenants" styleClass="dashboard-card-title"/>
+                    <Label fx:id="totalTenantsLabel" text="0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #16a34a, #15803d);">
+                    <Label text="This Month Income" styleClass="dashboard-card-title"/>
+                    <Label fx:id="monthIncomeLabel" text="৳ 0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #dc2626, #b91c1c);">
+                    <Label text="Total Due" styleClass="dashboard-card-title"/>
+                    <Label fx:id="totalDueLabel" text="৳ 0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #f97316, #ea580c);">
+                    <Label text="This Month Owner Repair" styleClass="dashboard-card-title"/>
+                    <Label fx:id="monthOwnerRepairLabel" text="৳ 0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #334155, #1e293b);">
+                    <Label text="This Month Net Profit" styleClass="dashboard-card-title"/>
+                    <Label fx:id="monthNetProfitLabel" text="৳ 0" styleClass="dashboard-card-value"/>
+                </VBox>
+
+            </FlowPane>
+
+            <!-- Charts -->
+            <GridPane hgap="16" vgap="16">
+
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="0"
+                      spacing="8"
+                      prefWidth="560"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Monthly Income" styleClass="dashboard-panel-title"/>
+
+                    <VBox fx:id="monthlyIncomeChartBox"
+                          prefWidth="520"
+                          prefHeight="280"/>
+                </VBox>
+
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="0"
+                      spacing="8"
+                      prefWidth="460"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Paid vs Due"
+                           styleClass="dashboard-panel-title"/>
+
+                    <VBox fx:id="paidDueChartBox"
+                          prefWidth="420"
+                          prefHeight="280"/>
+                </VBox>
+
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="1"
+                      spacing="8"
+                      prefWidth="560"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Income vs Owner Repair"
+                           styleClass="dashboard-panel-title"/>
+
+                    <VBox fx:id="incomeRepairChartBox"
+                          prefWidth="520"
+                          prefHeight="280"/>
+                </VBox>
+
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="1"
+                      spacing="8"
+                      prefWidth="460"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Occupancy"
+                           styleClass="dashboard-panel-title"/>
+
+                    <VBox fx:id="occupancyChartBox"
+                          prefWidth="420"
+                          prefHeight="280"/>
+                </VBox>
+
+            </GridPane>
+
+            <!-- Recent Tables -->
+            <GridPane hgap="16" vgap="16">
+
+                <!-- Recent Due Rent -->
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="0"
+                      spacing="10"
+                      prefWidth="560"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Recent Due Rent"
+                           styleClass="dashboard-panel-title"/>
+
+                    <TableView fx:id="dueTable" prefHeight="240" styleClass="dashboard-table">
+
+                        <columns>
+                            <TableColumn fx:id="dueColMonth" text="Month" prefWidth="90"/>
+                            <TableColumn fx:id="dueColFlat" text="Flat" prefWidth="80"/>
+                            <TableColumn fx:id="dueColTenant" text="Tenant" prefWidth="150"/>
+                            <TableColumn fx:id="dueColDue" text="Due" prefWidth="100"/>
+                            <TableColumn fx:id="dueColStatus" text="Status" prefWidth="100"/>
+                        </columns>
+
+                    </TableView>
+                </VBox>
+
+                <!-- Recent Payments -->
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="0"
+                      spacing="10"
+                      prefWidth="560"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Recent Payments"
+                           styleClass="dashboard-panel-title"/>
+
+                    <TableView fx:id="paymentTable" prefHeight="240" styleClass="dashboard-table">
+
+                        <columns>
+                            <TableColumn fx:id="paymentColDate" text="Date" prefWidth="100"/>
+                            <TableColumn fx:id="paymentColMonth" text="Month" prefWidth="90"/>
+                            <TableColumn fx:id="paymentColFlat" text="Flat" prefWidth="80"/>
+                            <TableColumn fx:id="paymentColTenant" text="Tenant" prefWidth="150"/>
+                            <TableColumn fx:id="paymentColPaid" text="Paid" prefWidth="100"/>
+                            <TableColumn fx:id="paymentColStatus" text="Status" prefWidth="100"/>
+                        </columns>
+
+                    </TableView>
+                </VBox>
+
+                <!-- Recent Repairs -->
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="1"
+                      GridPane.columnSpan="2"
+                      spacing="10"
+                      styleClass="dashboard-panel">
+
+                    <Label text="Recent Repairs"
+                           styleClass="dashboard-panel-title"/>
+
+                    <TableView fx:id="repairTable" prefHeight="240" styleClass="dashboard-table">
+
+                        <columns>
+                            <TableColumn fx:id="repairColDate" text="Date" prefWidth="100"/>
+                            <TableColumn fx:id="repairColFlat" text="Flat" prefWidth="80"/>
+                            <TableColumn fx:id="repairColCategory" text="Category" prefWidth="130"/>
+                            <TableColumn fx:id="repairColCost" text="Cost" prefWidth="100"/>
+                            <TableColumn fx:id="repairColPaidBy" text="Paid By" prefWidth="100"/>
+                            <TableColumn fx:id="repairColStatus" text="Status" prefWidth="100"/>
+                        </columns>
+
+                    </TableView>
+                </VBox>
+
+            </GridPane>
+
+        </VBox>
+    </content>
+
+</ScrollPane>

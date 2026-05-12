@@ -1,3 +1,113 @@
+/* ================= DASHBOARD ================= */
+
+.dashboard-root {
+    -fx-background-color: #f4f6f7;
+}
+
+.dashboard-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.dashboard-refresh-btn {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 14;
+}
+
+.dashboard-refresh-btn:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-cursor: hand;
+}
+
+.dashboard-card {
+    -fx-padding: 16;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 3);
+}
+
+.dashboard-card-title {
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 13px;
+}
+
+.dashboard-card-value {
+    -fx-text-fill: white;
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+}
+
+/* Card color variants */
+.card-blue {
+    -fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+}
+
+.card-green {
+    -fx-background-color: linear-gradient(to right, #16a34a, #15803d);
+}
+
+.card-orange {
+    -fx-background-color: linear-gradient(to right, #f97316, #ea580c);
+}
+
+.card-purple {
+    -fx-background-color: linear-gradient(to right, #7c3aed, #6d28d9);
+}
+
+.card-red {
+    -fx-background-color: linear-gradient(to right, #dc2626, #b91c1c);
+}
+
+.card-teal {
+    -fx-background-color: linear-gradient(to right, #0f766e, #115e59);
+}
+
+.card-slate {
+    -fx-background-color: linear-gradient(to right, #334155, #1e293b);
+}
+
+.card-pink {
+    -fx-background-color: linear-gradient(to right, #db2777, #be185d);
+}
+
+/* White panels for charts and tables */
+.dashboard-panel {
+    -fx-background-color: white;
+    -fx-padding: 16;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+}
+
+.dashboard-panel-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+/* Table polish */
+.dashboard-table {
+    -fx-background-radius: 10;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 10;
+}
+
+.dashboard-table .column-header-background {
+    -fx-background-color: #f3f4f6;
+}
+
+.dashboard-table .column-header,
+.dashboard-table .filler {
+    -fx-background-color: #f3f4f6;
+}
+
+.dashboard-table .column-header .label {
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+}
+
 /* SIDEBAR BUTTON BASE */
 .sidebar-btn {
     -fx-background-color: transparent;
@@ -32,4 +142,32 @@
 .page-back-btn:hover {
     -fx-background-color: #1f2937;
     -fx-text-fill: #f9fafb;
+}
+
+.dashboard-panel Label {
+    -fx-text-fill: #111827;
+}
+
+.dashboard-table {
+    -fx-text-fill: #111827;
+}
+
+.dashboard-table .table-cell {
+    -fx-text-fill: #111827;
+}
+
+.chart {
+    -fx-text-fill: #111827;
+}
+
+.chart-title {
+    -fx-text-fill: #111827;
+}
+
+.axis-label {
+    -fx-text-fill: #111827;
+}
+
+.chart-legend {
+    -fx-text-fill: #111827;
 }
