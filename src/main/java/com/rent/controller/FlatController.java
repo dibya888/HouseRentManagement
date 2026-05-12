@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.TableCell;
@@ -100,22 +101,31 @@ public class FlatController {
         });
     }
 
-    private void openViewFlat(Flat f) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Flat Details");
-        alert.setHeaderText("🏢 " + f.getFlatNo());
-        alert.setContentText(
-                "Bedrooms: " + f.getBedrooms() +
-                        "\nBathrooms: " + f.getBathrooms() +
-                        "\nKitchens: " + f.getKitchens() +
-                        "\nBalconies: " + f.getBalconies() +
-                        "\nDining Rooms: " + f.getDiningrooms() +
-                        "\nLiving Rooms: " + f.getLivingrooms() +
-                        "\nRent: ৳ " + f.getRent() +
-                        "\nStatus: " + f.getStatus()
-        );
-        alert.showAndWait();
+    private void openViewFlat(Flat flat) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/pages/view-flat.fxml")
+            );
+
+            Stage stage = new Stage();
+            stage.setTitle("Flat Details");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+            stage.setScene(new Scene(loader.load(), 420, 520));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            ViewFlatController controller = loader.getController();
+            controller.setFlat(flat);
+
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
     private void deleteFlat(Flat flat) {
 
@@ -146,6 +156,9 @@ public class FlatController {
 
             Stage stage = new Stage();
             stage.setTitle("Edit Flat");
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
             stage.setScene(new Scene(loader.load(), 420, 520));
             stage.initModality(Modality.APPLICATION_MODAL);
 
@@ -171,6 +184,9 @@ public class FlatController {
 
             Stage stage = new Stage();
             stage.setTitle("Add Flat");
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
             stage.setScene(new Scene(loader.load(), 400, 480));
             stage.setResizable(false);
 

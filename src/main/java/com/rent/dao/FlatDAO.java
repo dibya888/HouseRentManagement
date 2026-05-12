@@ -16,8 +16,8 @@ public class FlatDAO {
 
     private static final String INSERT_SQL =
             "INSERT INTO flats " +
-                    "(flat_no, bedrooms, bathrooms, kitchens, balconies, dining_rooms, living_rooms, rent, status) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "(flat_no, meter_no, bedrooms, bathrooms, kitchens, balconies, dining_rooms, living_rooms, rent, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static boolean deleteFlat(String flatNo) {
 
@@ -36,32 +36,33 @@ public class FlatDAO {
     }
 
     public static boolean updateFlat(Flat flat) {
-
         String sql = """
         UPDATE flats SET
-            bedrooms=?,
-            bathrooms=?,
-            kitchens=?,
-            balconies=?,
-            dining_rooms=?,
-            living_rooms=?,
-            rent=?,
-            status=?
+        meter_no=?,
+        bedrooms=?,
+        bathrooms=?,
+        kitchens=?,
+        balconies=?,
+        dining_rooms=?,
+        living_rooms=?,
+        rent=?,
+        status=?
         WHERE flat_no=?
         """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, flat.getBedrooms());
-            stmt.setInt(2, flat.getBathrooms());
-            stmt.setInt(3, flat.getKitchens());
-            stmt.setInt(4, flat.getBalconies());
-            stmt.setInt(5, flat.getDiningrooms());
-            stmt.setInt(6, flat.getLivingrooms());
-            stmt.setDouble(7, flat.getRent());
-            stmt.setString(8, flat.getStatus());
-            stmt.setString(9, flat.getFlatNo());
+            stmt.setString(1, flat.getMeterNo());
+            stmt.setInt(2, flat.getBedrooms());
+            stmt.setInt(3, flat.getBathrooms());
+            stmt.setInt(4, flat.getKitchens());
+            stmt.setInt(5, flat.getBalconies());
+            stmt.setInt(6, flat.getDiningrooms());
+            stmt.setInt(7, flat.getLivingrooms());
+            stmt.setDouble(8, flat.getRent());
+            stmt.setString(9, flat.getStatus());
+            stmt.setString(10, flat.getFlatNo());
 
             return stmt.executeUpdate() > 0;
 
@@ -84,6 +85,7 @@ public class FlatDAO {
             while (rs.next()) {
                 flats.add(new Flat(
                         rs.getString("flat_no"),
+                        rs.getString("meter_no"),
                         rs.getInt("bedrooms"),
                         rs.getInt("bathrooms"),
                         rs.getInt("kitchens"),
@@ -102,6 +104,26 @@ public class FlatDAO {
         return flats;
     }
 
+    // ✅ Get meter number using flat_no (used by Tenants table derived column)
+    public static String getMeterNoByFlatNo(String flatNo) {
+        String sql = "SELECT meter_no FROM flats WHERE flat_no=?";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, flatNo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("meter_no");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ""; // return empty if not found
+    }
+
 
     public static boolean saveFlat(Flat flat) {
 
@@ -109,14 +131,15 @@ public class FlatDAO {
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
 
             stmt.setString(1, flat.getFlatNo());
-            stmt.setInt(2, flat.getBedrooms());
-            stmt.setInt(3, flat.getBathrooms());
-            stmt.setInt(4, flat.getKitchens());
-            stmt.setInt(5, flat.getBalconies());
-            stmt.setInt(6, flat.getDiningrooms());
-            stmt.setInt(7, flat.getLivingrooms());
-            stmt.setDouble(8, flat.getRent());
-            stmt.setString(9, flat.getStatus());
+            stmt.setString(2, flat.getMeterNo());
+            stmt.setInt(3, flat.getBedrooms());
+            stmt.setInt(4, flat.getBathrooms());
+            stmt.setInt(5, flat.getKitchens());
+            stmt.setInt(6, flat.getBalconies());
+            stmt.setInt(7, flat.getDiningrooms());
+            stmt.setInt(8, flat.getLivingrooms());
+            stmt.setDouble(9, flat.getRent());
+            stmt.setString(10, flat.getStatus());
 
             stmt.executeUpdate();
             return true;

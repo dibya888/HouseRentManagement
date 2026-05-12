@@ -1,5 +1,6 @@
 package com.rent.controller;
 
+import com.rent.dao.FlatDAO;
 import com.rent.model.Tenant;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -22,6 +23,7 @@ public class ViewTenantController {
     @FXML private Label nidLabel;
     @FXML private Label flatLabel;
     @FXML private Label rentLabel;
+    @FXML private Label meterLabel;
     @FXML private Label addressLabel;
     @FXML private Label nidPathLabel;
     @FXML private Label docPathLabel;
@@ -41,6 +43,9 @@ public class ViewTenantController {
         emailLabel.setText(t.getEmail());
         nidLabel.setText(t.getNid());
         flatLabel.setText(t.getFlatNo());
+        meterLabel.setText(
+                FlatDAO.getMeterNoByFlatNo(t.getFlatNo())
+        );
         rentLabel.setText("৳ " + t.getRent());
         addressLabel.setText(t.getAddress());
 

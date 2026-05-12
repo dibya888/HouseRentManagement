@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 public class AddFlatController {
 
     @FXML private TextField flatNoField;
+    @FXML private TextField meterNoField;
     @FXML private TextField rentField;
 
     @FXML private Spinner<Integer> bedroomSpinner;
@@ -33,20 +34,32 @@ public class AddFlatController {
     @FXML
     private void handleSave() {
 
-        if (flatNoField.getText().isBlank() || rentField.getText().isBlank()) {
-            System.out.println("Flat No and Rent are required!");
+        // ✅ Validate all required fields including Meter No
+        if (flatNoField.getText().isBlank()
+                || meterNoField.getText().isBlank()
+                || rentField.getText().isBlank()) {
+            System.out.println("Flat No, Meter No and Rent are required!");
+            return;
+        }
+
+        double rent;
+        try {
+            rent = Double.parseDouble(rentField.getText().trim());
+        } catch (NumberFormatException ex) {
+            System.out.println("Invalid rent value!");
             return;
         }
 
         Flat flat = new Flat(
                 flatNoField.getText().trim(),
+                meterNoField.getText().trim(),   // ✅ METER NO (2nd arg)
                 bedroomSpinner.getValue(),
                 bathroomSpinner.getValue(),
                 kitchenSpinner.getValue(),
                 balconySpinner.getValue(),
                 diningSpinner.getValue(),
                 livingSpinner.getValue(),
-                Double.parseDouble(rentField.getText()),
+                rent,
                 "Available"
         );
 
@@ -59,6 +72,7 @@ public class AddFlatController {
             System.out.println("❌ Failed to save flat.");
         }
     }
+
 
     @FXML
     private void handleCancel() {

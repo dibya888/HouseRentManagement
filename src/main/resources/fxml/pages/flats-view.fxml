@@ -6,11 +6,11 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.FlatController"
-      spacing="15"
-      style="-fx-padding:20;">
+      spacing="16"
+      style="-fx-padding:20; -fx-background-color:#ffffff;">
 
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <HBox alignment="CENTER_LEFT" spacing="12">
         <Label text="🏢 Flat Management"
                style="-fx-font-size:20px; -fx-font-weight:bold;"/>
 
@@ -18,23 +18,40 @@
 
         <Button text="➕ Add Flat"
                 onAction="#handleAddFlat"
-                style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
+                style="
+                    -fx-background-color:#2563eb;
+                    -fx-text-fill:white;
+                    -fx-font-weight:bold;
+                    -fx-padding:6 14;
+                "/>
     </HBox>
+
+    <Separator/>
 
     <!-- Flats Table -->
     <TableView fx:id="flatTable">
 
         <columns>
-            <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="90"/>
+
+            <!-- Identity -->
+            <TableColumn fx:id="colFlatNo" text="Flat No" minWidth="90"/>
+            <TableColumn fx:id="colMeterNo" text="Meter No" minWidth="110"/>
+
+            <!-- Structure -->
             <TableColumn fx:id="colBeds" text="Beds" prefWidth="60"/>
             <TableColumn fx:id="colBaths" text="Baths" prefWidth="60"/>
-            <TableColumn fx:id="colKitchen" text="Kitchen" prefWidth="80"/>
-            <TableColumn fx:id="colBalcony" text="Balcony" prefWidth="80"/>
-            <TableColumn fx:id="colDining" text="Dining" prefWidth="80"/>
-            <TableColumn fx:id="colLiving" text="Living" prefWidth="80"/>
+            <TableColumn fx:id="colKitchen" text="Kitchen" prefWidth="70"/>
+            <TableColumn fx:id="colBalcony" text="Balcony" prefWidth="70"/>
+            <TableColumn fx:id="colDining" text="Dining" prefWidth="70"/>
+            <TableColumn fx:id="colLiving" text="Living" prefWidth="70"/>
+
+            <!-- Financial & Status -->
             <TableColumn fx:id="colRent" text="Rent" prefWidth="90"/>
-            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
-            <TableColumn fx:id="colAction" text="Action" prefWidth="200"/>
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+
+            <!-- Actions -->
+            <TableColumn fx:id="colAction" text="Actions" prefWidth="160"/>
+
         </columns>
 
     </TableView>

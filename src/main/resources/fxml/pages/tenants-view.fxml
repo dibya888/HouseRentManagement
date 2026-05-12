@@ -44,6 +44,7 @@
                     <TableColumn fx:id="colNid" text="NID" prefWidth="120"/>
                     <TableColumn fx:id="colAddress" text="Address" prefWidth="180"/>
                     <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
+                    <TableColumn fx:id="colMeterNo" text="Meter No" prefWidth="120"/>
                     <TableColumn fx:id="colRent" text="Rent" prefWidth="100"/>
                     <TableColumn fx:id="colAction" text="Actions" prefWidth="180"/>
                 </columns>

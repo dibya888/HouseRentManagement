@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS tenants (
 CREATE TABLE IF NOT EXISTS flats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     flat_no TEXT NOT NULL UNIQUE,
+    meter_no TEXT,
     bedrooms INTEGER,
     bathrooms INTEGER,
     kitchens INTEGER,

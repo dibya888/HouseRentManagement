@@ -18,6 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -32,6 +33,9 @@ import javafx.scene.layout.HBox;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TextField;
+import com.rent.dao.FlatDAO;
+import javafx.beans.property.SimpleStringProperty;
+
 
 
 public class TenantController {
@@ -59,6 +63,9 @@ public class TenantController {
 
     @FXML
     private TableColumn<Tenant, String> colFlatNo;
+
+    @FXML
+    private TableColumn<Tenant, String> colMeterNo;
 
     @FXML
     private TableColumn<Tenant, Double> colRent;
@@ -107,6 +114,20 @@ public class TenantController {
         colRent.setCellValueFactory(
                 new PropertyValueFactory<>("rent")
         );
+
+        // ✅ Derived column: Meter No comes from flats table using tenant.flatNo
+        colMeterNo.setCellValueFactory(cellData -> {
+            Tenant tenant = cellData.getValue();
+
+            // Safety: avoid null flat numbers
+            if (tenant == null || tenant.getFlatNo() == null || tenant.getFlatNo().isBlank()) {
+                return new SimpleStringProperty("");
+            }
+
+            String meterNo = FlatDAO.getMeterNoByFlatNo(tenant.getFlatNo());
+            return new SimpleStringProperty(meterNo == null ? "" : meterNo);
+        });
+
 
         // load data
         loadTenants();
@@ -167,6 +188,9 @@ public class TenantController {
 
             Stage stage = new Stage();
             stage.setTitle("Edit Tenant");
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
             stage.setScene(new Scene(root, 700, 500));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
@@ -190,6 +214,9 @@ public class TenantController {
 
             Stage stage = new Stage();
             stage.setTitle("Tenant Details");
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
             stage.setScene(new Scene(root, 700, 600));
             stage.setResizable(true);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -223,6 +250,10 @@ public class TenantController {
             Stage stage = new Stage();
 
             stage.setTitle("Add New Tenant");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
 
             stage.initModality(Modality.APPLICATION_MODAL);
 

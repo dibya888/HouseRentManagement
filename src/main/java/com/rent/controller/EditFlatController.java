@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 public class EditFlatController {
 
     @FXML private TextField flatNoField;
+    @FXML private TextField meterNoField;
     @FXML private TextField rentField;
 
     @FXML private Spinner<Integer> bedroomSpinner;
@@ -39,6 +40,7 @@ public class EditFlatController {
         this.flat = f;
 
         flatNoField.setText(f.getFlatNo());
+        meterNoField.setText(f.getMeterNo());
         bedroomSpinner.getValueFactory().setValue(f.getBedrooms());
         bathroomSpinner.getValueFactory().setValue(f.getBathrooms());
         kitchenSpinner.getValueFactory().setValue(f.getKitchens());
@@ -53,6 +55,7 @@ public class EditFlatController {
     private void handleUpdate() {
         Flat updated = new Flat(
                 flatNoField.getText(),
+                meterNoField.getText(),
                 bedroomSpinner.getValue(),
                 bathroomSpinner.getValue(),
                 kitchenSpinner.getValue(),

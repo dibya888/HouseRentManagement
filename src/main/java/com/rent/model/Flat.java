@@ -3,6 +3,7 @@ package com.rent.model;
 public class Flat {
 
     private String flatNo;
+    private String meterNo;
     private int bedrooms;
     private int bathrooms;
     private int kitchens;
@@ -13,6 +14,7 @@ public class Flat {
     private String status; // Available / Occupied
 
     public Flat(String flatNo,
+                String meterNo,
                 int bedrooms,
                 int bathrooms,
                 int kitchens,
@@ -23,6 +25,7 @@ public class Flat {
                 String status) {
 
         this.flatNo = flatNo;
+        this.meterNo = meterNo;
         this.bedrooms = bedrooms;
         this.bathrooms = bathrooms;
         this.kitchens = kitchens;
@@ -36,6 +39,8 @@ public class Flat {
     public String getFlatNo() {
         return flatNo;
     }
+
+    public String getMeterNo() { return meterNo;}
 
     public int getBedrooms() {
         return bedrooms;
