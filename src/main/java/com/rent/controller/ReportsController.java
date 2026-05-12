@@ -47,8 +47,9 @@ public class ReportsController {
     public void initialize() {
         setupComboBox();
         setupTable();
-        loadSummary();
+        loadOccupancySummary();
         loadReportRows();
+        applyReportFilter();
         monthPicker.valueProperty().addListener((obs, oldVal, newVal) -> applyReportFilter());
         fromDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyReportFilter());
         toDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyReportFilter());
@@ -69,7 +70,10 @@ public class ReportsController {
         ));
 
         reportTypeCombo.getSelectionModel().selectFirst();
-        reportTypeCombo.setOnAction(e -> applyReportFilter());
+        reportTypeCombo.setOnAction(e -> {
+            loadReportRows();
+            applyReportFilter();
+        });
     }
 
     private void setupTable() {
@@ -106,12 +110,36 @@ public class ReportsController {
     }
 
     private void loadReportRows() {
-        reportList.setAll(ReportDAO.getAllReportRows());
+        String type = reportTypeCombo.getValue();
+
+        if (type == null || type.equals("All Reports")) {
+            reportList.setAll(ReportDAO.getAllReportRows());
+            return;
+        }
+
+        switch (type) {
+            case "Monthly Income" ->
+                    reportList.setAll(ReportDAO.getMonthlyIncomeRows());
+
+            case "Flat-wise Income" ->
+                    reportList.setAll(ReportDAO.getFlatWiseIncomeRows());
+
+            case "Yearly Income" ->
+                    reportList.setAll(ReportDAO.getYearlyIncomeRows());
+
+            case "Tenant-wise Report" ->
+                    reportList.setAll(ReportDAO.getTenantWiseIncomeRows());
+
+            case "Due Rent" ->
+                    reportList.setAll(ReportDAO.getDueRentSummaryRows());
+
+            default ->
+                    reportList.setAll(ReportDAO.getAllReportRows());
+        }
     }
 
     @FXML
     private void generateReport() {
-        loadSummary();
         loadReportRows();
         applyReportFilter();
 
@@ -121,13 +149,17 @@ public class ReportsController {
 
     @FXML
     private void exportPdf() {
-        ReportSummary summary = ReportDAO.getSummary();
-        ReportPdfExporter.exportReport(summary, filteredList);
+        ReportSummary summary = buildSummaryFromFilteredRows();
+
+        javafx.collections.ObservableList<ReportRow> exportRows =
+                javafx.collections.FXCollections.observableArrayList(filteredList);
+
+        ReportPdfExporter.exportReport(summary, exportRows);
     }
 
     @FXML
     private void exportExcel() {
-        ReportSummary summary = ReportDAO.getSummary();
+        ReportSummary summary = buildSummaryFromFilteredRows();
 
         javafx.collections.ObservableList<ReportRow> exportRows =
                 javafx.collections.FXCollections.observableArrayList(filteredList);
@@ -151,6 +183,16 @@ public class ReportsController {
                         "Failed to print report.").show();
             }
         }
+    }
+
+    @FXML
+    private void clearFilters() {
+        reportTypeCombo.getSelectionModel().selectFirst();
+        monthPicker.setValue(null);
+        fromDatePicker.setValue(null);
+        toDatePicker.setValue(null);
+
+        applyReportFilter();
     }
 
     private String money(double value) {
@@ -230,5 +272,89 @@ public class ReportsController {
 
             return true;
         });
+
+        updateSummaryFromFilteredRows();
+    }
+
+    private void loadOccupancySummary() {
+        ReportSummary summary = ReportDAO.getSummary();
+
+        totalFlatsLabel.setText(String.valueOf(summary.getTotalFlats()));
+        occupiedFlatsLabel.setText(String.valueOf(summary.getOccupiedFlats()));
+        availableFlatsLabel.setText(String.valueOf(summary.getAvailableFlats()));
+        totalTenantsLabel.setText(String.valueOf(summary.getTotalTenants()));
+    }
+
+    private ReportSummary buildSummaryFromFilteredRows() {
+        ReportSummary summary = new ReportSummary();
+
+        if (filteredList == null) {
+            return summary;
+        }
+
+        double totalIncome = 0;
+        double totalDue = 0;
+        double monthIncome = 0;
+        double yearIncome = 0;
+
+        String currentMonth = java.time.YearMonth.now().toString();
+        String currentYear = String.valueOf(java.time.Year.now().getValue());
+
+        for (ReportRow row : filteredList) {
+            totalIncome += row.getPaid();
+            totalDue += row.getDue();
+
+            if (row.getMonth() != null && row.getMonth().equals(currentMonth)) {
+                monthIncome += row.getPaid();
+            }
+
+            if (row.getMonth() != null && row.getMonth().startsWith(currentYear + "-")) {
+                yearIncome += row.getPaid();
+            }
+        }
+
+        ReportSummary base = ReportDAO.getSummary();
+
+        summary.setTotalIncome(totalIncome);
+        summary.setMonthIncome(monthIncome);
+        summary.setYearIncome(yearIncome);
+        summary.setTotalDue(totalDue);
+
+        summary.setTotalFlats(base.getTotalFlats());
+        summary.setOccupiedFlats(base.getOccupiedFlats());
+        summary.setAvailableFlats(base.getAvailableFlats());
+        summary.setTotalTenants(base.getTotalTenants());
+
+        return summary;
+    }
+
+    private void updateSummaryFromFilteredRows() {
+        if (filteredList == null) return;
+
+        double totalIncome = 0;
+        double totalDue = 0;
+        double monthIncome = 0;
+        double yearIncome = 0;
+
+        String currentMonth = java.time.YearMonth.now().toString();
+        String currentYear = String.valueOf(java.time.Year.now().getValue());
+
+        for (ReportRow row : filteredList) {
+            totalIncome += row.getPaid();
+            totalDue += row.getDue();
+
+            if (row.getMonth() != null && row.getMonth().equals(currentMonth)) {
+                monthIncome += row.getPaid();
+            }
+
+            if (row.getMonth() != null && row.getMonth().startsWith(currentYear + "-")) {
+                yearIncome += row.getPaid();
+            }
+        }
+
+        totalIncomeLabel.setText(money(totalIncome));
+        monthIncomeLabel.setText(money(monthIncome));
+        yearIncomeLabel.setText(money(yearIncome));
+        totalDueLabel.setText(money(totalDue));
     }
 }

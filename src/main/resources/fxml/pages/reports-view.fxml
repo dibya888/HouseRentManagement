@@ -35,7 +35,7 @@
             <HBox spacing="10" alignment="CENTER_LEFT"
                   style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
 
-                <Label text="Report Type:"/>
+                <Label text="Report:"/>
                 <ComboBox fx:id="reportTypeCombo" prefWidth="180"/>
 
                 <Label text="Month:"/>
@@ -50,6 +50,10 @@
                 <Button text="Generate"
                         onAction="#generateReport"
                         style="-fx-background-color:#111827; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+                <Button text="Clear"
+                        onAction="#clearFilters"
+                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
             </HBox>
 
             <!-- Summary Cards -->
