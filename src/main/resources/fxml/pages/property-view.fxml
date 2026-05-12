@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.PropertyController"
+      spacing="20"
+      style="-fx-padding:24;">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="🏢 Properties"
+               style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ Add Property"
+                onAction="#addProperty"
+                styleClass="sidebar-btn-active"/>
+    </HBox>
+
+    <VBox fx:id="emptyStateBox"
+          spacing="10"
+          alignment="CENTER"
+          prefHeight="200"
+          style="-fx-border-color:#e5e7eb; -fx-border-radius:10; -fx-border-style:dashed;">
+
+        <Label text="No properties added yet"
+               style="-fx-font-size:16px; -fx-text-fill:#6b7280;"/>
+        <Label text="Click Add Property to create one."
+               style="-fx-text-fill:#9ca3af;"/>
+
+        <Button text="+ Add Property"
+                onAction="#addProperty"
+                styleClass="sidebar-btn-active"/>
+    </VBox>
+
+    <FlowPane fx:id="propertyContainer"
+              hgap="16"
+              vgap="16"
+              prefWrapLength="900"/>
+</VBox>

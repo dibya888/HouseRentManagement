@@ -54,6 +54,23 @@
                     maxWidth="Infinity"
                     styleClass="sidebar-btn"/>
 
+            <Button fx:id="btnSettings"
+                    text="Settings"
+                    onAction="#showSettings"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn"
+                    graphicTextGap="6">
+
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true">
+                        <image>
+                            <Image url="@/images/settings.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+
+            </Button>
+
             <!-- Logout -->
             <Button text="🚪 Logout"
                     fx:id="btnLogout"

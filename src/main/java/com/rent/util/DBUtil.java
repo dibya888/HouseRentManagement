@@ -158,6 +158,24 @@ CREATE TABLE IF NOT EXISTS rent_archive (
 """;
             stmt.execute(rentArchiveSql);
 
+            String propertiesSql = """
+CREATE TABLE IF NOT EXISTS properties (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    phone TEXT,
+    logo_path TEXT,
+    is_default INTEGER DEFAULT 0
+)
+""";
+            stmt.execute(propertiesSql);
+
+            try {
+                stmt.execute("ALTER TABLE flats ADD COLUMN property_id INTEGER");
+            } catch (Exception ignored) {
+                // column already exists → safe to ignore
+            }
+
             System.out.println("Database Ready");
 
         } catch (Exception e) {

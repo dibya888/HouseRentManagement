@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.AddPropertyController"
+      spacing="20"
+      style="-fx-padding:24;">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="➕ Add Property"
+               style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Close" onAction="#close" styleClass="sidebar-btn"/>
+    </HBox>
+
+    <VBox spacing="14"
+          maxWidth="560"
+          style="-fx-background-color:white;
+                 -fx-padding:20;
+                 -fx-background-radius:12;
+                 -fx-border-color:#e5e7eb;
+                 -fx-border-radius:12;">
+
+        <GridPane hgap="14" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints minWidth="140"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Property Name:"/>
+            <TextField fx:id="nameField" GridPane.columnIndex="1"/>
+
+            <Label text="Address:" GridPane.rowIndex="1"/>
+            <TextArea fx:id="addressField"
+                      prefRowCount="3"
+                      GridPane.rowIndex="1"
+                      GridPane.columnIndex="1"/>
+
+            <Label text="Phone:" GridPane.rowIndex="2"/>
+            <TextField fx:id="phoneField"
+                       GridPane.rowIndex="2"
+                       GridPane.columnIndex="1"/>
+
+            <CheckBox fx:id="defaultCheck"
+                      text="Set as default property"
+                      GridPane.rowIndex="3"
+                      GridPane.columnSpan="2"/>
+        </GridPane>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#close"/>
+        <Button text="Save Property"
+                onAction="#saveProperty"
+                styleClass="sidebar-btn-active"/>
+    </HBox>
+
+</VBox>

@@ -11,13 +11,19 @@ import javafx.event.ActionEvent;
 import java.util.prefs.Preferences;
 
 public class DashboardController {
+    private static DashboardController instance;
 
     @FXML
     private StackPane contentArea;
 
     @FXML
     public void initialize() {
+        instance = this;
         loadPage("/fxml/pages/dashboard-view.fxml");
+    }
+
+    public static DashboardController getInstance() {
+        return instance;
     }
 
     @FXML
@@ -45,7 +51,7 @@ public class DashboardController {
         loadPage("/fxml/pages/dashboard-view.fxml");
     }
 
-    private void loadPage(String fxmlPath) {
+    public void loadPage(String fxmlPath) {
 
         try {
 
@@ -62,6 +68,17 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    public void showSettings() {
+        loadPage("/fxml/pages/settings-view.fxml");
+    }
+
+    @FXML
+    public void showProperty() {
+        loadPage("/fxml/pages/property-view.fxml");
+    }
+
 
     @FXML
     public void handleLogout(ActionEvent event) {

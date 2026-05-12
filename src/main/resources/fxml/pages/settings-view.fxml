@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.SettingsController"
+      spacing="16"
+      style="-fx-padding:20;">
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+            <image>
+                <Image url="@/images/settings-blk.png"/>
+            </image>
+        </ImageView>
+        <Label text="Settings"
+               style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+    </HBox>
+
+    <Button text="🏢 Property"
+            onAction="#openProperty"
+            style="-fx-font-size:14px;"/>
+
+</VBox>
