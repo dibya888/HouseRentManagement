@@ -15,6 +15,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+
 public class DashboardHomeController {
 
     @FXML private Label totalFlatsLabel;
@@ -61,7 +64,11 @@ public class DashboardHomeController {
     }
 
     private void setupTables() {
-        dueColMonth.setCellValueFactory(new PropertyValueFactory<>("month"));
+        dueColMonth.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        formatMonth(cellData.getValue().getMonth())
+                )
+        );
         dueColFlat.setCellValueFactory(new PropertyValueFactory<>("flatNo"));
         dueColTenant.setCellValueFactory(new PropertyValueFactory<>("tenant"));
         dueColDue.setCellValueFactory(new PropertyValueFactory<>("due"));
@@ -83,7 +90,11 @@ public class DashboardHomeController {
         );
 
         paymentColDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        paymentColMonth.setCellValueFactory(new PropertyValueFactory<>("month"));
+        paymentColMonth.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        formatMonth(cellData.getValue().getMonth())
+                )
+        );
         paymentColFlat.setCellValueFactory(new PropertyValueFactory<>("flatNo"));
         paymentColTenant.setCellValueFactory(new PropertyValueFactory<>("tenant"));
         paymentColPaid.setCellValueFactory(new PropertyValueFactory<>("paid"));
@@ -128,6 +139,9 @@ public class DashboardHomeController {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
 
+        xAxis.setLabel("Month");
+        yAxis.setLabel("Income");
+
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
         chart.setLegendVisible(false);
         chart.setAnimated(false);
@@ -135,14 +149,19 @@ public class DashboardHomeController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         for (ChartItem item : DashboardDAO.getMonthlyIncomeChartData()) {
+            String displayMonth = formatMonth(item.getLabel());
+
             XYChart.Data<String, Number> data =
-                    new XYChart.Data<>(item.getLabel(), item.getValue());
+                    new XYChart.Data<>(displayMonth, item.getValue());
 
             series.getData().add(data);
-            setBarColor(data, "#2563eb"); // blue
+
+            // If you already added setBarColor helper
+            setBarColor(data, "#2563eb");
         }
 
         chart.getData().add(series);
+
         monthlyIncomeChartBox.getChildren().add(chart);
     }
 
@@ -186,7 +205,7 @@ public class DashboardHomeController {
 
         for (ChartItem item : DashboardDAO.getIncomeRepairChartData()) {
             XYChart.Data<String, Number> data =
-                    new XYChart.Data<>(item.getLabel(), item.getValue());
+                    new XYChart.Data<>(formatMonth(item.getLabel()), item.getValue());
 
             series.getData().add(data);
 
@@ -262,6 +281,16 @@ public class DashboardHomeController {
 
         if (data.getNode() != null) {
             data.getNode().setStyle("-fx-pie-color: " + color + ";");
+        }
+    }
+
+    private String formatMonth(String month) {
+        try {
+            if (month == null || month.isBlank()) return "";
+            return YearMonth.parse(month)
+                    .format(DateTimeFormatter.ofPattern("MMMM, yyyy"));
+        } catch (Exception e) {
+            return month;
         }
     }
 
