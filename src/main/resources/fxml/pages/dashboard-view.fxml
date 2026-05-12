@@ -10,10 +10,16 @@
             styleClass="dashboard-root">
 
     <content>
-        <VBox spacing="18"
-              style="-fx-padding:20; -fx-background-color:#f4f6f7;">
 
-            <!-- Header -->
+        <StackPane style="-fx-padding:20; -fx-background-color:#f4f6f7;">
+
+        <VBox spacing="18"
+              alignment="TOP_CENTER"
+              maxWidth="1180">
+
+
+
+        <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="10">
 
                 <Label text="📊 Dashboard"
@@ -29,7 +35,8 @@
             <!-- Summary Cards -->
             <FlowPane hgap="14"
                       vgap="14"
-                      prefWrapLength="1100">
+                      prefWrapLength="1100"
+                      alignment="CENTER">
 
                 <VBox prefWidth="210"
                       styleClass="dashboard-card"
@@ -90,7 +97,7 @@
             </FlowPane>
 
             <!-- Charts -->
-            <GridPane hgap="16" vgap="16">
+            <GridPane hgap="16" vgap="16" alignment="CENTER">
 
                 <VBox GridPane.columnIndex="0"
                       GridPane.rowIndex="0"
@@ -150,7 +157,7 @@
             </GridPane>
 
             <!-- Recent Tables -->
-            <GridPane hgap="16" vgap="16">
+            <GridPane hgap="16" vgap="16" alignment="CENTER">
 
                 <!-- Recent Due Rent -->
                 <VBox GridPane.columnIndex="0"
@@ -226,6 +233,8 @@
             </GridPane>
 
         </VBox>
+
+        </StackPane>
     </content>
 
 </ScrollPane>

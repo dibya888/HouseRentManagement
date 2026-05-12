@@ -171,3 +171,42 @@
 .chart-legend {
     -fx-text-fill: #111827;
 }
+
+/* ================= DASHBOARD CHART POLISH ================= */
+
+.chart {
+    -fx-padding: 6;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: #e5e7eb;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #e5e7eb;
+}
+
+.axis {
+    -fx-tick-label-fill: #374151;
+}
+
+.axis-label {
+    -fx-text-fill: #111827;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: #111827;
+}
+
+.chart-pie-label {
+    -fx-fill: #111827;
+    -fx-font-size: 11px;
+}

@@ -135,7 +135,11 @@ public class DashboardHomeController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         for (ChartItem item : DashboardDAO.getMonthlyIncomeChartData()) {
-            series.getData().add(new XYChart.Data<>(item.getLabel(), item.getValue()));
+            XYChart.Data<String, Number> data =
+                    new XYChart.Data<>(item.getLabel(), item.getValue());
+
+            series.getData().add(data);
+            setBarColor(data, "#2563eb"); // blue
         }
 
         chart.getData().add(series);
@@ -148,10 +152,18 @@ public class DashboardHomeController {
         PieChart chart = new PieChart();
 
         for (ChartItem item : DashboardDAO.getPaidDueChartData()) {
-            chart.getData().add(new PieChart.Data(
+            PieChart.Data data = new PieChart.Data(
                     item.getLabel() + " - " + money(item.getValue()),
                     item.getValue()
-            ));
+            );
+
+            chart.getData().add(data);
+
+            if ("Paid".equalsIgnoreCase(item.getLabel())) {
+                setPieColor(data, "#16a34a"); // green
+            } else if ("Due".equalsIgnoreCase(item.getLabel())) {
+                setPieColor(data, "#dc2626"); // red
+            }
         }
 
         chart.setLegendVisible(true);
@@ -173,7 +185,16 @@ public class DashboardHomeController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         for (ChartItem item : DashboardDAO.getIncomeRepairChartData()) {
-            series.getData().add(new XYChart.Data<>(item.getLabel(), item.getValue()));
+            XYChart.Data<String, Number> data =
+                    new XYChart.Data<>(item.getLabel(), item.getValue());
+
+            series.getData().add(data);
+
+            if ("Income".equalsIgnoreCase(item.getLabel())) {
+                setBarColor(data, "#16a34a"); // green
+            } else {
+                setBarColor(data, "#f97316"); // orange
+            }
         }
 
         chart.getData().add(series);
@@ -186,10 +207,18 @@ public class DashboardHomeController {
         PieChart chart = new PieChart();
 
         for (ChartItem item : DashboardDAO.getOccupancyChartData()) {
-            chart.getData().add(new PieChart.Data(
+            PieChart.Data data = new PieChart.Data(
                     item.getLabel() + " - " + (int) item.getValue(),
                     item.getValue()
-            ));
+            );
+
+            chart.getData().add(data);
+
+            if ("Occupied".equalsIgnoreCase(item.getLabel())) {
+                setPieColor(data, "#16a34a"); // green
+            } else if ("Available".equalsIgnoreCase(item.getLabel())) {
+                setPieColor(data, "#0f766e"); // teal
+            }
         }
 
         chart.setLegendVisible(true);
@@ -210,6 +239,30 @@ public class DashboardHomeController {
         repairTable.setItems(FXCollections.observableArrayList(
                 DashboardDAO.getRecentRepairs()
         ));
+    }
+
+    private void setBarColor(XYChart.Data<String, Number> data, String color) {
+        data.nodeProperty().addListener((obs, oldNode, node) -> {
+            if (node != null) {
+                node.setStyle("-fx-bar-fill: " + color + ";");
+            }
+        });
+
+        if (data.getNode() != null) {
+            data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+        }
+    }
+
+    private void setPieColor(PieChart.Data data, String color) {
+        data.nodeProperty().addListener((obs, oldNode, node) -> {
+            if (node != null) {
+                node.setStyle("-fx-pie-color: " + color + ";");
+            }
+        });
+
+        if (data.getNode() != null) {
+            data.getNode().setStyle("-fx-pie-color: " + color + ";");
+        }
     }
 
     private String money(double value) {
