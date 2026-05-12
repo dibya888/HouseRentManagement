@@ -48,7 +48,7 @@ public class DashboardController {
 
     @FXML
     public void showReports() {
-        loadPage("/fxml/pages/dashboard-view.fxml");
+        loadPage("/fxml/pages/reports-view.fxml");
     }
 
     public void loadPage(String fxmlPath) {

@@ -1,43 +1,43 @@
 package com.rent.controller;
 
 import com.rent.model.RentRow;
-import javafx.scene.control.Alert;
 import com.rent.util.DBUtil;
-import javafx.scene.control.Separator;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
-import javafx.scene.transform.Rotate;
+import javafx.scene.control.Alert;
+import javafx.stage.FileChooser;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
+import org.apache.pdfbox.util.Matrix;
+
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.print.PageLayout;
-import javafx.print.PageOrientation;
-import javafx.print.Paper;
-import javafx.print.Printer;
-import javafx.print.PrinterJob;
-import javafx.scene.Node;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReceiptPrinter {
+
+    private static final PDType1Font FONT_REGULAR =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+
+    private static final PDType1Font FONT_BOLD =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
     public static void printReceipt(
             RentRow row,
@@ -49,263 +49,343 @@ public class ReceiptPrinter {
             return;
         }
 
-        Printer printer = Printer.getDefaultPrinter();
-        if (printer == null) {
-            new Alert(Alert.AlertType.ERROR, "No printer found.").show();
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Receipt PDF");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+        );
+
+        String safeMonth = row.getBillMonth() == null ? "receipt" : row.getBillMonth();
+        String safeFlat = row.getFlatNo() == null ? "flat" : row.getFlatNo().replaceAll("[\\\\/:*?\"<>|]", "_");
+
+        chooser.setInitialFileName("Receipt_" + safeFlat + "_" + safeMonth + ".pdf");
+
+        File file = chooser.showSaveDialog(null);
+
+        if (file == null) {
             return;
         }
 
-        PrinterJob job = PrinterJob.createPrinterJob(printer);
-        if (job == null) {
-            new Alert(Alert.AlertType.ERROR, "Failed to create print job.").show();
-            return;
+        if (!file.getName().toLowerCase().endsWith(".pdf")) {
+            file = new File(file.getAbsolutePath() + ".pdf");
         }
 
-        PageLayout layout = createA5Layout(printer);
-        Node receiptNode = buildReceiptNode(row, layout, includePropertyName, includePropertyAddress);
-
-        boolean printed = job.printPage(layout, receiptNode);
-
-        if (printed) {
-            job.endJob();
-        } else {
-            job.cancelJob();
-        }
-    }
-
-    private static PageLayout createA5Layout(Printer printer) {
         try {
-            return printer.createPageLayout(
-                    Paper.A5,
-                    PageOrientation.PORTRAIT,
-                    Printer.MarginType.HARDWARE_MINIMUM
-            );
+            createReceiptPdf(row, includePropertyName, includePropertyAddress, file);
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Receipt PDF saved successfully:\n" + file.getAbsolutePath()
+            ).show();
+
         } catch (Exception e) {
-            return printer.getDefaultPageLayout();
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Failed to save receipt PDF.").show();
         }
     }
 
-    private static Node buildReceiptNode(
+    private static void createReceiptPdf(
             RentRow row,
-            PageLayout layout,
             boolean includePropertyName,
-            boolean includePropertyAddress
-    ) {
-        double width = layout.getPrintableWidth();
-        double height = layout.getPrintableHeight();
+            boolean includePropertyAddress,
+            File outputFile
+    ) throws Exception {
 
-        StackPane root = new StackPane();
-        root.setPrefSize(width, height);
-        root.setMinSize(width, height);
-        root.setMaxSize(width, height);
-        root.setStyle("-fx-background-color:white;");
+        try (PDDocument doc = new PDDocument()) {
 
-        Node paidStamp = buildPaidStamp();
-        StackPane.setAlignment(paidStamp, Pos.CENTER);
+            PDPage page = new PDPage(PDRectangle.A5);
+            doc.addPage(page);
 
-        VBox content = new VBox(9);
-        content.setPadding(new Insets(12));
-        content.setPrefSize(width, height);
-        content.setFillWidth(true);
+            PDRectangle mediaBox = page.getMediaBox();
+            float pageWidth = mediaBox.getWidth();
+            float pageHeight = mediaBox.getHeight();
 
-        VBox header = buildHeader(row, width, includePropertyName, includePropertyAddress);
+            try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
 
-        Separator sep1 = new Separator();
+                float margin = 34;
+                float contentWidth = pageWidth - (margin * 2);
+                float y = pageHeight - 28;
 
-        GridPane meta = buildMetaBlock(row, width);
+                drawPaidWatermark(doc, cs, pageWidth / 2f, pageHeight / 2f);
 
-        Separator sep2 = new Separator();
+                y = drawLogo(doc, cs, pageWidth, y);
 
-        GridPane billTable = buildBillTable(row, width);
+                PropertyInfo property = fetchPropertyForFlat(row.getFlatNo());
 
-        Separator sep3 = new Separator();
+                if (includePropertyName && !isBlank(property.name)) {
+                    y -= 6;
+                    y = drawCenteredText(cs, property.name, FONT_BOLD, 12.5f, pageWidth / 2f, y);
+                }
 
-        Text totalText = new Text("TOTAL AMOUNT: ৳ " + formatMoney(row.getTotal()));
-        totalText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-        totalText.setFill(Color.web("#111827"));
+                if (includePropertyAddress && !isBlank(property.address)) {
+                    y -= 4;
+                    List<String> addressLines = wrapText(property.address, FONT_REGULAR, 9.5f, contentWidth);
+                    for (String line : addressLines) {
+                        y = drawCenteredText(cs, line, FONT_REGULAR, 9.5f, pageWidth / 2f, y);
+                    }
+                }
 
-        Text wordsText = new Text("In Words: " + amountToWordsBDT(row.getTotal()));
-        wordsText.setFont(Font.font("Segoe UI", 10.5));
-        wordsText.setFill(Color.web("#374151"));
-        wordsText.setWrappingWidth(width - 24);
+                y -= 8;
+                drawLine(cs, margin, y, pageWidth - margin, y);
+                y -= 18;
 
-        Separator sep4 = new Separator();
+                String billMonthPretty = YearMonth.parse(row.getBillMonth())
+                        .format(DateTimeFormatter.ofPattern("MMMM, yyyy"));
 
-        VBox footer = buildFooter();
+                String paymentDate = LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-        content.getChildren().addAll(
-                header,
-                sep1,
-                meta,
-                sep2,
-                billTable,
-                sep3,
-                totalText,
-                wordsText,
-                sep4,
-                footer
-        );
+                float leftX = margin;
+                float rightX = pageWidth / 2f + 12;
 
-        root.getChildren().addAll(paidStamp, content);
-        return root;
+                float metaYStart = y;
+
+                y = drawKeyValue(cs, "Tenant:", row.getTenantName(), leftX, y);
+                y = drawKeyValue(cs, "Mobile:", row.getPhone(), leftX, y);
+                y = drawKeyValue(cs, "Flat No:", row.getFlatNo(), leftX, y);
+                y = drawKeyValue(cs, "Meter No:", row.getMeterNo(), leftX, y);
+
+                float rightY = metaYStart;
+                rightY = drawKeyValue(cs, "Bill Month:", billMonthPretty, rightX, rightY);
+                rightY = drawKeyValue(cs, "Payment Date:", paymentDate, rightX, rightY);
+
+                y = Math.min(y, rightY) - 10;
+
+                drawLine(cs, margin, y, pageWidth - margin, y);
+                y -= 18;
+
+                y = drawBillRow(cs, "House Rent", row.getHouseRent(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Electricity", row.getElectricity(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Water", row.getWater(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Gas", row.getGas(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Other Bills", row.getOtherBills(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Fine", row.getFine(), margin, pageWidth - margin, y);
+                y = drawBillRow(cs, "Discount", -row.getDiscount(), margin, pageWidth - margin, y);
+
+                y -= 6;
+                drawLine(cs, margin, y, pageWidth - margin, y);
+                y -= 18;
+
+                String total = "TOTAL AMOUNT: Tk. " + formatMoney(row.getTotal());
+                drawText(cs, total, FONT_BOLD, 13.5f, margin, y);
+                y -= 18;
+
+                String words = "In Words: " + amountToWordsBDT(row.getTotal());
+                List<String> wordLines = wrapText(words, FONT_REGULAR, 9.5f, contentWidth);
+
+                for (String line : wordLines) {
+                    drawText(cs, line, FONT_REGULAR, 9.5f, margin, y);
+                    y -= 12;
+                }
+
+                float footerY = 28;
+                drawLine(cs, margin, footerY + 12, pageWidth - margin, footerY + 12);
+
+                String footer = "This is a system-generated receipt. No signature required. Thank you.";
+                drawCenteredText(cs, footer, FONT_REGULAR, 7.8f, pageWidth / 2f, footerY);
+            }
+
+            doc.save(outputFile);
+        }
     }
 
-    private static VBox buildHeader(
-            RentRow row,
-            double width,
-            boolean includePropertyName,
-            boolean includePropertyAddress
+    private static float drawLogo(
+            PDDocument doc,
+            PDPageContentStream cs,
+            float pageWidth,
+            float y
     ) {
-        VBox header = new VBox(4);
-        header.setAlignment(Pos.CENTER);
+        try (InputStream in = ReceiptPrinter.class.getResourceAsStream("/images/app-logo.png")) {
+            if (in == null) {
+                return y;
+            }
 
-        Image logoImage = new Image(
-                ReceiptPrinter.class.getResourceAsStream("/images/app-logo.png")
-        );
+            BufferedImage img = ImageIO.read(in);
+            if (img == null) {
+                return y;
+            }
 
-        ImageView logo = new ImageView(logoImage);
-        logo.setPreserveRatio(true);
-        logo.setFitHeight(52);
+            PDImageXObject logo = LosslessFactory.createFromImage(doc, img);
 
-        header.getChildren().add(logo);
+            float logoHeight = 42;
+            float logoWidth = logoHeight * ((float) img.getWidth() / img.getHeight());
+            float x = (pageWidth - logoWidth) / 2f;
 
-        PropertyInfo propertyInfo = fetchPropertyForFlat(row.getFlatNo());
+            cs.drawImage(logo, x, y - logoHeight, logoWidth, logoHeight);
 
-        if (includePropertyName) {
-            Text name = new Text(nullSafe(propertyInfo.name));
-            name.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
-            name.setTextAlignment(TextAlignment.CENTER);
-            header.getChildren().add(name);
+            return y - logoHeight - 8;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return y;
+        }
+    }
+
+    private static void drawPaidWatermark(
+            PDDocument doc,
+            PDPageContentStream cs,
+            float centerX,
+            float centerY
+    ) throws Exception {
+
+        PDExtendedGraphicsState gs = new PDExtendedGraphicsState();
+        gs.setStrokingAlphaConstant(0.16f);
+        gs.setNonStrokingAlphaConstant(0.16f);
+
+        cs.saveGraphicsState();
+        cs.setGraphicsStateParameters(gs);
+        cs.transform(Matrix.getRotateInstance(Math.toRadians(-12), centerX, centerY));
+
+        cs.setStrokingColor(new Color(34, 197, 94));
+        cs.setNonStrokingColor(new Color(34, 197, 94));
+
+        drawCircle(cs, centerX, centerY, 58);
+        drawCircle(cs, centerX, centerY, 44);
+
+        String paid = "PAID";
+        float fontSize = 30;
+        float textWidth = textWidth(paid, FONT_BOLD, fontSize);
+
+        cs.beginText();
+        cs.setFont(FONT_BOLD, fontSize);
+        cs.newLineAtOffset(centerX - textWidth / 2f, centerY - 10);
+        cs.showText(paid);
+        cs.endText();
+
+        cs.restoreGraphicsState();
+    }
+
+    private static void drawCircle(
+            PDPageContentStream cs,
+            float cx,
+            float cy,
+            float r
+    ) throws Exception {
+        float k = 0.552284749831f;
+        float c = r * k;
+
+        cs.moveTo(cx + r, cy);
+        cs.curveTo(cx + r, cy + c, cx + c, cy + r, cx, cy + r);
+        cs.curveTo(cx - c, cy + r, cx - r, cy + c, cx - r, cy);
+        cs.curveTo(cx - r, cy - c, cx - c, cy - r, cx, cy - r);
+        cs.curveTo(cx + c, cy - r, cx + r, cy - c, cx + r, cy);
+        cs.closePath();
+        cs.stroke();
+    }
+
+    private static float drawKeyValue(
+            PDPageContentStream cs,
+            String key,
+            String value,
+            float x,
+            float y
+    ) throws Exception {
+        drawText(cs, key + " " + nullSafe(value), FONT_REGULAR, 9.5f, x, y);
+        return y - 13;
+    }
+
+    private static float drawBillRow(
+            PDPageContentStream cs,
+            String label,
+            double amount,
+            float leftX,
+            float rightX,
+            float y
+    ) throws Exception {
+        drawText(cs, label, FONT_REGULAR, 10f, leftX, y);
+
+        String money = "Tk. " + formatMoney(amount);
+        float moneyWidth = textWidth(money, FONT_REGULAR, 10f);
+        drawText(cs, money, FONT_REGULAR, 10f, rightX - moneyWidth, y);
+
+        return y - 13;
+    }
+
+    private static void drawText(
+            PDPageContentStream cs,
+            String text,
+            PDType1Font font,
+            float size,
+            float x,
+            float y
+    ) throws Exception {
+        cs.beginText();
+        cs.setFont(font, size);
+        cs.newLineAtOffset(x, y);
+        cs.showText(safePdfText(text));
+        cs.endText();
+    }
+
+    private static float drawCenteredText(
+            PDPageContentStream cs,
+            String text,
+            PDType1Font font,
+            float size,
+            float centerX,
+            float y
+    ) throws Exception {
+        String safe = safePdfText(text);
+        float width = textWidth(safe, font, size);
+        drawText(cs, safe, font, size, centerX - width / 2f, y);
+        return y - (size + 3);
+    }
+
+    private static void drawLine(
+            PDPageContentStream cs,
+            float x1,
+            float y1,
+            float x2,
+            float y2
+    ) throws Exception {
+        cs.setStrokingColor(new Color(209, 213, 219));
+        cs.setLineWidth(0.6f);
+        cs.moveTo(x1, y1);
+        cs.lineTo(x2, y2);
+        cs.stroke();
+        cs.setStrokingColor(Color.BLACK);
+    }
+
+    private static List<String> wrapText(
+            String text,
+            PDType1Font font,
+            float size,
+            float maxWidth
+    ) throws Exception {
+        List<String> lines = new ArrayList<>();
+
+        if (isBlank(text)) {
+            return lines;
         }
 
-        if (includePropertyAddress) {
-            Text address = new Text(nullSafe(propertyInfo.address));
-            address.setFont(Font.font("Segoe UI", 10.5));
-            address.setFill(Color.web("#4b5563"));
-            address.setTextAlignment(TextAlignment.CENTER);
-            address.setWrappingWidth(width - 24);
-            header.getChildren().add(address);
+        String[] words = safePdfText(text).split("\\s+");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            String candidate = line.isEmpty() ? word : line + " " + word;
+
+            if (textWidth(candidate, font, size) <= maxWidth) {
+                line = new StringBuilder(candidate);
+            } else {
+                if (!line.isEmpty()) {
+                    lines.add(line.toString());
+                }
+                line = new StringBuilder(word);
+            }
         }
 
-        return header;
+        if (!line.isEmpty()) {
+            lines.add(line.toString());
+        }
+
+        return lines;
     }
 
-    private static GridPane buildMetaBlock(RentRow row, double width) {
-        GridPane meta = new GridPane();
-        meta.setHgap(16);
-        meta.setVgap(6);
-
-        ColumnConstraints leftCol = new ColumnConstraints((width - 24) * 0.55);
-        ColumnConstraints rightCol = new ColumnConstraints((width - 24) * 0.45);
-
-        meta.getColumnConstraints().addAll(leftCol, rightCol);
-
-        String billMonth = YearMonth.parse(row.getBillMonth())
-                .format(DateTimeFormatter.ofPattern("MMMM, yyyy"));
-
-        String paymentDate = LocalDate.now()
-                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        VBox left = new VBox(4);
-        left.getChildren().add(line("Tenant:", row.getTenantName()));
-        left.getChildren().add(line("Mobile:", row.getPhone()));
-        left.getChildren().add(line("Flat No:", row.getFlatNo()));
-        left.getChildren().add(line("Meter No:", row.getMeterNo()));
-
-        VBox right = new VBox(4);
-        right.getChildren().add(line("Bill Month:", billMonth));
-        right.getChildren().add(line("Payment Date:", paymentDate));
-
-        meta.add(left, 0, 0);
-        meta.add(right, 1, 0);
-
-        return meta;
-    }
-
-    private static GridPane buildBillTable(RentRow row, double width) {
-        GridPane table = new GridPane();
-        table.setHgap(10);
-        table.setVgap(6);
-
-        ColumnConstraints labelCol = new ColumnConstraints((width - 24) * 0.60);
-        ColumnConstraints amountCol = new ColumnConstraints((width - 24) * 0.40);
-        amountCol.setHalignment(HPos.RIGHT);
-
-        table.getColumnConstraints().addAll(labelCol, amountCol);
-
-        int r = 0;
-        r = addBillRow(table, r, "House Rent", row.getHouseRent());
-        r = addBillRow(table, r, "Electricity", row.getElectricity());
-        r = addBillRow(table, r, "Water", row.getWater());
-        r = addBillRow(table, r, "Gas", row.getGas());
-        r = addBillRow(table, r, "Other Bills", row.getOtherBills());
-        r = addBillRow(table, r, "Fine", row.getFine());
-        addBillRow(table, r, "Discount", -row.getDiscount());
-
-        return table;
-    }
-
-    private static Node buildPaidStamp() {
-        StackPane stamp = new StackPane();
-        stamp.setMouseTransparent(true);
-
-        Circle circle = new Circle(118);
-        circle.setFill(Color.TRANSPARENT);
-        circle.setStroke(Color.web("#22c55e"));
-        circle.setStrokeWidth(7);
-        circle.setOpacity(0.16);
-
-        Text paidText = new Text("PAID");
-        paidText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 58));
-        paidText.setFill(Color.web("#22c55e"));
-        paidText.setOpacity(0.14);
-
-        stamp.getChildren().addAll(circle, paidText);
-        stamp.getTransforms().add(new Rotate(-12));
-
-        return stamp;
-    }
-
-    private static VBox buildFooter() {
-        Text line1 = new Text("This is a system-generated receipt.");
-        line1.setFont(Font.font("Segoe UI", 10));
-        line1.setFill(Color.web("#6b7280"));
-
-        Text line2 = new Text("No signature required. Thank you.");
-        line2.setFont(Font.font("Segoe UI", 10));
-        line2.setFill(Color.web("#6b7280"));
-
-        VBox footer = new VBox(2, line1, line2);
-        footer.setAlignment(Pos.CENTER);
-
-        return footer;
-    }
-
-    private static VBox line(String key, String value) {
-        Text k = new Text(key + " ");
-        k.setFont(Font.font("Segoe UI", FontWeight.BOLD, 10.5));
-        k.setFill(Color.web("#111827"));
-
-        Text v = new Text(nullSafe(value));
-        v.setFont(Font.font("Segoe UI", 10.5));
-        v.setFill(Color.web("#111827"));
-
-        return new VBox(new TextFlow(k, v));
-    }
-
-    private static int addBillRow(GridPane table, int rowIndex, String label, double amount) {
-        Text labelText = new Text(label);
-        labelText.setFont(Font.font("Segoe UI", 10.5));
-        labelText.setFill(Color.web("#111827"));
-
-        Text amountText = new Text("৳ " + formatMoney(amount));
-        amountText.setFont(Font.font("Segoe UI", 10.5));
-        amountText.setFill(Color.web("#111827"));
-
-        table.add(labelText, 0, rowIndex);
-        table.add(amountText, 1, rowIndex);
-
-        return rowIndex + 1;
+    private static float textWidth(
+            String text,
+            PDType1Font font,
+            float size
+    ) throws Exception {
+        return font.getStringWidth(safePdfText(text)) / 1000f * size;
     }
 
     private static PropertyInfo fetchPropertyForFlat(String flatNo) {
@@ -345,6 +425,23 @@ public class ReceiptPrinter {
         return value == null ? "" : value;
     }
 
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private static String safePdfText(String text) {
+        if (text == null) return "";
+
+        return text
+                .replace("৳", "Tk.")
+                .replace("–", "-")
+                .replace("—", "-")
+                .replace("“", "\"")
+                .replace("”", "\"")
+                .replace("‘", "'")
+                .replace("’", "'");
+    }
+
     private static String amountToWordsBDT(double amount) {
         long taka = (long) Math.floor(amount);
         long paisa = Math.round((amount - taka) * 100);
@@ -362,13 +459,8 @@ public class ReceiptPrinter {
     }
 
     private static String numberToWords(long number) {
-        if (number == 0) {
-            return "";
-        }
-
-        if (number < 20) {
-            return BELOW_TWENTY[(int) number];
-        }
+        if (number == 0) return "";
+        if (number < 20) return BELOW_TWENTY[(int) number];
 
         if (number < 100) {
             return TENS[(int) number / 10]

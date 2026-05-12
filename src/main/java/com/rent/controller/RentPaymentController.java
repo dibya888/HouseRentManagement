@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -123,6 +124,7 @@ public class RentPaymentController {
 
             Stage stage = new Stage();
             stage.setTitle("Print Receipt Options");
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
             stage.initModality(Modality.APPLICATION_MODAL);
 
             Scene scene = new Scene(loader.load(), 360, 260);

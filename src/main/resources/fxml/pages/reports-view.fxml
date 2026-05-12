@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.ReportsController"
+            style="-fx-background-color:#f4f6f7;">
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:20;">
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📈 Reports"
+                       style="-fx-font-size:22px; -fx-font-weight:bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="Export PDF"
+                        onAction="#exportPdf"
+                        style="-fx-background-color:#dc2626; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+                <Button text="Export Excel"
+                        onAction="#exportExcel"
+                        style="-fx-background-color:#16a34a; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+                <Button text="Print"
+                        onAction="#printReport"
+                        style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <!-- Filter Area -->
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
+
+                <Label text="Report Type:"/>
+                <ComboBox fx:id="reportTypeCombo" prefWidth="180"/>
+
+                <Label text="Month:"/>
+                <DatePicker fx:id="monthPicker" prefWidth="150"/>
+
+                <Label text="From:"/>
+                <DatePicker fx:id="fromDatePicker" prefWidth="150"/>
+
+                <Label text="To:"/>
+                <DatePicker fx:id="toDatePicker" prefWidth="150"/>
+
+                <Button text="Generate"
+                        onAction="#generateReport"
+                        style="-fx-background-color:#111827; -fx-text-fill:white; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <!-- Summary Cards -->
+            <GridPane hgap="14" vgap="14">
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Total Income" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalIncomeLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="This Month Income" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="monthIncomeLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <Label text="This Year Income" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="yearIncomeLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="3" GridPane.rowIndex="0">
+                    <Label text="Total Due" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalDueLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label text="Total Flats" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalFlatsLabel"
+                           text="0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label text="Occupied Flats" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="occupiedFlatsLabel"
+                           text="0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <Label text="Available Flats" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="availableFlatsLabel"
+                           text="0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="3" GridPane.rowIndex="1">
+                    <Label text="Total Tenants" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalTenantsLabel"
+                           text="0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+            </GridPane>
+
+            <!-- Report Table -->
+            <TableView fx:id="reportTable">
+                <columns>
+                    <TableColumn fx:id="colTitle" text="Title" prefWidth="180"/>
+                    <TableColumn fx:id="colMonth" text="Month" prefWidth="100"/>
+                    <TableColumn fx:id="colDate" text="Date" prefWidth="110"/>
+                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
+                    <TableColumn fx:id="colTenant" text="Tenant" prefWidth="160"/>
+                    <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
+                    <TableColumn fx:id="colPaid" text="Paid" prefWidth="120"/>
+                    <TableColumn fx:id="colDue" text="Due" prefWidth="120"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>
