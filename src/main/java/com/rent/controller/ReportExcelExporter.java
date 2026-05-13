@@ -101,7 +101,7 @@ public class ReportExcelExporter {
         rowIndex = createSummaryRow(sheet, rowIndex, "Tenant Paid Repairs", summary.getTenantPaidRepairCost(), headerStyle, moneyStyle);
         rowIndex = createSummaryRow(sheet, rowIndex, "This Month Repair", summary.getMonthRepairCost(), headerStyle, moneyStyle);
         rowIndex = createSummaryRow(sheet, rowIndex, "This Year Repair", summary.getYearRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Net Profit", summary.getNetProfit(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "Net Income", summary.getNetProfit(), headerStyle, moneyStyle);
 
         rowIndex++;
 

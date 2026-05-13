@@ -29,7 +29,7 @@ public class DashboardDAO {
             summary.setTotalTenants(getInt(conn, "SELECT COUNT(*) FROM tenants"));
 
             double monthIncome = getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive WHERE bill_month=?",
+                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month=?",
                     currentMonth);
 
             double totalDue = getDouble(conn,
@@ -60,7 +60,7 @@ public class DashboardDAO {
         List<ChartItem> list = new ArrayList<>();
 
         String sql = """
-                SELECT bill_month, COALESCE(SUM(paid_amount), 0) AS income
+                SELECT bill_month, COALESCE(SUM(house_rent), 0) AS income
                 FROM rent_archive
                 GROUP BY bill_month
                 ORDER BY bill_month DESC
@@ -133,7 +133,7 @@ public class DashboardDAO {
 
         try (Connection conn = DBUtil.connect()) {
             double income = getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive WHERE bill_month=?",
+                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month=?",
                     currentMonth);
 
             double ownerRepair = getDouble(conn,
@@ -267,8 +267,8 @@ public class DashboardDAO {
                 ra.payment_date,
                 ra.flat_no,
                 t.name AS tenant_name,
-                ra.total,
-                ra.paid_amount,
+                ra.house_rent AS total,
+                ra.house_rent AS paid_amount,
                 ra.status
             FROM rent_archive ra
             JOIN tenants t ON ra.tenant_id = t.id

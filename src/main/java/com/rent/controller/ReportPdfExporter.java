@@ -158,7 +158,7 @@ public class ReportPdfExporter {
             drawText(cs, "This Year Repair: Tk. " + money(summary.getYearRepairCost()), FONT_REGULAR, 10, margin, y);
             y -= 14;
 
-            drawText(cs, "Net Profit: Tk. " + money(summary.getNetProfit()), FONT_BOLD, 10, margin, y);
+            drawText(cs, "Net Income: Tk. " + money(summary.getNetProfit()), FONT_BOLD, 10, margin, y);
             y -= 14;
 
             drawText(cs,

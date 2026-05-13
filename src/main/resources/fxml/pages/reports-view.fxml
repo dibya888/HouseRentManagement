@@ -116,7 +116,7 @@
 
                 <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
                       GridPane.columnIndex="3" GridPane.rowIndex="2">
-                    <Label text="Net Profit" style="-fx-text-fill:#6b7280;"/>
+                    <Label text="Net Income" style="-fx-text-fill:#6b7280;"/>
                     <Label fx:id="netProfitLabel"
                            text="৳ 0"
                            style="-fx-font-size:20px; -fx-font-weight:bold;"/>
@@ -167,21 +167,6 @@
                     <Label text="Total Tenants" style="-fx-text-fill:#6b7280;"/>
                     <Label fx:id="totalTenantsLabel"
                            text="0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      prefWidth="220">
-                    <Label text="Owner Paid" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="ownerPaidLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      prefWidth="220">
-                    <Label text="Tenant Paid" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="tenantPaidLabel"
-                           text="৳ 0"
                            style="-fx-font-size:20px; -fx-font-weight:bold;"/>
                 </VBox>
 

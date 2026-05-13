@@ -34,14 +34,14 @@ public class ReportDAO {
         try (Connection conn = DBUtil.connect()) {
 
             summary.setTotalIncome(getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive"));
+                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive"));
 
             summary.setMonthIncome(getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive WHERE bill_month = ?",
+                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month = ?",
                     currentMonth));
 
             summary.setYearIncome(getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive WHERE bill_month LIKE ?",
+                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month LIKE ?",
                     currentYear + "-%"));
 
             summary.setTotalDue(getDouble(conn,
@@ -87,8 +87,8 @@ public class ReportDAO {
                 ra.payment_date AS report_date,
                 ra.flat_no,
                 t.name AS tenant_name,
-                ra.total,
-                ra.paid_amount,
+                ra.house_rent AS total,
+                ra.house_rent AS paid_amount,
                 0 AS due,
                 ra.status
             FROM rent_archive ra
@@ -181,8 +181,8 @@ public class ReportDAO {
         String sql = """
             SELECT
                 flat_no,
-                SUM(total) AS total_amount,
-                SUM(paid_amount) AS paid_amount
+                SUM(house_rent) AS total_amount,
+                SUM(house_rent) AS paid_amount
             FROM rent_archive
             GROUP BY flat_no
             ORDER BY flat_no
@@ -219,8 +219,8 @@ public class ReportDAO {
         String sql = """
             SELECT
                 bill_month,
-                SUM(total) AS total_amount,
-                SUM(paid_amount) AS paid_amount
+                SUM(house_rent) AS total_amount,
+                SUM(house_rent) AS paid_amount
             FROM rent_archive
             GROUP BY bill_month
             ORDER BY bill_month DESC
@@ -257,8 +257,8 @@ public class ReportDAO {
         String sql = """
             SELECT
                 substr(bill_month, 1, 4) AS report_year,
-                SUM(total) AS total_amount,
-                SUM(paid_amount) AS paid_amount
+                SUM(house_rent) AS total_amount,
+                SUM(house_rent) AS paid_amount
             FROM rent_archive
             GROUP BY substr(bill_month, 1, 4)
             ORDER BY report_year DESC
@@ -296,8 +296,8 @@ public class ReportDAO {
             SELECT
                 t.name AS tenant_name,
                 ra.flat_no,
-                SUM(ra.total) AS total_amount,
-                SUM(ra.paid_amount) AS paid_amount
+                SUM(ra.house_rent) AS total_amount,
+                SUM(ra.house_rent) AS paid_amount
             FROM rent_archive ra
             JOIN tenants t ON ra.tenant_id = t.id
             GROUP BY ra.tenant_id, t.name, ra.flat_no

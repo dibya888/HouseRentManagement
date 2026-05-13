@@ -325,7 +325,7 @@ public class RentDAO {
              tenant_id, flat_no, bill_month, house_rent,
              electricity, water, gas,
              other_bills, fine, discount, total,
-             paid_amount, payment_date, due_date, 'DUE', notes
+             0, NULL, due_date, 'DUE', notes
             FROM rent_archive
             WHERE id=?
             """;
@@ -335,21 +335,27 @@ public class RentDAO {
         try (Connection conn = DBUtil.connect()) {
             conn.setAutoCommit(false);
 
+            int insertedRows;
+
             try (PreparedStatement ps = conn.prepareStatement(insertBack)) {
                 ps.setInt(1, archiveId);
-                ps.executeUpdate();
+                insertedRows = ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = conn.prepareStatement(delete)) {
-                ps.setInt(1, archiveId);
-                ps.executeUpdate();
+            if (insertedRows > 0) {
+                try (PreparedStatement ps = conn.prepareStatement(delete)) {
+                    ps.setInt(1, archiveId);
+                    ps.executeUpdate();
+                }
             }
 
             conn.commit();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     // Update existing DUE/PARTIAL/LATE rows to latest global defaults (does NOT touch archive)
     public static void applyGlobalDefaultsToUnpaidRows() {
