@@ -115,8 +115,12 @@ public class DashboardController {
                     .getScene()
                     .getWindow();
 
-            stage.setTitle("Rent Management - Login");
+            stage.setTitle("House Rent Management - Login");
             stage.setScene(scene);
+            stage.setMaximized(false);
+            stage.setWidth(900);
+            stage.setHeight(600);
+            stage.centerOnScreen();
             stage.show();
 
         } catch (Exception e) {

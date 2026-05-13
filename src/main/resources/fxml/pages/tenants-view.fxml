@@ -11,7 +11,7 @@
         <VBox spacing="10" style="-fx-padding: 15;">
 
             <!-- Title -->
-            <Label text="Tenants"
+            <Label text="👤 Tenants"
                    style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
             <!-- Actions -->

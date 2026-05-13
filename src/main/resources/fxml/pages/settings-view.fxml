@@ -2,27 +2,200 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rent.controller.SettingsController"
-      spacing="16"
-      style="-fx-padding:20;">
+<?import javafx.scene.image.ImageView?>
 
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
-            <image>
-                <Image url="@/images/settings-blk.png"/>
-            </image>
-        </ImageView>
-        <Label text="Settings"
-               style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-    </HBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.SettingsController"
+            fitToWidth="true"
+            style="-fx-background-color:#f4f6f7;">
 
-    <Button text="🏢 Property"
-            onAction="#openProperty"
-            style="-fx-font-size:14px;"/>
+    <content>
+        <VBox spacing="20"
+              style="-fx-padding:24; -fx-background-color:#f4f6f7;">
 
-</VBox>
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/settings-blk.png"/>
+                    </image>
+                </ImageView>
+
+                <VBox spacing="2">
+                    <Label text="Settings"
+                           style="-fx-font-size:24px; -fx-font-weight:bold; -fx-text-fill:#111827;"/>
+                    <Label text="Manage property, account security, backup, restore, and app preferences."
+                           style="-fx-font-size:13px; -fx-text-fill:#6b7280;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Main Settings Grid -->
+            <GridPane hgap="16" vgap="16">
+
+                <!-- Property -->
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="0"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="🏢"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Property"
+                                   styleClass="settings-card-title"/>
+                            <Label text="Manage property name, address, phone, and default property."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Open Property Settings"
+                            onAction="#openProperty"
+                            maxWidth="Infinity"
+                            styleClass="settings-primary-btn"/>
+                </VBox>
+
+                <!-- Account Security -->
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="0"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="🔐"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Account Security"
+                                   styleClass="settings-card-title"/>
+                            <Label text="Change password, set recovery PIN, and generate emergency keys."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Coming Soon"
+                            disable="true"
+                            maxWidth="Infinity"
+                            styleClass="settings-disabled-btn"/>
+                </VBox>
+
+                <!-- Backup & Restore -->
+                <VBox GridPane.columnIndex="2"
+                      GridPane.rowIndex="0"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="💾"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Backup &amp; Restore"
+                                   styleClass="settings-card-title"/>
+                            <Label text="Backup database after login and restore database when needed."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Coming Soon"
+                            disable="true"
+                            maxWidth="Infinity"
+                            styleClass="settings-disabled-btn"/>
+                </VBox>
+
+                <!-- Recovery -->
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="1"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="🗝"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Recovery Keys"
+                                   styleClass="settings-card-title"/>
+                            <Label text="Generate 10 one-time emergency keys and save or print as PDF."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Coming Soon"
+                            disable="true"
+                            maxWidth="Infinity"
+                            styleClass="settings-disabled-btn"/>
+                </VBox>
+
+                <!-- Factory Reset -->
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="1"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card settings-danger-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="⚠"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Factory Reset"
+                                   styleClass="settings-card-title"/>
+                            <Label text="Delete current database and recreate a fresh app with default admin."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Coming Soon"
+                            disable="true"
+                            maxWidth="Infinity"
+                            styleClass="settings-danger-btn"/>
+                </VBox>
+
+                <!-- App Info -->
+                <VBox GridPane.columnIndex="2"
+                      GridPane.rowIndex="1"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="ℹ"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="App Information"
+                                   styleClass="settings-card-title"/>
+                            <Label text="House Rent Management System - offline desktop edition."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Label text="Version 1.0"
+                           style="-fx-text-fill:#6b7280; -fx-font-weight:bold;"/>
+                </VBox>
+
+            </GridPane>
+
+        </VBox>
+    </content>
+</ScrollPane>

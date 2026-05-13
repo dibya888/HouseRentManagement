@@ -210,3 +210,63 @@
     -fx-fill: #111827;
     -fx-font-size: 11px;
 }
+
+/* ================= SETTINGS ================= */
+
+.settings-card {
+    -fx-background-color: white;
+    -fx-padding: 18;
+    -fx-background-radius: 14;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+    -fx-min-height: 165;
+}
+
+.settings-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.14), 14, 0, 0, 4);
+}
+
+.settings-card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.settings-card-desc {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.settings-primary-btn {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 12;
+}
+
+.settings-primary-btn:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-cursor: hand;
+}
+
+.settings-disabled-btn {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #6b7280;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 12;
+}
+
+.settings-danger-card {
+    -fx-border-color: #fecaca;
+}
+
+.settings-danger-btn {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 12;
+}
