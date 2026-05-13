@@ -75,4 +75,14 @@ public class DashboardSummary {
     public void setMonthNetProfit(double monthNetProfit) {
         this.monthNetProfit = monthNetProfit;
     }
+
+    private double monthUtilityBills;
+
+    public double getMonthUtilityBills() {
+        return monthUtilityBills;
+    }
+
+    public void setMonthUtilityBills(double monthUtilityBills) {
+        this.monthUtilityBills = monthUtilityBills;
+    }
 }

@@ -16,8 +16,19 @@ public class ReportSummary {
     private double monthRepairCost;
     private double yearRepairCost;
     private double netProfit;
+
     private double ownerPaidRepairCost;
     private double tenantPaidRepairCost;
+
+    // Utility Bills
+    private double totalUtilityBills;
+    private double monthUtilityBills;
+    private double yearUtilityBills;
+
+    private double electricityBills;
+    private double waterBills;
+    private double gasBills;
+    private double otherBills;
 
     public double getTotalIncome() {
         return totalIncome;
@@ -114,6 +125,7 @@ public class ReportSummary {
     public void setNetProfit(double netProfit) {
         this.netProfit = netProfit;
     }
+
     public double getOwnerPaidRepairCost() {
         return ownerPaidRepairCost;
     }
@@ -128,5 +140,61 @@ public class ReportSummary {
 
     public void setTenantPaidRepairCost(double tenantPaidRepairCost) {
         this.tenantPaidRepairCost = tenantPaidRepairCost;
+    }
+
+    public double getTotalUtilityBills() {
+        return totalUtilityBills;
+    }
+
+    public void setTotalUtilityBills(double totalUtilityBills) {
+        this.totalUtilityBills = totalUtilityBills;
+    }
+
+    public double getMonthUtilityBills() {
+        return monthUtilityBills;
+    }
+
+    public void setMonthUtilityBills(double monthUtilityBills) {
+        this.monthUtilityBills = monthUtilityBills;
+    }
+
+    public double getYearUtilityBills() {
+        return yearUtilityBills;
+    }
+
+    public void setYearUtilityBills(double yearUtilityBills) {
+        this.yearUtilityBills = yearUtilityBills;
+    }
+
+    public double getElectricityBills() {
+        return electricityBills;
+    }
+
+    public void setElectricityBills(double electricityBills) {
+        this.electricityBills = electricityBills;
+    }
+
+    public double getWaterBills() {
+        return waterBills;
+    }
+
+    public void setWaterBills(double waterBills) {
+        this.waterBills = waterBills;
+    }
+
+    public double getGasBills() {
+        return gasBills;
+    }
+
+    public void setGasBills(double gasBills) {
+        this.gasBills = gasBills;
+    }
+
+    public double getOtherBills() {
+        return otherBills;
+    }
+
+    public void setOtherBills(double otherBills) {
+        this.otherBills = otherBills;
     }
 }

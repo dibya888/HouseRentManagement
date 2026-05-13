@@ -94,6 +94,13 @@
                     <Label fx:id="monthNetProfitLabel" text="৳ 0" styleClass="dashboard-card-value"/>
                 </VBox>
 
+                <VBox prefWidth="210"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: linear-gradient(to right, #0f766e, #115e59);">
+                    <Label text="This Month Utility Bills" styleClass="dashboard-card-title"/>
+                    <Label fx:id="monthUtilityBillsLabel" text="৳ 0" styleClass="dashboard-card-value"/>
+                </VBox>
+
             </FlowPane>
 
             <!-- Charts -->

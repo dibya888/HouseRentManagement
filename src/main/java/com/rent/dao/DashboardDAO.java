@@ -44,9 +44,18 @@ public class DashboardDAO {
                     """,
                     currentMonth + "-%");
 
+            double monthUtilityBills = getDouble(conn,
+                    """
+                    SELECT COALESCE(SUM(electricity + water + gas + other_bills), 0)
+                    FROM rent_archive
+                    WHERE bill_month=?
+                    """,
+                    currentMonth);
+
             summary.setMonthIncome(monthIncome);
             summary.setTotalDue(totalDue);
             summary.setMonthOwnerRepair(monthOwnerRepair);
+            summary.setMonthUtilityBills(monthUtilityBills);
             summary.setMonthNetProfit(monthIncome - monthOwnerRepair);
 
         } catch (Exception e) {

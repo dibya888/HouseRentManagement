@@ -49,6 +49,11 @@ public class ReportsController {
     @FXML private Label tenantRepairLabel;
     @FXML private TableColumn<ReportRow, String> colExtra;
 
+    @FXML private Label totalUtilityLabel;
+    @FXML private Label monthUtilityLabel;
+    @FXML private Label yearUtilityLabel;
+    @FXML private Label utilityBreakdownLabel;
+
     private final ObservableList<ReportRow> reportList =
             FXCollections.observableArrayList();
 
@@ -75,7 +80,8 @@ public class ReportsController {
                 "Yearly Income",
                 "Due Rent",
                 "Tenant-wise Report",
-                "Repair Report"
+                "Repair Report",
+                "Utility Bills Report"
         ));
 
         reportTypeCombo.getSelectionModel().selectFirst();
@@ -147,6 +153,9 @@ public class ReportsController {
 
             case "Repair Report" ->
                     reportList.setAll(ReportDAO.getRepairReportRows());
+
+            case "Utility Bills Report" ->
+                    reportList.setAll(ReportDAO.getUtilityBillReportRows());
 
             default ->
                     reportList.setAll(ReportDAO.getAllReportRows());
@@ -303,6 +312,9 @@ public class ReportsController {
             if (type.equals("Repair Report")) {
                 return row.getTitle() != null && row.getTitle().startsWith("Repair");
             }
+            if (type.equals("Utility Bills Report")) {
+                return row.getTitle() != null && row.getTitle().equals("Utility Bills");
+            }
 
             return true;
         });
@@ -355,6 +367,15 @@ public class ReportsController {
         double tenantPaidRepair = RepairDAO.getTenantPaidTotalRepairCost();
 
         ReportSummary base = ReportDAO.getSummary();
+
+        summary.setTotalUtilityBills(base.getTotalUtilityBills());
+        summary.setMonthUtilityBills(base.getMonthUtilityBills());
+        summary.setYearUtilityBills(base.getYearUtilityBills());
+
+        summary.setElectricityBills(base.getElectricityBills());
+        summary.setWaterBills(base.getWaterBills());
+        summary.setGasBills(base.getGasBills());
+        summary.setOtherBills(base.getOtherBills());
 
         summary.setTotalIncome(totalIncome);
         summary.setMonthIncome(monthIncome);
@@ -434,6 +455,19 @@ public class ReportsController {
         tenantRepairLabel.setText(money(tenantPaidRepair));
 
         netProfitLabel.setText(money(netProfit));
+
+        ReportSummary baseSummary = ReportDAO.getSummary();
+
+        totalUtilityLabel.setText(money(baseSummary.getTotalUtilityBills()));
+        monthUtilityLabel.setText(money(baseSummary.getMonthUtilityBills()));
+        yearUtilityLabel.setText(money(baseSummary.getYearUtilityBills()));
+
+        utilityBreakdownLabel.setText(
+                "E: " + money(baseSummary.getElectricityBills())
+                        + " | W: " + money(baseSummary.getWaterBills())
+                        + " | G: " + money(baseSummary.getGasBills())
+                        + " | O: " + money(baseSummary.getOtherBills())
+        );
     }
     private void updateColumnTitles() {
         String type = reportTypeCombo.getValue();
@@ -447,6 +481,21 @@ public class ReportsController {
             colTenant.setText("Description");
             colTotal.setText("Repair Cost");
             colExtra.setText("Paid By");
+            colStatus.setText("Status");
+
+            colExtra.setVisible(true);
+            colPaid.setVisible(false);
+            colDue.setVisible(false);
+
+        } else if ("Utility Bills Report".equals(type)) {
+
+            colTitle.setText("Report Type");
+            colMonth.setText("Month");
+            colDate.setText("Payment Date");
+            colFlatNo.setText("Flat No");
+            colTenant.setText("Tenant");
+            colTotal.setText("Utility Total");
+            colExtra.setText("Breakdown");
             colStatus.setText("Status");
 
             colExtra.setVisible(true);

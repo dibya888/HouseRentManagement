@@ -169,6 +169,37 @@
                            text="0"
                            style="-fx-font-size:20px; -fx-font-weight:bold;"/>
                 </VBox>
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="4">
+                    <Label text="Total Utility Bills" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="totalUtilityLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <Label text="This Month Utility Bills" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="monthUtilityLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="2" GridPane.rowIndex="4">
+                    <Label text="This Year Utility Bills" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="yearUtilityLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                </VBox>
+
+                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
+                      GridPane.columnIndex="3" GridPane.rowIndex="4">
+                    <Label text="Utility Breakdown" style="-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="utilityBreakdownLabel"
+                           text="৳ 0"
+                           style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                </VBox>
 
             </GridPane>
 

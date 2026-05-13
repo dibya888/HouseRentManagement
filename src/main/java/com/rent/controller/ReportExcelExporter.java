@@ -103,6 +103,15 @@ public class ReportExcelExporter {
         rowIndex = createSummaryRow(sheet, rowIndex, "This Year Repair", summary.getYearRepairCost(), headerStyle, moneyStyle);
         rowIndex = createSummaryRow(sheet, rowIndex, "Net Income", summary.getNetProfit(), headerStyle, moneyStyle);
 
+        rowIndex = createSummaryRow(sheet, rowIndex, "Total Utility Bills", summary.getTotalUtilityBills(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "This Month Utility Bills", summary.getMonthUtilityBills(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "This Year Utility Bills", summary.getYearUtilityBills(), headerStyle, moneyStyle);
+
+        rowIndex = createSummaryRow(sheet, rowIndex, "Electricity Bills", summary.getElectricityBills(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "Water Bills", summary.getWaterBills(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "Gas Bills", summary.getGasBills(), headerStyle, moneyStyle);
+        rowIndex = createSummaryRow(sheet, rowIndex, "Other Bills", summary.getOtherBills(), headerStyle, moneyStyle);
+
         rowIndex++;
 
         rowIndex = createNumberSummaryRow(sheet, rowIndex, "Total Flats", summary.getTotalFlats(), headerStyle);

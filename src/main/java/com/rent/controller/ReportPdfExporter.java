@@ -161,6 +161,27 @@ public class ReportPdfExporter {
             drawText(cs, "Net Income: Tk. " + money(summary.getNetProfit()), FONT_BOLD, 10, margin, y);
             y -= 14;
 
+            drawText(cs, "Total Utility Bills: Tk. " + money(summary.getTotalUtilityBills()), FONT_REGULAR, 10, margin, y);
+            y -= 14;
+
+            drawText(cs, "This Month Utility Bills: Tk. " + money(summary.getMonthUtilityBills()), FONT_REGULAR, 10, margin, y);
+            y -= 14;
+
+            drawText(cs, "This Year Utility Bills: Tk. " + money(summary.getYearUtilityBills()), FONT_REGULAR, 10, margin, y);
+            y -= 14;
+
+            drawText(cs,
+                    "Utility Breakdown: Electricity Tk. " + money(summary.getElectricityBills())
+                            + " | Water Tk. " + money(summary.getWaterBills())
+                            + " | Gas Tk. " + money(summary.getGasBills())
+                            + " | Other Tk. " + money(summary.getOtherBills()),
+                    FONT_REGULAR,
+                    9,
+                    margin,
+                    y
+            );
+            y -= 14;
+
             drawText(cs,
                     "Flats: " + summary.getTotalFlats()
                             + " | Occupied: " + summary.getOccupiedFlats()

@@ -21,7 +21,6 @@ public class ReportDAO {
         String currentMonth = YearMonth.now().toString();
         String currentYear = String.valueOf(Year.now().getValue());
 
-
         double totalRepair = RepairDAO.getTotalRepairCost();
         double monthRepair = RepairDAO.getMonthRepairCost(currentMonth);
         double yearRepair = RepairDAO.getYearRepairCost(currentYear);
@@ -29,10 +28,9 @@ public class ReportDAO {
         double ownerPaidRepair = RepairDAO.getOwnerPaidTotalRepairCost();
         double tenantPaidRepair = RepairDAO.getTenantPaidTotalRepairCost();
 
-
-
         try (Connection conn = DBUtil.connect()) {
 
+            // Income = House Rent only
             summary.setTotalIncome(getDouble(conn,
                     "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive"));
 
@@ -44,9 +42,11 @@ public class ReportDAO {
                     "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month LIKE ?",
                     currentYear + "-%"));
 
+            // Due = full unpaid receivable from tenant
             summary.setTotalDue(getDouble(conn,
                     "SELECT COALESCE(SUM(total - paid_amount), 0) FROM rent_current"));
 
+            // Flat/Tenant counts
             summary.setTotalFlats(getInt(conn,
                     "SELECT COUNT(*) FROM flats"));
 
@@ -59,23 +59,115 @@ public class ReportDAO {
             summary.setTotalTenants(getInt(conn,
                     "SELECT COUNT(*) FROM tenants"));
 
-
+            // Repair
             summary.setTotalRepairCost(totalRepair);
             summary.setMonthRepairCost(monthRepair);
             summary.setYearRepairCost(yearRepair);
-
             summary.setOwnerPaidRepairCost(ownerPaidRepair);
             summary.setTenantPaidRepairCost(tenantPaidRepair);
 
+            // Utility Bills = electricity + water + gas + other_bills
+            summary.setTotalUtilityBills(getDouble(conn,
+                    """
+                    SELECT COALESCE(SUM(electricity + water + gas + other_bills), 0)
+                    FROM rent_archive
+                    """));
+
+            summary.setMonthUtilityBills(getDouble(conn,
+                    """
+                    SELECT COALESCE(SUM(electricity + water + gas + other_bills), 0)
+                    FROM rent_archive
+                    WHERE bill_month = ?
+                    """,
+                    currentMonth));
+
+            summary.setYearUtilityBills(getDouble(conn,
+                    """
+                    SELECT COALESCE(SUM(electricity + water + gas + other_bills), 0)
+                    FROM rent_archive
+                    WHERE bill_month LIKE ?
+                    """,
+                    currentYear + "-%"));
+
+            summary.setElectricityBills(getDouble(conn,
+                    "SELECT COALESCE(SUM(electricity), 0) FROM rent_archive"));
+
+            summary.setWaterBills(getDouble(conn,
+                    "SELECT COALESCE(SUM(water), 0) FROM rent_archive"));
+
+            summary.setGasBills(getDouble(conn,
+                    "SELECT COALESCE(SUM(gas), 0) FROM rent_archive"));
+
+            summary.setOtherBills(getDouble(conn,
+                    "SELECT COALESCE(SUM(other_bills), 0) FROM rent_archive"));
+
+            // Net Income = House Rent Income - Owner Paid Repair
             summary.setNetProfit(summary.getTotalIncome() - ownerPaidRepair);
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return summary;
+    }
+
+    public static List<ReportRow> getUtilityBillReportRows() {
+        List<ReportRow> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                ra.bill_month,
+                ra.payment_date AS report_date,
+                ra.flat_no,
+                t.name AS tenant_name,
+                ra.electricity,
+                ra.water,
+                ra.gas,
+                ra.other_bills,
+                (ra.electricity + ra.water + ra.gas + ra.other_bills) AS utility_total,
+                ra.status
+            FROM rent_archive ra
+            JOIN tenants t ON ra.tenant_id = t.id
+            ORDER BY ra.bill_month DESC, ra.flat_no
+            """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                double electricity = rs.getDouble("electricity");
+                double water = rs.getDouble("water");
+                double gas = rs.getDouble("gas");
+                double other = rs.getDouble("other_bills");
+                double utilityTotal = rs.getDouble("utility_total");
+
+                String breakdown =
+                        "Electricity: " + moneyText(electricity)
+                                + ", Water: " + moneyText(water)
+                                + ", Gas: " + moneyText(gas)
+                                + ", Other: " + moneyText(other);
+
+                list.add(new ReportRow(
+                        "Utility Bills",
+                        rs.getString("bill_month"),
+                        rs.getString("report_date"),
+                        rs.getString("flat_no"),
+                        rs.getString("tenant_name"),
+                        utilityTotal,
+                        0,
+                        0,
+                        rs.getString("status"),
+                        breakdown
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public static List<ReportRow> getAllReportRows() {
@@ -420,5 +512,8 @@ public class ReportDAO {
         }
 
         return list;
+    }
+    private static String moneyText(double value) {
+        return "৳ " + String.format("%,.2f", value);
     }
 }

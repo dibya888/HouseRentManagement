@@ -56,6 +56,7 @@ public class DashboardHomeController {
     @FXML private TableColumn<ReportRow, String> paymentColTenant;
     @FXML private TableColumn<ReportRow, Double> paymentColPaid;
     @FXML private TableColumn<ReportRow, String> paymentColStatus;
+    @FXML private Label monthUtilityBillsLabel;
 
     @FXML
     public void initialize() {
@@ -124,6 +125,8 @@ public class DashboardHomeController {
         totalDueLabel.setText(money(s.getTotalDue()));
         monthOwnerRepairLabel.setText(money(s.getMonthOwnerRepair()));
         monthNetProfitLabel.setText(money(s.getMonthNetProfit()));
+        monthUtilityBillsLabel.setText(money(s.getMonthUtilityBills()));
+
     }
 
     private void loadCharts() {
