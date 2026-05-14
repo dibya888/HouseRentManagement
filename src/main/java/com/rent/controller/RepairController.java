@@ -16,7 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import com.rent.util.StatusBadgeCellFactory;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -71,6 +71,8 @@ public class RepairController {
         colCost.setCellValueFactory(new PropertyValueFactory<>("cost"));
         colPaidBy.setCellValueFactory(new PropertyValueFactory<>("paidBy"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colPaidBy.setCellFactory(StatusBadgeCellFactory.forPaidBy());
+        colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         setupActionColumn();
 

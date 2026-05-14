@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import com.rent.dao.RepairDAO;
 import com.rent.dao.AuditLogDAO;
 import com.rent.util.AuditActions;
+import com.rent.util.StatusBadgeCellFactory;
 
 public class ReportsController {
 
@@ -104,6 +105,7 @@ public class ReportsController {
         colPaid.setCellValueFactory(new PropertyValueFactory<>("paid"));
         colDue.setCellValueFactory(new PropertyValueFactory<>("due"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         reportTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN

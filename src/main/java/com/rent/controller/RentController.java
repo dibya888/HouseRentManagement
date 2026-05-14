@@ -23,7 +23,7 @@ import com.rent.dao.AuditLogDAO;
 import com.rent.util.AuditActions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import com.rent.util.StatusBadgeCellFactory;
 import javafx.util.StringConverter;
 import javafx.scene.control.DateCell;
 import java.time.YearMonth;
@@ -108,6 +108,7 @@ public class RentController {
 
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         // action buttons
         setupActionColumn();

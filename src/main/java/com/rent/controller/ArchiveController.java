@@ -2,7 +2,7 @@ package com.rent.controller;
 
 import com.rent.dao.RentDAO;
 import com.rent.model.RentRow;
-
+import com.rent.util.StatusBadgeCellFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -60,6 +60,7 @@ public class ArchiveController {
 
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         setupAction();
 
