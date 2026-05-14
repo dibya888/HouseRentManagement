@@ -38,3 +38,48 @@ build/
 ### Mac OS ###
 .DS_Store
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+src/main/resources/database/*.db
+src/main/resources/database/*.sqlite
+src/main/resources/database/*.sqlite3
+
+# Backups
+backup/
+backups/
+*.bak
+*_backup_*.db
+rent_backup_*.db
+
+# Recovery/emergency keys PDFs
+Emergency_Recovery_Keys*.pdf
+*Recovery_Keys*.pdf
+*emergency*.pdf
+
+# Generated exports
+exports/
+reports/
+receipts/
+*.pdf
+*.xlsx
+
+# Build outputs
+target/
+out/
+build/
+
+# IDE/user files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs/temp
+*.log
+tmp/
+temp/
