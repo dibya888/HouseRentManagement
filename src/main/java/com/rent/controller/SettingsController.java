@@ -175,6 +175,11 @@ public class SettingsController {
         }
     }
 
+    @FXML
+    private void openAuditLogs() {
+        DashboardController.getInstance().showAuditLogs();
+    }
+
     private void clearSavedLogin() {
         Preferences prefs =
                 Preferences.userNodeForPackage(LoginController.class);

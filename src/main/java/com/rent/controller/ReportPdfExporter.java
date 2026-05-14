@@ -59,7 +59,7 @@ public class ReportPdfExporter {
             75    // Status
     };
 
-    public static void exportReport(ReportSummary summary,
+    public static boolean exportReport(ReportSummary summary,
                                     ObservableList<ReportRow> rows) {
 
         FileChooser chooser = new FileChooser();
@@ -75,7 +75,7 @@ public class ReportPdfExporter {
         File file = chooser.showSaveDialog(null);
 
         if (file == null) {
-            return;
+            return false;
         }
 
         if (!file.getName().toLowerCase().endsWith(".pdf")) {
@@ -89,12 +89,16 @@ public class ReportPdfExporter {
                     "PDF report exported successfully:\n" + file.getAbsolutePath()
             ).show();
 
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
 
             new Alert(Alert.AlertType.ERROR,
                     "Failed to export PDF report."
             ).show();
+
+            return false;
         }
     }
 

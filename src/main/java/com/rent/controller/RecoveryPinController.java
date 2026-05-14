@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.prefs.Preferences;
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 
 public class RecoveryPinController {
 
@@ -61,6 +63,11 @@ public class RecoveryPinController {
         String hash = SecurityUtil.hashSecret(pin, salt);
 
         if (updateRecoveryPin(username, hash, salt)) {
+            AuditLogDAO.log(
+                    AuditActions.RECOVERY_PIN_SET,
+                    "Recovery PIN set or updated for user: " + username
+            );
+
             showInfo("Recovery PIN saved successfully.");
             close();
         } else {

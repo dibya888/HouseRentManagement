@@ -9,7 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +34,7 @@ public class RentPaymentController {
     @FXML private DatePicker paymentDatePicker;
 
     private RentRow row;
+    private RentRow receiptRow;
 
     public void setRow(RentRow row) {
         this.row = row;
@@ -88,9 +90,10 @@ public class RentPaymentController {
 
     @FXML
     private void save() {
+        int originalRentId = row.getId();
 
         RentDAO.applyPayment(
-                row.getId(),
+                originalRentId,
                 d(electricityField),
                 d(waterField),
                 d(gasField),
@@ -101,6 +104,36 @@ public class RentPaymentController {
                 paymentDatePicker.getValue()
         );
 
+        receiptRow = RentDAO.getArchivedRowByOriginalId(originalRentId);
+
+        if (receiptRow != null) {
+            AuditLogDAO.log(
+                    AuditActions.RENT_PAYMENT,
+                    "Payment completed. Receipt No: "
+                            + receiptRow.getReceiptNo()
+                            + ", Flat: "
+                            + receiptRow.getFlatNo()
+                            + ", Tenant: "
+                            + receiptRow.getTenantName()
+                            + ", Month: "
+                            + receiptRow.getBillMonth()
+                            + ", Amount: "
+                            + receiptRow.getPaidAmount()
+            );
+        } else {
+            AuditLogDAO.log(
+                    AuditActions.RENT_PAYMENT,
+                    "Partial payment saved. Flat: "
+                            + row.getFlatNo()
+                            + ", Tenant: "
+                            + row.getTenantName()
+                            + ", Month: "
+                            + row.getBillMonth()
+                            + ", Paid: "
+                            + paidAmountField.getText()
+            );
+        }
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Payment Saved");
         confirm.setHeaderText("✅ Payment saved successfully");
@@ -110,7 +143,13 @@ public class RentPaymentController {
         Optional<ButtonType> res = confirm.showAndWait();
 
         if (res.isPresent() && res.get() == ButtonType.YES) {
-            openPrintOptions();
+            if (receiptRow != null) {
+                openPrintOptions();
+            } else {
+                new Alert(Alert.AlertType.WARNING,
+                        "Payment saved, but receipt is available only after full payment.")
+                        .showAndWait();
+            }
         }
 
         close();
@@ -131,7 +170,7 @@ public class RentPaymentController {
             stage.setScene(scene);
 
             PrintOptionsController controller = loader.getController();
-            controller.setRentRow(row);
+            controller.setRentRow(receiptRow);
 
             stage.showAndWait();
 

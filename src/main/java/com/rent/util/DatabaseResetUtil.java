@@ -3,7 +3,8 @@ package com.rent.util;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Window;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -55,6 +56,11 @@ public class DatabaseResetUtil {
 
             DBUtil.init();
             com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
+            AuditLogDAO.log(
+                    "SYSTEM",
+                    AuditActions.FACTORY_RESET,
+                    "Factory reset performed. Database deleted and recreated."
+            );
 
             return true;
 

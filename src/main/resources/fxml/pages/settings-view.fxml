@@ -183,9 +183,36 @@
                             styleClass="settings-danger-btn"/>
                 </VBox>
 
-                <!-- App Info -->
+                <!-- Audit Logs -->
                 <VBox GridPane.columnIndex="2"
                       GridPane.rowIndex="1"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="📜"
+                               style="-fx-font-size:24px;"/>
+                        <VBox spacing="2">
+                            <Label text="Audit Logs"
+                                   styleClass="settings-card-title"/>
+                            <Label text="View important app activity, security events, and data changes."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Open Audit Logs"
+                            onAction="#openAuditLogs"
+                            maxWidth="Infinity"
+                            styleClass="settings-primary-btn"/>
+                </VBox>
+
+                <!-- App Info -->
+                <VBox GridPane.columnIndex="0"
+                      GridPane.rowIndex="2"
                       spacing="12"
                       prefWidth="330"
                       styleClass="settings-card">

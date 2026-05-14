@@ -5,7 +5,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.rent.controller.ArchiveController"
+            fx:controller="com.rent.controller.AuditLogsController"
             style="-fx-background-color:#f4f6f7;">
 
     <center>
@@ -13,13 +13,13 @@
 
             <!-- Header -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="🗃 Rent Archive"
+                <Label text="📜 Audit Logs"
                        style="-fx-font-size:22px; -fx-font-weight:bold;"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <Button text="🔄 Refresh"
-                        onAction="#loadArchive"
+                        onAction="#loadLogs"
                         style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
             </HBox>
 
@@ -28,35 +28,35 @@
                   style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
 
                 <TextField fx:id="searchField"
-                           promptText="🔍 Search tenant, flat, phone..."
+                           promptText="🔍 Search action, user, details..."
                            onKeyReleased="#applyFilters"
-                           prefWidth="280"/>
+                           prefWidth="300"/>
 
-                <Label text="Month:"/>
-                <DatePicker fx:id="monthPicker" prefWidth="145"/>
+                <Label text="Action:"/>
+                <ComboBox fx:id="actionCombo"
+                          prefWidth="190"/>
 
                 <Label text="From:"/>
-                <DatePicker fx:id="fromDatePicker" prefWidth="145"/>
+                <DatePicker fx:id="fromDatePicker"
+                            prefWidth="145"/>
 
                 <Label text="To:"/>
-                <DatePicker fx:id="toDatePicker" prefWidth="145"/>
+                <DatePicker fx:id="toDatePicker"
+                            prefWidth="145"/>
 
                 <Button text="Clear"
                         onAction="#clearFilters"
                         style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
             </HBox>
 
-            <!-- Archive Table -->
-            <TableView fx:id="archiveTable">
+            <!-- Table -->
+            <TableView fx:id="auditTable">
                 <columns>
-                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="90"/>
-                    <TableColumn fx:id="colTenantName" text="Tenant" prefWidth="140"/>
-                    <TableColumn fx:id="colPhone" text="Phone" prefWidth="120"/>
-                    <TableColumn fx:id="colBillMonth" text="Bill Month" prefWidth="110"/>
-                    <TableColumn fx:id="colPaymentDate" text="Payment Date" prefWidth="120"/>
-                    <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
-                    <TableColumn fx:id="colAction" text="Action" prefWidth="240"/>
+                    <TableColumn fx:id="colCreatedAt" text="Date / Time" prefWidth="160"/>
+                    <TableColumn fx:id="colUsername" text="User" prefWidth="120"/>
+                    <TableColumn fx:id="colActionType" text="Action" prefWidth="190"/>
+                    <TableColumn fx:id="colDetails" text="Details" prefWidth="520"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="100"/>
                 </columns>
             </TableView>
 

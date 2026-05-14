@@ -4,7 +4,8 @@ import com.rent.util.DBUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,6 +63,8 @@ public class EditPropertyController {
                 }
             }
 
+            int rows;
+
             try (PreparedStatement ps = conn.prepareStatement(
                     "UPDATE properties SET name=?, address=?, phone=?, is_default=? WHERE id=?"
             )) {
@@ -70,10 +73,25 @@ public class EditPropertyController {
                 ps.setString(3, phone.isBlank() ? null : phone);
                 ps.setInt(4, makeDefault);
                 ps.setInt(5, propertyId);
-                ps.executeUpdate();
+                rows = ps.executeUpdate();
             }
 
             conn.commit();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.PROPERTY_UPDATED,
+                        "Property updated. ID: "
+                                + propertyId
+                                + ", Name: "
+                                + name
+                                + ", Phone: "
+                                + (phone.isBlank() ? "-" : phone)
+                                + ", Default: "
+                                + (makeDefault == 1 ? "Yes" : "No")
+                );
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to update property.").show();

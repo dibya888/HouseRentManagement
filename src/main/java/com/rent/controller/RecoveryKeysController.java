@@ -2,7 +2,8 @@ package com.rent.controller;
 
 import com.rent.dao.EmergencyKeyDAO;
 import com.rent.util.EmergencyKeyUtil;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -44,6 +45,11 @@ public class RecoveryKeysController {
         currentGeneratedKeys = EmergencyKeyUtil.generatePlainKeys(10);
 
         EmergencyKeyDAO.replaceKeys(currentGeneratedKeys);
+
+        AuditLogDAO.log(
+                AuditActions.EMERGENCY_KEYS_GENERATED,
+                "Generated 10 new one-time emergency recovery keys."
+        );
 
         keysArea.setText(formatKeys(currentGeneratedKeys));
         updateRemainingKeysLabel();

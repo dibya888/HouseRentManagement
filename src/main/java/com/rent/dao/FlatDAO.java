@@ -5,8 +5,8 @@ import com.rent.util.DBUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,16 @@ public class FlatDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, flatNo);
-            return stmt.executeUpdate() > 0;
+            boolean success = stmt.executeUpdate() > 0;
+
+            if (success) {
+                AuditLogDAO.log(
+                        AuditActions.FLAT_DELETED,
+                        "Flat deleted. Flat No: " + flatNo
+                );
+            }
+
+            return success;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +73,23 @@ public class FlatDAO {
             stmt.setString(9, flat.getStatus());
             stmt.setString(10, flat.getFlatNo());
 
-            return stmt.executeUpdate() > 0;
+            boolean success = stmt.executeUpdate() > 0;
+
+            if (success) {
+                AuditLogDAO.log(
+                        AuditActions.FLAT_UPDATED,
+                        "Flat updated. Flat No: "
+                                + flat.getFlatNo()
+                                + ", Meter: "
+                                + flat.getMeterNo()
+                                + ", Rent: "
+                                + flat.getRent()
+                                + ", Status: "
+                                + flat.getStatus()
+                );
+            }
+
+            return success;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,8 +166,23 @@ public class FlatDAO {
             stmt.setDouble(9, flat.getRent());
             stmt.setString(10, flat.getStatus());
 
-            stmt.executeUpdate();
-            return true;
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.FLAT_ADDED,
+                        "Flat added. Flat No: "
+                                + flat.getFlatNo()
+                                + ", Meter: "
+                                + flat.getMeterNo()
+                                + ", Rent: "
+                                + flat.getRent()
+                                + ", Status: "
+                                + flat.getStatus()
+                );
+            }
+
+            return rows > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -285,6 +325,21 @@ public class FlatDAO {
             }
 
             conn.commit();
+
+            AuditLogDAO.log(
+                    AuditActions.FLAT_ADDED,
+                    "Flat added. Flat No: "
+                            + flat.getFlatNo()
+                            + ", Meter: "
+                            + flat.getMeterNo()
+                            + ", Rent: "
+                            + flat.getRent()
+                            + ", Status: "
+                            + flat.getStatus()
+                            + ", Property ID: "
+                            + propertyId
+            );
+
             return true;
 
         } catch (Exception e) {

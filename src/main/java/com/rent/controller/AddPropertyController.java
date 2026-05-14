@@ -4,7 +4,8 @@ import com.rent.util.DBUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,8 @@ public class AddPropertyController {
                 }
             }
 
+            int rows;
+
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO properties(name, address, phone, is_default) VALUES(?,?,?,?)"
             )) {
@@ -51,7 +54,21 @@ public class AddPropertyController {
                 ps.setString(2, address);
                 ps.setString(3, phone.isBlank() ? null : phone);
                 ps.setInt(4, makeDefault);
-                ps.executeUpdate();
+                rows = ps.executeUpdate();
+            }
+
+            conn.commit();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.PROPERTY_ADDED,
+                        "Property added. Name: "
+                                + name
+                                + ", Phone: "
+                                + (phone.isBlank() ? "-" : phone)
+                                + ", Default: "
+                                + (makeDefault == 1 ? "Yes" : "No")
+                );
             }
 
             conn.commit();

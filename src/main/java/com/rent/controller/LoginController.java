@@ -10,7 +10,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
@@ -39,7 +40,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (checkLogin(username, password)) {
-
+            AuditLogDAO.log(username, AuditActions.LOGIN_SUCCESS, "User logged in successfully.");
             try {
 
                 // save login session
@@ -83,9 +84,10 @@ public class LoginController {
             }
 
         } else {
-
+            AuditLogDAO.log(username, AuditActions.LOGIN_FAILED, "Failed login attempt.");
             messageLabel.setText("Invalid username or password");
             messageLabel.setStyle("-fx-text-fill: red;");
+
         }
     }
 

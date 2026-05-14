@@ -2,7 +2,8 @@ package com.rent.controller;
 
 import com.rent.dao.RepairDAO;
 import com.rent.model.Repair;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -310,7 +311,28 @@ public class RepairController {
         Optional<ButtonType> result = confirm.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            RepairDAO.deleteRepair(repair.getId());
+            boolean success = RepairDAO.deleteRepair(repair.getId());
+
+            if (success) {
+                AuditLogDAO.log(
+                        AuditActions.REPAIR_DELETED,
+                        "Repair deleted. ID: "
+                                + repair.getId()
+                                + ", Flat: "
+                                + repair.getFlatNo()
+                                + ", Date: "
+                                + repair.getRepairDate()
+                                + ", Category: "
+                                + repair.getCategory()
+                                + ", Cost: "
+                                + repair.getCost()
+                                + ", Paid By: "
+                                + repair.getPaidBy()
+                                + ", Status: "
+                                + repair.getStatus()
+                );
+            }
+
             loadRepairs();
         }
     }

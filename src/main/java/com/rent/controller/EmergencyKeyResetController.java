@@ -12,7 +12,8 @@ import com.rent.dao.UserSecurityDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import javafx.stage.Window;
 
 public class EmergencyKeyResetController {
@@ -67,6 +68,12 @@ public class EmergencyKeyResetController {
         }
 
         if (UserSecurityDAO.updatePassword(username, newPassword)) {
+            AuditLogDAO.log(
+                    username,
+                    AuditActions.EMERGENCY_KEY_USED,
+                    "Password reset using emergency recovery key for user: " + username
+            );
+
             showInfo("Password reset successfully. This emergency key is now used.");
             closeWithOwner();
         } else {

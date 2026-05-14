@@ -3,7 +3,8 @@ package com.rent.util;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,6 +53,10 @@ public class DatabaseBackupUtil {
                     destination.toPath(),
                     StandardCopyOption.REPLACE_EXISTING
             );
+            AuditLogDAO.log(
+                    AuditActions.DATABASE_BACKUP,
+                    "Database backup created: " + destination.getAbsolutePath()
+            );
 
             showInfo("Backup created successfully:\n" + destination.getAbsolutePath());
 
@@ -85,6 +90,10 @@ public class DatabaseBackupUtil {
                     selectedBackup.toPath(),
                     DB_PATH,
                     StandardCopyOption.REPLACE_EXISTING
+            );
+            AuditLogDAO.log(
+                    AuditActions.DATABASE_RESTORE,
+                    "Database restored from: " + selectedBackup.getAbsolutePath()
             );
 
             showInfo("""

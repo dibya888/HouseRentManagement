@@ -2,7 +2,8 @@ package com.rent.dao;
 
 import com.rent.model.Repair;
 import com.rent.util.DBUtil;
-
+import com.rent.util.AuditActions;
+import com.rent.dao.AuditLogDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,7 +62,27 @@ public class RepairDAO {
             ps.setString(8, repair.getNotes());
             ps.setString(9, LocalDateTime.now().format(TS));
 
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+
+            if (success) {
+                AuditLogDAO.log(
+                        AuditActions.REPAIR_ADDED,
+                        "Repair added. Flat: "
+                                + repair.getFlatNo()
+                                + ", Date: "
+                                + repair.getRepairDate()
+                                + ", Category: "
+                                + repair.getCategory()
+                                + ", Cost: "
+                                + repair.getCost()
+                                + ", Paid By: "
+                                + repair.getPaidBy()
+                                + ", Status: "
+                                + repair.getStatus()
+                );
+            }
+
+            return success;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,7 +117,29 @@ public class RepairDAO {
             ps.setString(8, repair.getNotes());
             ps.setInt(9, repair.getId());
 
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+
+            if (success) {
+                AuditLogDAO.log(
+                        AuditActions.REPAIR_UPDATED,
+                        "Repair updated. ID: "
+                                + repair.getId()
+                                + ", Flat: "
+                                + repair.getFlatNo()
+                                + ", Date: "
+                                + repair.getRepairDate()
+                                + ", Category: "
+                                + repair.getCategory()
+                                + ", Cost: "
+                                + repair.getCost()
+                                + ", Paid By: "
+                                + repair.getPaidBy()
+                                + ", Status: "
+                                + repair.getStatus()
+                );
+            }
+
+            return success;
 
         } catch (Exception e) {
             e.printStackTrace();

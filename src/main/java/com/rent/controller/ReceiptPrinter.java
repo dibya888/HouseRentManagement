@@ -4,7 +4,8 @@ import com.rent.model.RentRow;
 import com.rent.util.DBUtil;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -73,6 +74,20 @@ public class ReceiptPrinter {
         try {
             createReceiptPdf(row, includePropertyName, includePropertyAddress, file);
 
+            AuditLogDAO.log(
+                    AuditActions.RECEIPT_PRINTED,
+                    "Receipt printed/saved. Receipt No: "
+                            + receiptNo(row)
+                            + ", Flat: "
+                            + row.getFlatNo()
+                            + ", Tenant: "
+                            + row.getTenantName()
+                            + ", Month: "
+                            + row.getBillMonth()
+                            + ", File: "
+                            + file.getAbsolutePath()
+            );
+
             new Alert(
                     Alert.AlertType.INFORMATION,
                     "Receipt PDF saved successfully:\n" + file.getAbsolutePath()
@@ -132,8 +147,7 @@ public class ReceiptPrinter {
                 String billMonthPretty = YearMonth.parse(row.getBillMonth())
                         .format(DateTimeFormatter.ofPattern("MMMM, yyyy"));
 
-                String paymentDate = LocalDate.now()
-                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                String paymentDate = formatReceiptDate(row.getPaymentDate());
 
                 float leftX = margin;
                 float rightX = pageWidth / 2f + 12;
@@ -148,6 +162,7 @@ public class ReceiptPrinter {
                 float rightY = metaYStart;
                 rightY = drawKeyValue(cs, "Bill Month:", billMonthPretty, rightX, rightY);
                 rightY = drawKeyValue(cs, "Payment Date:", paymentDate, rightX, rightY);
+                rightY = drawKeyValue(cs, "Receipt No:", receiptNo(row), rightX, rightY);
 
                 y = Math.min(y, rightY) - 10;
 
@@ -442,6 +457,20 @@ public class ReceiptPrinter {
                 .replace("’", "'");
     }
 
+    private static String formatReceiptDate(String date) {
+        try {
+            if (date == null || date.isBlank()) {
+                return LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            }
+
+            return LocalDate.parse(date)
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        } catch (Exception e) {
+            return LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        }
+    }
+
     private static String amountToWordsBDT(double amount) {
         long taka = (long) Math.floor(amount);
         long paisa = Math.round((amount - taka) * 100);
@@ -530,4 +559,12 @@ public class ReceiptPrinter {
         String name = "";
         String address = "";
     }
+    private static String receiptNo(RentRow row) {
+        if (row == null || row.getReceiptNo() == null || row.getReceiptNo().isBlank()) {
+            return "N/A";
+        }
+
+        return row.getReceiptNo();
+    }
+
 }

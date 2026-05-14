@@ -10,7 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -183,10 +184,52 @@ public class PropertyController {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
 
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM properties WHERE id=?")) {
-            ps.setInt(1, propertyId);
-            ps.executeUpdate();
+        String propertyName = "";
+        String propertyAddress = "";
+
+        String selectSql = """
+            SELECT name, address
+            FROM properties
+            WHERE id=?
+            """;
+
+        String deleteSql = "DELETE FROM properties WHERE id=?";
+
+        try (Connection conn = DBUtil.connect()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+                ps.setInt(1, propertyId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        propertyName = rs.getString("name");
+                        propertyAddress = rs.getString("address");
+                    }
+                }
+            }
+
+            int rows;
+
+            try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+                ps.setInt(1, propertyId);
+                rows = ps.executeUpdate();
+            }
+
+            conn.commit();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.PROPERTY_DELETED,
+                        "Property deleted. ID: "
+                                + propertyId
+                                + ", Name: "
+                                + propertyName
+                                + ", Address: "
+                                + propertyAddress
+                );
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

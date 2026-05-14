@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.prefs.Preferences;
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 
 public class ChangePasswordController {
 
@@ -64,6 +66,11 @@ public class ChangePasswordController {
         }
 
         if (UserSecurityDAO.updatePassword(username, newPassword)) {
+            AuditLogDAO.log(
+                    AuditActions.PASSWORD_CHANGED,
+                    "Password changed for user: " + username
+            );
+
             showInfo("Password changed successfully.");
             close();
         } else {

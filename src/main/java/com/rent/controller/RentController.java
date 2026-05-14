@@ -19,7 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -138,7 +139,16 @@ public class RentController {
         }
 
         String month = YearMonth.from(monthPicker.getValue()).toString(); // yyyy-MM
+
         RentDAO.ensureMonthGenerated(month, 5);
+
+        AuditLogDAO.log(
+                AuditActions.MONTH_GENERATED,
+                "Billing month generated. Month: "
+                        + month
+                        + ", Due day: 5"
+        );
+
         loadRentRows();
     }
 

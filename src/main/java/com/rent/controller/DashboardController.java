@@ -9,7 +9,8 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import com.rent.dao.EmergencyKeyDAO;
 import javafx.scene.control.Alert;
-
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.util.prefs.Preferences;
 
 public class DashboardController {
@@ -59,6 +60,9 @@ public class DashboardController {
         loadPage("/fxml/pages/reports-view.fxml");
     }
 
+    @FXML
+    public void showAuditLogs() { loadPage("/fxml/pages/audit-logs-view.fxml");}
+
     public void loadPage(String fxmlPath) {
 
         try {
@@ -90,6 +94,7 @@ public class DashboardController {
 
     @FXML
     public void handleLogout(ActionEvent event) {
+        AuditLogDAO.log(AuditActions.LOGOUT, "User logged out.");
 
         try {
 
@@ -129,6 +134,11 @@ public class DashboardController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void openAuditLogs() {
+        DashboardController.getInstance().showAuditLogs();
     }
 
     private void checkEmergencyKeys() {

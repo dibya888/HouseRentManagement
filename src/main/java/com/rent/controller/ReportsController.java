@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import java.time.LocalDate;
 import com.rent.dao.RepairDAO;
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 
 public class ReportsController {
 
@@ -191,19 +193,52 @@ public class ReportsController {
             return;
         }
 
-        ReportPdfExporter.exportReport(summary, exportRows);
+        boolean exported = ReportPdfExporter.exportReport(summary, exportRows);
+
+        if (exported) {
+            AuditLogDAO.log(
+                    AuditActions.REPORT_PDF_EXPORTED,
+                    "PDF report exported. Type: "
+                            + reportTypeCombo.getValue()
+                            + ", Rows: "
+                            + exportRows.size()
+            );
+        }
     }
 
 
 
     @FXML
     private void exportExcel() {
+        loadReportRows();
+        applyReportFilter();
+
         ReportSummary summary = buildSummaryFromFilteredRows();
 
         javafx.collections.ObservableList<ReportRow> exportRows =
-                javafx.collections.FXCollections.observableArrayList(filteredList);
+                javafx.collections.FXCollections.observableArrayList();
 
-        ReportExcelExporter.exportReport(summary, exportRows);
+        if (filteredList != null) {
+            exportRows.addAll(filteredList);
+        }
+
+        if (exportRows.isEmpty()) {
+            new Alert(Alert.AlertType.WARNING,
+                    "No report rows found to export. Please click Generate or check filters.").show();
+            return;
+        }
+
+        boolean exported = ReportExcelExporter.exportReport(summary, exportRows);
+
+        if (exported) {
+            AuditLogDAO.log(
+                    AuditActions.REPORT_EXCEL_EXPORTED,
+                    "Excel report exported. Type: "
+                            + reportTypeCombo.getValue()
+                            + ", Rows: "
+                            + exportRows.size()
+            );
+        }
     }
 
     @FXML
@@ -215,6 +250,15 @@ public class ReportsController {
 
             if (success) {
                 job.endJob();
+
+                AuditLogDAO.log(
+                        AuditActions.REPORT_PRINTED,
+                        "Report printed. Type: "
+                                + reportTypeCombo.getValue()
+                                + ", Rows: "
+                                + (filteredList == null ? 0 : filteredList.size())
+                );
+
                 new Alert(Alert.AlertType.INFORMATION,
                         "Report sent to printer.").show();
             } else {

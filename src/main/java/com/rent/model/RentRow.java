@@ -28,6 +28,7 @@ public class RentRow {
     private String paymentDate;   // YYYY-MM-DD (nullable)
     private double paidAmount;
     private String notes;
+    private String receiptNo;
 
     public RentRow() {}
 
@@ -91,4 +92,12 @@ public class RentRow {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getReceiptNo() {
+        return receiptNo;
+    }
+
+    public void setReceiptNo(String receiptNo) {
+        this.receiptNo = receiptNo;
+    }
 }

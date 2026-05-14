@@ -270,7 +270,8 @@ public class RentDAO {
                 ra.due_date,
                 ra.payment_date,
                 ra.paid_amount,
-                ra.notes
+                ra.notes,
+                ra.receipt_no
             FROM rent_archive ra
             JOIN tenants t ON ra.tenant_id = t.id
             JOIN flats f ON ra.flat_no = f.flat_no
@@ -303,6 +304,7 @@ public class RentDAO {
                 r.setPaymentDate(rs.getString("payment_date"));
                 r.setPaidAmount(rs.getDouble("paid_amount"));
                 r.setNotes(rs.getString("notes"));
+                r.setReceiptNo(rs.getString("receipt_no"));
                 list.add(r);
             }
         } catch (Exception e) {
@@ -403,26 +405,28 @@ public class RentDAO {
 
     // ---------------- ARCHIVE MOVE ----------------
     private static void moveToArchive(Connection conn, int id) throws SQLException {
+        String receiptNo = generateReceiptNo(conn);
         String insert = """
-            INSERT INTO rent_archive
-            (original_id, tenant_id, flat_no, bill_month,
-             house_rent, electricity, water, gas,
-             other_bills, fine, discount,
-             total, paid_amount, payment_date, due_date,
-             status, notes, archived_at)
-            SELECT
-             id, tenant_id, flat_no, bill_month,
-             house_rent, electricity, water, gas,
-             other_bills, fine, discount,
-             total, paid_amount, payment_date, due_date,
-             'PAID', notes, ?
-            FROM rent_current
-            WHERE id=?
-            """;
+        INSERT INTO rent_archive
+        (original_id, tenant_id, flat_no, bill_month,
+         house_rent, electricity, water, gas,
+         other_bills, fine, discount,
+         total, paid_amount, payment_date, due_date,
+         status, notes, archived_at, receipt_no)
+        SELECT
+         id, tenant_id, flat_no, bill_month,
+         house_rent, electricity, water, gas,
+         other_bills, fine, discount,
+         total, paid_amount, payment_date, due_date,
+         'PAID', notes, ?, ?
+        FROM rent_current
+        WHERE id=?
+        """;
 
         try (PreparedStatement ps = conn.prepareStatement(insert)) {
             ps.setString(1, LocalDateTime.now().format(TS));
-            ps.setInt(2, id);
+            ps.setString(2, receiptNo);
+            ps.setInt(3, id);
             ps.executeUpdate();
         }
 
@@ -441,5 +445,104 @@ public class RentDAO {
     private static class RentSnapshot {
         double houseRent;
         String dueDate;
+    }
+
+    private static String generateReceiptNo(Connection conn) throws SQLException {
+        String year = String.valueOf(LocalDate.now().getYear());
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM rent_archive
+            WHERE receipt_no LIKE ?
+            """;
+
+        int nextNumber = 1;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "RCP-" + year + "-%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    nextNumber = rs.getInt(1) + 1;
+                }
+            }
+        }
+
+        return "RCP-" + year + "-" + String.format("%06d", nextNumber);
+    }
+
+    public static RentRow getArchivedRowByOriginalId(int originalId) {
+        String sql = """
+            SELECT
+                ra.id,
+                ra.original_id,
+                ra.tenant_id,
+                ra.flat_no,
+                f.meter_no,
+                t.name AS tenant_name,
+                t.phone,
+                ra.bill_month,
+                ra.house_rent,
+                ra.electricity,
+                ra.water,
+                ra.gas,
+                ra.other_bills,
+                ra.fine,
+                ra.discount,
+                ra.total,
+                ra.status,
+                ra.due_date,
+                ra.payment_date,
+                ra.paid_amount,
+                ra.notes,
+                ra.receipt_no
+            FROM rent_archive ra
+            JOIN tenants t ON ra.tenant_id = t.id
+            JOIN flats f ON ra.flat_no = f.flat_no
+            WHERE ra.original_id = ?
+            ORDER BY ra.id DESC
+            LIMIT 1
+            """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, originalId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    RentRow r = new RentRow();
+
+                    r.setId(rs.getInt("id"));
+                    r.setTenantId(rs.getInt("tenant_id"));
+                    r.setFlatNo(rs.getString("flat_no"));
+                    r.setMeterNo(rs.getString("meter_no"));
+                    r.setTenantName(rs.getString("tenant_name"));
+                    r.setPhone(rs.getString("phone"));
+                    r.setBillMonth(rs.getString("bill_month"));
+                    r.setHouseRent(rs.getDouble("house_rent"));
+                    r.setElectricity(rs.getDouble("electricity"));
+                    r.setWater(rs.getDouble("water"));
+                    r.setGas(rs.getDouble("gas"));
+                    r.setOtherBills(rs.getDouble("other_bills"));
+                    r.setFine(rs.getDouble("fine"));
+                    r.setDiscount(rs.getDouble("discount"));
+                    r.setTotal(rs.getDouble("total"));
+                    r.setStatus(rs.getString("status"));
+                    r.setDueDate(rs.getString("due_date"));
+                    r.setPaymentDate(rs.getString("payment_date"));
+                    r.setPaidAmount(rs.getDouble("paid_amount"));
+                    r.setNotes(rs.getString("notes"));
+                    r.setReceiptNo(rs.getString("receipt_no"));
+
+                    return r;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

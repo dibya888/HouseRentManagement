@@ -197,6 +197,12 @@ public class DBUtil {
                 """;
             stmt.execute(rentArchiveSql);
 
+            try {
+                stmt.execute("ALTER TABLE rent_archive ADD COLUMN receipt_no TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
             String propertiesSql = """
                 CREATE TABLE IF NOT EXISTS properties (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -232,6 +238,18 @@ public class DBUtil {
                 )
                 """;
             stmt.execute(repairsSql);
+
+            // AUDIT LOGS TABLE
+            String auditLogsSql = """
+                CREATE TABLE IF NOT EXISTS audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT,
+                    action TEXT NOT NULL,
+                    details TEXT,
+                    created_at TEXT NOT NULL
+                )
+                """;
+            stmt.execute(auditLogsSql);
 
             System.out.println("Database Ready");
 

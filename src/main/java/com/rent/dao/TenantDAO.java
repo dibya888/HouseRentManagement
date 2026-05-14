@@ -2,7 +2,8 @@ package com.rent.dao;
 
 import com.rent.model.Tenant;
 import com.rent.util.DBUtil;
-
+import com.rent.util.AuditActions;
+import com.rent.dao.AuditLogDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +39,21 @@ public class TenantDAO {
             ps.setString(8, t.getNidPath());
             ps.setString(9, t.getDocPath());
 
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.TENANT_ADDED,
+                        "Tenant added. Name: "
+                                + t.getName()
+                                + ", Phone: "
+                                + t.getPhone()
+                                + ", Flat: "
+                                + t.getFlatNo()
+                                + ", Rent: "
+                                + t.getRent()
+                );
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,7 +145,23 @@ public class TenantDAO {
             ps.setString(8, t.getDocPath());
             ps.setInt(9, t.getId());
 
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.TENANT_UPDATED,
+                        "Tenant updated. ID: "
+                                + t.getId()
+                                + ", Name: "
+                                + t.getName()
+                                + ", Phone: "
+                                + t.getPhone()
+                                + ", Flat: "
+                                + t.getFlatNo()
+                                + ", Rent: "
+                                + t.getRent()
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,20 +169,32 @@ public class TenantDAO {
 
     // DELETE
     public static void deleteTenant(int id) {
+        Tenant tenant = getTenantById(id);
 
-        String sql =
-                "DELETE FROM tenants WHERE id=?";
+        String sql = "DELETE FROM tenants WHERE id=?";
 
         try (
                 Connection conn = DBUtil.connect();
-
                 PreparedStatement ps =
                         conn.prepareStatement(sql)
         ) {
-
             ps.setInt(1, id);
 
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.TENANT_DELETED,
+                        "Tenant deleted. ID: "
+                                + id
+                                + ", Name: "
+                                + (tenant == null ? "" : tenant.getName())
+                                + ", Phone: "
+                                + (tenant == null ? "" : tenant.getPhone())
+                                + ", Flat: "
+                                + (tenant == null ? "" : tenant.getFlatNo())
+                );
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,8 +230,10 @@ public class TenantDAO {
     }
 
     public static void deleteTenantAndFreeFlat(int tenantId) {
+        String tenantName = null;
+        String tenantPhone = null;
 
-        String selectFlatSql = "SELECT flat_no FROM tenants WHERE id=?";
+        String selectFlatSql = "SELECT name, phone, flat_no FROM tenants WHERE id=?";
         String deleteTenantSql = "DELETE FROM tenants WHERE id=?";
         String updateFlatSql = "UPDATE flats SET status='Available' WHERE flat_no=?";
 
@@ -203,6 +248,8 @@ public class TenantDAO {
                 ps.setInt(1, tenantId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        tenantName = rs.getString("name");
+                        tenantPhone = rs.getString("phone");
                         flatNo = rs.getString("flat_no");
                     }
                 }
@@ -223,6 +270,17 @@ public class TenantDAO {
             }
 
             conn.commit(); // ✅ commit both operations
+            AuditLogDAO.log(
+                    AuditActions.TENANT_DELETED,
+                    "Tenant deleted. ID: "
+                            + tenantId
+                            + ", Name: "
+                            + tenantName
+                            + ", Phone: "
+                            + tenantPhone
+                            + ", Flat freed: "
+                            + flatNo
+            );
 
         } catch (Exception e) {
             e.printStackTrace();

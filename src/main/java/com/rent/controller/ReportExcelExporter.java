@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ReportExcelExporter {
 
-    public static void exportReport(ReportSummary summary,
+    public static boolean exportReport(ReportSummary summary,
                                     ObservableList<ReportRow> rows) {
 
         FileChooser chooser = new FileChooser();
@@ -33,7 +33,7 @@ public class ReportExcelExporter {
         File file = chooser.showSaveDialog(null);
 
         if (file == null) {
-            return;
+            return false;
         }
 
         if (!file.getName().toLowerCase().endsWith(".xlsx")) {
@@ -46,6 +46,7 @@ public class ReportExcelExporter {
             new Alert(Alert.AlertType.INFORMATION,
                     "Excel report exported successfully:\n" + file.getAbsolutePath()
             ).show();
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,6 +54,7 @@ public class ReportExcelExporter {
             new Alert(Alert.AlertType.ERROR,
                     "Failed to export Excel report."
             ).show();
+            return false;
         }
     }
 
