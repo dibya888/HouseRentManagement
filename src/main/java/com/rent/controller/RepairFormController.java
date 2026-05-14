@@ -23,6 +23,9 @@ public class RepairFormController {
     @FXML private ComboBox<String> statusCombo;
     @FXML private TextArea descriptionArea;
     @FXML private TextArea notesArea;
+    @FXML private TextField vendorNameField;
+    @FXML private TextField vendorPhoneField;
+    @FXML private TextField invoiceNoField;
 
     private Repair repair;
 
@@ -81,6 +84,9 @@ public class RepairFormController {
         statusCombo.setValue(repair.getStatus());
         descriptionArea.setText(repair.getDescription());
         notesArea.setText(repair.getNotes());
+        vendorNameField.setText(repair.getVendorName());
+        vendorPhoneField.setText(repair.getVendorPhone());
+        invoiceNoField.setText(repair.getInvoiceNo());
     }
 
     @FXML
@@ -95,6 +101,9 @@ public class RepairFormController {
         String paidBy = paidByCombo.getValue();
         String status = statusCombo.getValue();
         String notes = notesArea.getText();
+        String vendorName = vendorNameField.getText() == null ? "" : vendorNameField.getText().trim();
+        String vendorPhone = vendorPhoneField.getText() == null ? "" : vendorPhoneField.getText().trim();
+        String invoiceNo = invoiceNoField.getText() == null ? "" : invoiceNoField.getText().trim();
 
         boolean success;
 
@@ -110,6 +119,10 @@ public class RepairFormController {
                     notes
             );
 
+            newRepair.setVendorName(vendorName);
+            newRepair.setVendorPhone(vendorPhone);
+            newRepair.setInvoiceNo(invoiceNo);
+
             success = RepairDAO.addRepair(newRepair);
         } else {
             repair.setFlatNo(flatNo);
@@ -120,6 +133,10 @@ public class RepairFormController {
             repair.setPaidBy(paidBy);
             repair.setStatus(status);
             repair.setNotes(notes);
+
+            repair.setVendorName(vendorName);
+            repair.setVendorPhone(vendorPhone);
+            repair.setInvoiceNo(invoiceNo);
 
             success = RepairDAO.updateRepair(repair);
         }

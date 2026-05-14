@@ -1,9 +1,9 @@
 package com.rent.dao;
 
 import com.rent.model.Repair;
-import com.rent.util.DBUtil;
 import com.rent.util.AuditActions;
-import com.rent.dao.AuditLogDAO;
+import com.rent.util.DBUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,8 +45,9 @@ public class RepairDAO {
         String sql = """
                 INSERT INTO repairs
                 (flat_no, repair_date, category, description, cost,
-                 paid_by, status, notes, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 paid_by, status, notes, created_at,
+                 vendor_name, vendor_phone, invoice_no)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = DBUtil.connect();
@@ -61,6 +62,9 @@ public class RepairDAO {
             ps.setString(7, repair.getStatus());
             ps.setString(8, repair.getNotes());
             ps.setString(9, LocalDateTime.now().format(TS));
+            ps.setString(10, repair.getVendorName());
+            ps.setString(11, repair.getVendorPhone());
+            ps.setString(12, repair.getInvoiceNo());
 
             boolean success = ps.executeUpdate() > 0;
 
@@ -79,6 +83,12 @@ public class RepairDAO {
                                 + repair.getPaidBy()
                                 + ", Status: "
                                 + repair.getStatus()
+                                + ", Vendor: "
+                                + nullSafe(repair.getVendorName())
+                                + ", Vendor Phone: "
+                                + nullSafe(repair.getVendorPhone())
+                                + ", Invoice: "
+                                + nullSafe(repair.getInvoiceNo())
                 );
             }
 
@@ -100,7 +110,10 @@ public class RepairDAO {
                     cost=?,
                     paid_by=?,
                     status=?,
-                    notes=?
+                    notes=?,
+                    vendor_name=?,
+                    vendor_phone=?,
+                    invoice_no=?
                 WHERE id=?
                 """;
 
@@ -115,7 +128,10 @@ public class RepairDAO {
             ps.setString(6, repair.getPaidBy());
             ps.setString(7, repair.getStatus());
             ps.setString(8, repair.getNotes());
-            ps.setInt(9, repair.getId());
+            ps.setString(9, repair.getVendorName());
+            ps.setString(10, repair.getVendorPhone());
+            ps.setString(11, repair.getInvoiceNo());
+            ps.setInt(12, repair.getId());
 
             boolean success = ps.executeUpdate() > 0;
 
@@ -136,6 +152,12 @@ public class RepairDAO {
                                 + repair.getPaidBy()
                                 + ", Status: "
                                 + repair.getStatus()
+                                + ", Vendor: "
+                                + nullSafe(repair.getVendorName())
+                                + ", Vendor Phone: "
+                                + nullSafe(repair.getVendorPhone())
+                                + ", Invoice: "
+                                + nullSafe(repair.getInvoiceNo())
                 );
             }
 
@@ -221,29 +243,12 @@ public class RepairDAO {
         }
     }
 
-    private static Repair mapRepair(ResultSet rs) throws Exception {
-        Repair repair = new Repair();
-
-        repair.setId(rs.getInt("id"));
-        repair.setFlatNo(rs.getString("flat_no"));
-        repair.setRepairDate(rs.getString("repair_date"));
-        repair.setCategory(rs.getString("category"));
-        repair.setDescription(rs.getString("description"));
-        repair.setCost(rs.getDouble("cost"));
-        repair.setPaidBy(rs.getString("paid_by"));
-        repair.setStatus(rs.getString("status"));
-        repair.setNotes(rs.getString("notes"));
-        repair.setCreatedAt(rs.getString("created_at"));
-
-        return repair;
-    }
-
     public static double getOwnerPaidTotalRepairCost() {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Owner'
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Owner'
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -259,11 +264,11 @@ public class RepairDAO {
 
     public static double getOwnerPaidMonthRepairCost(String month) {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Owner'
-            AND repair_date LIKE ?
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Owner'
+                  AND repair_date LIKE ?
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -282,11 +287,11 @@ public class RepairDAO {
 
     public static double getOwnerPaidYearRepairCost(String year) {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Owner'
-            AND repair_date LIKE ?
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Owner'
+                  AND repair_date LIKE ?
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -305,10 +310,10 @@ public class RepairDAO {
 
     public static double getTenantPaidTotalRepairCost() {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Tenant'
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Tenant'
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -324,11 +329,11 @@ public class RepairDAO {
 
     public static double getTenantPaidMonthRepairCost(String month) {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Tenant'
-            AND repair_date LIKE ?
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Tenant'
+                  AND repair_date LIKE ?
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -347,11 +352,11 @@ public class RepairDAO {
 
     public static double getTenantPaidYearRepairCost(String year) {
         String sql = """
-            SELECT COALESCE(SUM(cost), 0)
-            FROM repairs
-            WHERE paid_by = 'Tenant'
-            AND repair_date LIKE ?
-            """;
+                SELECT COALESCE(SUM(cost), 0)
+                FROM repairs
+                WHERE paid_by = 'Tenant'
+                  AND repair_date LIKE ?
+                """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -366,5 +371,30 @@ public class RepairDAO {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    private static Repair mapRepair(ResultSet rs) throws Exception {
+        Repair repair = new Repair();
+
+        repair.setId(rs.getInt("id"));
+        repair.setFlatNo(rs.getString("flat_no"));
+        repair.setRepairDate(rs.getString("repair_date"));
+        repair.setCategory(rs.getString("category"));
+        repair.setDescription(rs.getString("description"));
+        repair.setCost(rs.getDouble("cost"));
+        repair.setPaidBy(rs.getString("paid_by"));
+        repair.setStatus(rs.getString("status"));
+        repair.setNotes(rs.getString("notes"));
+        repair.setCreatedAt(rs.getString("created_at"));
+
+        repair.setVendorName(rs.getString("vendor_name"));
+        repair.setVendorPhone(rs.getString("vendor_phone"));
+        repair.setInvoiceNo(rs.getString("invoice_no"));
+
+        return repair;
+    }
+
+    private static String nullSafe(String value) {
+        return value == null || value.isBlank() ? "-" : value;
     }
 }

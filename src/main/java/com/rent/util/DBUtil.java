@@ -293,6 +293,24 @@ public class DBUtil {
                 """;
             stmt.execute(repairsSql);
 
+            try {
+                stmt.execute("ALTER TABLE repairs ADD COLUMN vendor_name TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE repairs ADD COLUMN vendor_phone TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE repairs ADD COLUMN invoice_no TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
             // AUDIT LOGS TABLE
             String auditLogsSql = """
                 CREATE TABLE IF NOT EXISTS audit_logs (

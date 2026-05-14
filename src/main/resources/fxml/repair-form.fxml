@@ -56,16 +56,37 @@
                       GridPane.columnIndex="1"
                       prefWidth="260"/>
 
-            <Label text="Description:" GridPane.rowIndex="6"/>
+            <Label text="Vendor Name:" GridPane.rowIndex="6"/>
+            <TextField fx:id="vendorNameField"
+                       GridPane.rowIndex="6"
+                       GridPane.columnIndex="1"
+                       prefWidth="260"
+                       promptText="Vendor / contractor name"/>
+
+            <Label text="Vendor Phone:" GridPane.rowIndex="7"/>
+            <TextField fx:id="vendorPhoneField"
+                       GridPane.rowIndex="7"
+                       GridPane.columnIndex="1"
+                       prefWidth="260"
+                       promptText="Vendor phone number"/>
+
+            <Label text="Invoice No:" GridPane.rowIndex="8"/>
+            <TextField fx:id="invoiceNoField"
+                       GridPane.rowIndex="8"
+                       GridPane.columnIndex="1"
+                       prefWidth="260"
+                       promptText="Invoice / bill no"/>
+
+            <Label text="Description:" GridPane.rowIndex="9"/>
             <TextArea fx:id="descriptionArea"
-                      GridPane.rowIndex="6"
+                      GridPane.rowIndex="9"
                       GridPane.columnIndex="1"
                       prefWidth="260"
                       prefRowCount="3"/>
 
-            <Label text="Notes:" GridPane.rowIndex="7"/>
+            <Label text="Notes:" GridPane.rowIndex="10"/>
             <TextArea fx:id="notesArea"
-                      GridPane.rowIndex="7"
+                      GridPane.rowIndex="10"
                       GridPane.columnIndex="1"
                       prefWidth="260"
                       prefRowCount="2"/>

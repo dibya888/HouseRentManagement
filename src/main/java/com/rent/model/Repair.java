@@ -13,7 +13,12 @@ public class Repair {
     private String notes;
     private String createdAt;
 
-    public Repair() {}
+    private String vendorName;
+    private String vendorPhone;
+    private String invoiceNo;
+
+    public Repair() {
+    }
 
     public Repair(int id, String flatNo, String repairDate, String category,
                   String description, double cost, String paidBy,
@@ -83,6 +88,18 @@ public class Repair {
         return createdAt;
     }
 
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public String getVendorPhone() {
+        return vendorPhone;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -121,5 +138,17 @@ public class Repair {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
+
+    public void setVendorPhone(String vendorPhone) {
+        this.vendorPhone = vendorPhone;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
     }
 }
