@@ -1,0 +1,173 @@
+package com.rent.controller;
+
+import com.rent.util.DBUtil;
+import com.rent.util.SecurityUtil;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class ForgotPasswordController {
+
+    @FXML private TextField usernameField;
+    @FXML private PasswordField recoveryPinField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
+
+    @FXML
+    private void resetPassword() {
+        String username = text(usernameField);
+        String recoveryPin = text(recoveryPinField);
+        String newPassword = text(newPasswordField);
+        String confirmPassword = text(confirmPasswordField);
+
+        if (username.isBlank()) {
+            showWarning("Please enter username.");
+            return;
+        }
+
+        if (recoveryPin.isBlank()) {
+            showWarning("Please enter recovery PIN.");
+            return;
+        }
+
+        if (newPassword.isBlank()) {
+            showWarning("Please enter new password.");
+            return;
+        }
+
+        if (newPassword.length() < 4) {
+            showWarning("New password must be at least 4 characters.");
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            showWarning("New password and confirm password do not match.");
+            return;
+        }
+
+        RecoveryPinData pinData = getRecoveryPinData(username);
+
+        if (pinData == null) {
+            showError("User not found or recovery PIN is not set.");
+            return;
+        }
+
+        boolean validPin = SecurityUtil.verifySecret(
+                recoveryPin,
+                pinData.hash,
+                pinData.salt
+        );
+
+        if (!validPin) {
+            showError("Invalid recovery PIN.");
+            return;
+        }
+
+        if (updatePassword(username, newPassword)) {
+            showInfo("Password reset successfully. You can now login with your new password.");
+            close();
+        } else {
+            showError("Failed to reset password.");
+        }
+    }
+
+    private RecoveryPinData getRecoveryPinData(String username) {
+        String sql = """
+                SELECT recovery_pin_hash, recovery_pin_salt
+                FROM users
+                WHERE username = ?
+                """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String hash = rs.getString("recovery_pin_hash");
+                    String salt = rs.getString("recovery_pin_salt");
+
+                    if (hash == null || hash.isBlank()
+                            || salt == null || salt.isBlank()) {
+                        return null;
+                    }
+
+                    return new RecoveryPinData(hash, salt);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private boolean updatePassword(String username, String newPassword) {
+        String sql = """
+                UPDATE users
+                SET password = ?
+                WHERE username = ?
+                """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, username);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String text(TextField field) {
+        return field.getText() == null ? "" : field.getText().trim();
+    }
+
+    private String text(PasswordField field) {
+        return field.getText() == null ? "" : field.getText().trim();
+    }
+
+    @FXML
+    private void close() {
+        Stage stage = (Stage) usernameField
+                .getScene()
+                .getWindow();
+
+        stage.close();
+    }
+
+    private void showInfo(String message) {
+        new Alert(Alert.AlertType.INFORMATION, message).showAndWait();
+    }
+
+    private void showWarning(String message) {
+        new Alert(Alert.AlertType.WARNING, message).showAndWait();
+    }
+
+    private void showError(String message) {
+        new Alert(Alert.AlertType.ERROR, message).showAndWait();
+    }
+
+    private static class RecoveryPinData {
+        String hash;
+        String salt;
+
+        RecoveryPinData(String hash, String salt) {
+            this.hash = hash;
+            this.salt = salt;
+        }
+    }
+}

@@ -88,10 +88,10 @@
                                 maxWidth="Infinity"
                                 styleClass="settings-primary-btn"/>
 
-                        <Button text="Recovery PIN - Coming Soon"
-                                disable="true"
+                        <Button text="Set / Update Recovery PIN"
+                                onAction="#openRecoveryPin"
                                 maxWidth="Infinity"
-                                styleClass="settings-disabled-btn"/>
+                                styleClass="settings-primary-btn"/>
                     </VBox>
                 </VBox>
 

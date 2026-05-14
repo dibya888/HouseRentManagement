@@ -32,6 +32,19 @@ public class DBUtil {
                 )
             """);
 
+            //Add recovery PIN columns safely
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN recovery_pin_hash TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN recovery_pin_salt TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
             // Default admin user
             stmt.execute("""
                 INSERT OR IGNORE INTO users(username, password)

@@ -10,10 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Modality;
 
 import java.util.prefs.Preferences;
@@ -106,6 +102,41 @@ public class SettingsController {
                     javafx.scene.control.Alert.AlertType.ERROR,
                     "Failed to open Change Password."
             ).showAndWait();
+        }
+    }
+
+    @FXML
+    private void openRecoveryPin(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/recovery-pin.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
+            );
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Recovery PIN");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to open Recovery PIN.").showAndWait();
         }
     }
 

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.RecoveryPinController"
+      spacing="16"
+      prefWidth="460"
+      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+
+    <Label text="🔐 Set Recovery PIN"
+           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           maxWidth="Infinity"
+           alignment="CENTER"/>
+
+    <VBox spacing="12"
+          style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
+
+        <Label text="Recovery PIN helps you reset your password if you forget it."
+               wrapText="true"
+               style="-fx-text-fill:#374151;"/>
+
+        <GridPane hgap="14" vgap="12">
+
+            <Label text="Login Password:"/>
+            <PasswordField fx:id="passwordField"
+                           GridPane.columnIndex="1"
+                           prefWidth="250"/>
+
+            <Label text="Recovery PIN:" GridPane.rowIndex="1"/>
+            <PasswordField fx:id="recoveryPinField"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="1"
+                           prefWidth="250"/>
+
+            <Label text="Confirm PIN:" GridPane.rowIndex="2"/>
+            <PasswordField fx:id="confirmPinField"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="1"
+                           prefWidth="250"/>
+
+        </GridPane>
+
+        <Label text="PIN must be 4 to 8 digits. Keep it private."
+               wrapText="true"
+               style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
+
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel"
+                onAction="#close"/>
+
+        <Button text="Save Recovery PIN"
+                onAction="#saveRecoveryPin"
+                style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+    </HBox>
+
+</VBox>

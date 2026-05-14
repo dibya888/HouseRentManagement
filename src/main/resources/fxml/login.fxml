@@ -49,6 +49,10 @@
                    -fx-padding: 10;
                    -fx-background-radius: 8;"/>
 
+    <Button text="Forgot Password?"
+            onAction="#openForgotPassword"
+            style="-fx-background-color:transparent; -fx-text-fill:#2563eb; -fx-font-weight:bold;"/>
+
     <Label fx:id="messageLabel"
            textFill="red"/>
 

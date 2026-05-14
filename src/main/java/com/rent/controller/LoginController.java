@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.Node;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -21,6 +22,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import java.util.prefs.Preferences;
+import javafx.scene.image.Image;
+import javafx.stage.Modality;
+
 
 public class LoginController {
 
@@ -87,6 +91,41 @@ public class LoginController {
 
             messageLabel.setText("Invalid username or password");
             messageLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+
+    @FXML
+    private void openForgotPassword() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/forgot-password.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
+            );
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Forgot Password");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to open password recovery.").showAndWait();
         }
     }
 
