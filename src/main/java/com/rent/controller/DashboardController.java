@@ -106,6 +106,7 @@ public class DashboardController {
                     Preferences.userNodeForPackage(LoginController.class);
 
             prefs.remove("loggedInUser");
+            prefs.putBoolean("saveLogin", false);
 
             // load login page
             FXMLLoader loader = new FXMLLoader(

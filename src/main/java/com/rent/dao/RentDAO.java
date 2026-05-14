@@ -90,23 +90,24 @@ public class RentDAO {
         String dueDate = due.format(YMD);
 
         String selectOccupiedTenants = """
-    SELECT t.id AS tenant_id, f.flat_no, f.rent
-    FROM tenants t
-    JOIN flats f ON t.flat_no = f.flat_no
-    WHERE f.status='Occupied'
-      AND NOT EXISTS (
-          SELECT 1
-          FROM rent_archive ra
-          WHERE ra.flat_no = f.flat_no
+        SELECT t.id AS tenant_id, f.flat_no, f.rent
+        FROM tenants t
+        JOIN flats f ON t.flat_no = f.flat_no
+        WHERE f.status='Occupied'
+          AND (t.status IS NULL OR t.status = '' OR t.status = 'Active')
+        AND NOT EXISTS (
+            SELECT 1
+            FROM rent_archive ra
+            WHERE ra.tenant_id = t.id
             AND ra.bill_month = ?
-      )
-      AND NOT EXISTS (
-          SELECT 1
-          FROM rent_current rc
-          WHERE rc.flat_no = f.flat_no
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM rent_current rc
+            WHERE rc.tenant_id = t.id
             AND rc.bill_month = ?
-      )
-    """;
+        )
+        """;
 
         String selectGlobalDefaults = """
             SELECT electricity, gas, water
