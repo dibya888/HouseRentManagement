@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rent.controller.PastTenantsController"
+            style="-fx-background-color:#f4f6f7;">
+
+    <center>
+        <VBox spacing="14" style="-fx-padding:20;">
+
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="📦 Past Tenants"
+                       style="-fx-font-size:22px; -fx-font-weight:bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="⬅ Back to Tenants"
+                        onAction="#backToTenants"
+                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
+
+                <Button text="🔄 Refresh"
+                        onAction="#loadPastTenants"
+                        style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <!-- Filters -->
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
+
+                <TextField fx:id="searchField"
+                           promptText="🔍 Search name, phone, NID, flat..."
+                           onKeyReleased="#onSearch"
+                           prefWidth="330"/>
+
+                <Label text="From:"/>
+                <DatePicker fx:id="fromDatePicker"
+                            prefWidth="145"/>
+
+                <Label text="To:"/>
+                <DatePicker fx:id="toDatePicker"
+                            prefWidth="145"/>
+
+                <Button text="Clear"
+                        onAction="#clearFilters"
+                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="pastTenantTable">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+                    <TableColumn fx:id="colPhone" text="Phone" prefWidth="130"/>
+                    <TableColumn fx:id="colNid" text="NID" prefWidth="130"/>
+                    <TableColumn fx:id="colFlatNo" text="Previous Flat" prefWidth="120"/>
+                    <TableColumn fx:id="colRent" text="Rent" prefWidth="100"/>
+                    <TableColumn fx:id="colMoveOutDate" text="Move Out Date" prefWidth="130"/>
+                    <TableColumn fx:id="colMoveOutReason" text="Reason" prefWidth="260"/>
+                    <TableColumn fx:id="colSettlement" text="Settlement" prefWidth="110"/>
+                    <TableColumn fx:id="colRefund" text="Refund" prefWidth="100"/>
+                    <TableColumn fx:id="colPayable" text="Payable" prefWidth="100"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="260"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

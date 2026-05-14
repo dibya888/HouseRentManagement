@@ -6,7 +6,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextArea;
+import java.time.LocalDate;
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +30,10 @@ public class AddTenantController {
 
     @FXML private Label nidFileLabel;
     @FXML private Label docFileLabel;
+    @FXML private CheckBox depositCheckBox;
+    @FXML private TextField depositAmountField;
+    @FXML private DatePicker depositDatePicker;
+    @FXML private TextArea depositNoteArea;
 
     private File nidFile;
     private File docFile;
@@ -41,54 +50,149 @@ public class AddTenantController {
             return;
         }
 
-        String sql = """
-                INSERT INTO tenants
-                (name, phone, email, nid, address, flat_no, rent, nid_path, doc_path)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+        String name = nameField.getText() == null ? "" : nameField.getText().trim();
+        String phone = phoneField.getText() == null ? "" : phoneField.getText().trim();
+        String email = emailField.getText() == null ? "" : emailField.getText().trim();
+        String nid = nidField.getText() == null ? "" : nidField.getText().trim();
+        String address = addressField.getText() == null ? "" : addressField.getText().trim();
 
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        if (name.isBlank() || phone.isBlank()) {
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.WARNING,
+                    "Name and phone are required."
+            ).show();
+            return;
+        }
 
-            stmt.setString(1, nameField.getText());
+        boolean depositTaken = depositCheckBox != null && depositCheckBox.isSelected();
 
-            stmt.setString(2, phoneField.getText());
+        double depositAmount = 0;
+        String depositDate = null;
+        String depositNote = null;
 
-            stmt.setString(3, emailField.getText());
+        if (depositTaken) {
+            try {
+                depositAmount = Double.parseDouble(depositAmountField.getText().trim());
+            } catch (Exception e) {
+                new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.WARNING,
+                        "Please enter a valid security deposit amount."
+                ).show();
+                return;
+            }
 
-            stmt.setString(4, nidField.getText());
+            if (depositAmount <= 0) {
+                new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.WARNING,
+                        "Security deposit amount must be greater than 0."
+                ).show();
+                return;
+            }
 
-            stmt.setString(5, addressField.getText());
+            if (depositDatePicker.getValue() == null) {
+                new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.WARNING,
+                        "Please select security deposit date."
+                ).show();
+                return;
+            }
 
-            stmt.setString(6, selectedFlat);
+            depositDate = depositDatePicker.getValue().toString();
 
-            double rent = FlatDAO.getRentByFlatNo(selectedFlat);  // rent from flats table
+            depositNote = depositNoteArea.getText() == null
+                    ? null
+                    : depositNoteArea.getText().trim();
+        }
 
-            stmt.setDouble(7, rent);
+        String insertTenantSql = """
+            INSERT INTO tenants
+            (name, phone, email, nid, address, flat_no, rent,
+             nid_path, doc_path, status, move_in_date,
+             move_out_date, move_out_reason,
+             security_deposit, security_deposit_date, security_deposit_note)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, NULL, NULL, ?, ?, ?)
+            """;
 
+        String occupyFlatSql = """
+            UPDATE flats
+            SET status = 'Occupied'
+            WHERE flat_no = ?
+            """;
 
-            stmt.setString(8,
-                    nidFile != null
-                            ? nidFile.getAbsolutePath()
-                            : null);
+        try (Connection conn = DBUtil.connect()) {
+            conn.setAutoCommit(false);
 
-            stmt.setString(9,
-                    docFile != null
-                            ? docFile.getAbsolutePath()
-                            : null);
+            double rent = FlatDAO.getRentByFlatNo(selectedFlat);
 
-            stmt.executeUpdate();
-            FlatDAO.markFlatOccupied(selectedFlat);
+            int rows;
+
+            try (PreparedStatement stmt = conn.prepareStatement(insertTenantSql)) {
+                stmt.setString(1, name);
+                stmt.setString(2, phone);
+                stmt.setString(3, email);
+                stmt.setString(4, nid);
+                stmt.setString(5, address);
+                stmt.setString(6, selectedFlat);
+                stmt.setDouble(7, rent);
+
+                stmt.setString(8,
+                        nidFile != null
+                                ? nidFile.getAbsolutePath()
+                                : null);
+
+                stmt.setString(9,
+                        docFile != null
+                                ? docFile.getAbsolutePath()
+                                : null);
+
+                stmt.setString(10, LocalDate.now().toString());
+
+                stmt.setDouble(11, depositAmount);
+                stmt.setString(12, depositDate);
+                stmt.setString(13, depositNote);
+
+                rows = stmt.executeUpdate();
+            }
+
+            if (rows > 0) {
+                try (PreparedStatement ps = conn.prepareStatement(occupyFlatSql)) {
+                    ps.setString(1, selectedFlat);
+                    ps.executeUpdate();
+                }
+            }
+
+            conn.commit();
+
+            if (rows > 0) {
+                AuditLogDAO.log(
+                        AuditActions.TENANT_ADDED,
+                        "Tenant added. Name: "
+                                + name
+                                + ", Phone: "
+                                + phone
+                                + ", Flat: "
+                                + selectedFlat
+                                + ", Rent: "
+                                + rent
+                                + ", Security Deposit: "
+                                + depositAmount
+                );
+            }
 
             Stage stage =
                     (Stage) nameField.getScene().getWindow();
-
             stage.close();
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.ERROR,
+                    "Failed to save tenant."
+            ).show();
         }
     }
+
 
     @FXML
     public void uploadNidFile() {
@@ -139,5 +243,32 @@ public class AddTenantController {
             }
         });
 
+        setupDepositFields();
+    }
+
+    private void setupDepositFields() {
+        if (depositCheckBox == null) {
+            return;
+        }
+
+        depositAmountField.setDisable(true);
+        depositDatePicker.setDisable(true);
+        depositNoteArea.setDisable(true);
+
+        depositCheckBox.selectedProperty().addListener((obs, oldVal, selected) -> {
+            depositAmountField.setDisable(!selected);
+            depositDatePicker.setDisable(!selected);
+            depositNoteArea.setDisable(!selected);
+
+            if (selected) {
+                if (depositDatePicker.getValue() == null) {
+                    depositDatePicker.setValue(LocalDate.now());
+                }
+            } else {
+                depositAmountField.clear();
+                depositDatePicker.setValue(null);
+                depositNoteArea.clear();
+            }
+        });
     }
 }

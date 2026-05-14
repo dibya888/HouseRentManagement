@@ -29,7 +29,7 @@ public class DashboardDAO {
             summary.setTotalTenants(getInt(conn, "SELECT COUNT(*) FROM tenants"));
 
             double monthIncome = getDouble(conn,
-                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month=?",
+                    "SELECT COALESCE(SUM(MAX(house_rent - discount, 0)), 0) FROM rent_archive WHERE bill_month=?",
                     currentMonth);
 
             double totalDue = getDouble(conn,
@@ -69,12 +69,12 @@ public class DashboardDAO {
         List<ChartItem> list = new ArrayList<>();
 
         String sql = """
-                SELECT bill_month, COALESCE(SUM(house_rent), 0) AS income
-                FROM rent_archive
-                GROUP BY bill_month
-                ORDER BY bill_month DESC
-                LIMIT 6
-                """;
+            SELECT bill_month, COALESCE(SUM(MAX(house_rent - discount, 0)), 0) AS income
+            FROM rent_archive
+            GROUP BY bill_month
+            ORDER BY bill_month DESC
+            LIMIT 6
+            """;
 
         try (Connection conn = DBUtil.connect();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -100,7 +100,7 @@ public class DashboardDAO {
 
         try (Connection conn = DBUtil.connect()) {
             double paid = getDouble(conn,
-                    "SELECT COALESCE(SUM(paid_amount), 0) FROM rent_archive");
+                    "SELECT COALESCE(SUM(MAX(house_rent - discount, 0)), 0) FROM rent_archive");
 
             double due = getDouble(conn,
                     "SELECT COALESCE(SUM(total - paid_amount), 0) FROM rent_current");
@@ -142,7 +142,7 @@ public class DashboardDAO {
 
         try (Connection conn = DBUtil.connect()) {
             double income = getDouble(conn,
-                    "SELECT COALESCE(SUM(house_rent), 0) FROM rent_archive WHERE bill_month=?",
+                    "SELECT COALESCE(SUM(MAX(house_rent - discount, 0)), 0) FROM rent_archive WHERE bill_month=?",
                     currentMonth);
 
             double ownerRepair = getDouble(conn,
@@ -276,8 +276,8 @@ public class DashboardDAO {
                 ra.payment_date,
                 ra.flat_no,
                 t.name AS tenant_name,
-                ra.house_rent AS total,
-                ra.house_rent AS paid_amount,
+                MAX(ra.house_rent - ra.discount, 0) AS total,
+                MAX(ra.house_rent - ra.discount, 0) AS paid_amount,
                 ra.status
             FROM rent_archive ra
             JOIN tenants t ON ra.tenant_id = t.id

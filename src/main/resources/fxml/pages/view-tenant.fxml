@@ -72,6 +72,56 @@
                         </GridPane>
                     </VBox>
 
+                    <!-- Tenancy & Deposit Card -->
+                    <VBox spacing="10"
+                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+
+                        <Label text="Tenancy &amp; Security Deposit"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+
+                        <GridPane hgap="16" vgap="10">
+
+                            <Label text="Status:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="statusLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Move In Date:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="moveInDateLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Security Deposit:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <Label fx:id="securityDepositLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                            <Label text="Deposit Date:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <Label fx:id="securityDepositDateLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                            <Label text="Deposit Note:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                            <Label fx:id="securityDepositNoteLabel"
+                                   wrapText="true"
+                                   GridPane.rowIndex="6"
+                                   GridPane.columnIndex="1"/>
+
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Move Out Info Card -->
+                    <VBox fx:id="moveOutInfoBox"
+                          spacing="10"
+                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+
+                        <Label text="Move Out Information"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+
+                        <GridPane hgap="16" vgap="10">
+                            <Label text="Move Out Date:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="moveOutDateLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Move Out Reason:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="moveOutReasonLabel"
+                                   wrapText="true"
+                                   GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </VBox>
+
                     <!-- Documents Card -->
                     <VBox spacing="10"
                           fx:id="documentsBox"

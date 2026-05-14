@@ -95,6 +95,60 @@ public class DBUtil {
 
             stmt.execute(tenantsSql);
 
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN status TEXT DEFAULT 'Active'");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN move_in_date TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN move_out_date TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN move_out_reason TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            stmt.execute("""
+                UPDATE tenants
+                SET status = 'Active'
+                WHERE status IS NULL OR status = ''
+                """);
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN security_deposit REAL DEFAULT 0");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN security_deposit_date TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE tenants ADD COLUMN security_deposit_note TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            stmt.execute("""
+                UPDATE tenants
+                SET security_deposit = 0
+                WHERE security_deposit IS NULL
+                """);
+
             // FLATS TABLE
             String flatsSql = """
                 CREATE TABLE IF NOT EXISTS flats (
@@ -250,6 +304,26 @@ public class DBUtil {
                 )
                 """;
             stmt.execute(auditLogsSql);
+
+            // MOVE OUT SETTLEMENTS TABLE
+            String moveOutSettlementsSql = """
+                CREATE TABLE IF NOT EXISTS move_out_settlements (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tenant_id INTEGER,
+                    tenant_name TEXT,
+                    tenant_phone TEXT,
+                    flat_no TEXT,
+                    move_out_date TEXT,
+                    unpaid_due REAL DEFAULT 0,
+                    security_deposit REAL DEFAULT 0,
+                    refund_amount REAL DEFAULT 0,
+                    payable_amount REAL DEFAULT 0,
+                    result TEXT,
+                    reason TEXT,
+                    created_at TEXT
+                )
+                """;
+            stmt.execute(moveOutSettlementsSql);
 
             System.out.println("Database Ready");
 

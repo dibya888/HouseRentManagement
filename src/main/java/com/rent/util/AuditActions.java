@@ -17,6 +17,7 @@ public class AuditActions {
 
     public static final String RENT_PAYMENT = "RENT_PAYMENT";
     public static final String ARCHIVE_RESTORE = "ARCHIVE_RESTORE";
+    public static final String ARCHIVE_PAYMENT_DELETED = "ARCHIVE_PAYMENT_DELETED";
     public static final String RECEIPT_PRINTED = "RECEIPT_PRINTED";
 
     public static final String REPAIR_ADDED = "REPAIR_ADDED";
@@ -25,6 +26,7 @@ public class AuditActions {
 
     public static final String TENANT_ADDED = "TENANT_ADDED";
     public static final String TENANT_UPDATED = "TENANT_UPDATED";
+    public static final String TENANT_MOVED_OUT = "TENANT_MOVED_OUT";
     public static final String TENANT_DELETED = "TENANT_DELETED";
 
     public static final String FLAT_ADDED = "FLAT_ADDED";
@@ -40,6 +42,12 @@ public class AuditActions {
     public static final String REPORT_PRINTED = "REPORT_PRINTED";
 
     public static final String MONTH_GENERATED = "MONTH_GENERATED";
+
+    public static final String SETTLEMENT_CREATED = "SETTLEMENT_CREATED";
+
+    public static final String SETTLEMENT_PDF_EXPORTED = "SETTLEMENT_PDF_EXPORTED";
+
+    public static final String SETTLEMENT_SETTLED = "SETTLEMENT_SETTLED";
 
     private AuditActions() {
     }

@@ -36,6 +36,28 @@
         <Label text="Rent:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
         <TextField fx:id="rentField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
+        <CheckBox fx:id="depositCheckBox"
+                  text="Security deposit taken"
+                  GridPane.rowIndex="7"
+                  GridPane.columnIndex="1"/>
+
+        <Label text="Deposit Amount:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+        <TextField fx:id="depositAmountField"
+                   GridPane.rowIndex="8"
+                   GridPane.columnIndex="1"/>
+
+        <Label text="Deposit Date:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="depositDatePicker"
+                    GridPane.rowIndex="9"
+                    GridPane.columnIndex="1"/>
+
+        <Label text="Deposit Note:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+        <TextArea fx:id="depositNoteArea"
+                  GridPane.rowIndex="10"
+                  GridPane.columnIndex="1"
+                  prefRowCount="3"
+                  wrapText="true"/>
+
     </GridPane>
 
     <!-- Action Buttons -->

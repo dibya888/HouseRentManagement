@@ -23,6 +23,9 @@
 
                 <Button text="🔄 Refresh"
                         onAction="#loadTenants"/>
+                <Button text="📦 Past Tenants"
+                        onAction="#openPastTenants"
+                        style="-fx-background-color:#334155; -fx-text-fill:white; -fx-font-weight:bold;"/>
 
             </HBox>
 
@@ -46,7 +49,7 @@
                     <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
                     <TableColumn fx:id="colMeterNo" text="Meter No" prefWidth="120"/>
                     <TableColumn fx:id="colRent" text="Rent" prefWidth="100"/>
-                    <TableColumn fx:id="colAction" text="Actions" prefWidth="180"/>
+                    <TableColumn fx:id="colAction" text="Actions" prefWidth="230"/>
                 </columns>
 
             </TableView>

@@ -32,6 +32,14 @@ public class ViewTenantController {
     @FXML private VBox docBox;
     @FXML private Button openNidBtn;
     @FXML private Button openDocBtn;
+    @FXML private Label statusLabel;
+    @FXML private Label moveInDateLabel;
+    @FXML private Label moveOutDateLabel;
+    @FXML private Label moveOutReasonLabel;
+    @FXML private Label securityDepositLabel;
+    @FXML private Label securityDepositDateLabel;
+    @FXML private Label securityDepositNoteLabel;
+    @FXML private VBox moveOutInfoBox;
 
     private Tenant tenant;
 
@@ -48,6 +56,23 @@ public class ViewTenantController {
         );
         rentLabel.setText("৳ " + t.getRent());
         addressLabel.setText(t.getAddress());
+        statusLabel.setText(nullSafe(t.getStatus()));
+        moveInDateLabel.setText(nullSafe(t.getMoveInDate()));
+        moveOutDateLabel.setText(nullSafe(t.getMoveOutDate()));
+        moveOutReasonLabel.setText(nullSafe(t.getMoveOutReason()));
+
+        securityDepositLabel.setText("৳ " + String.format("%,.2f", t.getSecurityDeposit()));
+        securityDepositDateLabel.setText(nullSafe(t.getSecurityDepositDate()));
+        securityDepositNoteLabel.setText(nullSafe(t.getSecurityDepositNote()));
+        boolean movedOut = "Moved Out".equalsIgnoreCase(t.getStatus());
+
+        moveOutInfoBox.setVisible(movedOut);
+        moveOutInfoBox.setManaged(movedOut);
+
+        if (movedOut) {
+            moveOutDateLabel.setText(nullSafe(t.getMoveOutDate()));
+            moveOutReasonLabel.setText(nullSafe(t.getMoveOutReason()));
+        }
 
         // --- NID handling ---
         if (t.getNidPath() == null || t.getNidPath().isBlank()) {
@@ -98,5 +123,9 @@ public class ViewTenantController {
     private void close() {
         Stage stage = (Stage) nameLabel.getScene().getWindow();
         stage.close();
+    }
+
+    private String nullSafe(String value) {
+        return value == null || value.isBlank() ? "-" : value;
     }
 }

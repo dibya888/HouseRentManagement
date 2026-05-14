@@ -41,6 +41,9 @@ public class DashboardController {
     }
 
     @FXML
+    public void showPastTenants() { loadPage("/fxml/pages/past-tenants-view.fxml"); }
+
+    @FXML
     public void showFlats() {
         loadPage("/fxml/pages/flats-view.fxml");
     }

@@ -2,34 +2,25 @@ package com.rent.controller;
 
 import com.rent.dao.TenantDAO;
 import com.rent.model.Tenant;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import javafx.event.ActionEvent;
-
 import java.util.Optional;
-
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
-
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TextField;
@@ -134,17 +125,22 @@ public class TenantController {
         addActionButtons();
     }
 
+    @FXML
+    private void openPastTenants() {
+        DashboardController.getInstance().showPastTenants();
+    }
+
     private void addActionButtons() {
         colAction.setCellFactory(param -> new TableCell<>() {
 
             private final Button viewBtn = new Button("View");
             private final Button editBtn = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
+            private final Button moveOutBtn = new Button("Move Out");
 
             {
                 viewBtn.setStyle("-fx-background-color:#22c55e; -fx-text-fill:white;");
                 editBtn.setStyle("-fx-background-color:#3b82f6; -fx-text-fill:white;");
-                deleteBtn.setStyle("-fx-background-color:#ef4444; -fx-text-fill:white;");
+                moveOutBtn.setStyle("-fx-background-color:#dc2626; -fx-text-fill:white; -fx-font-weight:bold;");
 
                 viewBtn.setOnAction(e -> {
                     Tenant tenant = getTableView().getItems().get(getIndex());
@@ -156,9 +152,9 @@ public class TenantController {
                     openEditForm(tenant);
                 });
 
-                deleteBtn.setOnAction(e -> {
+                moveOutBtn.setOnAction(e -> {
                     Tenant tenant = getTableView().getItems().get(getIndex());
-                    TenantDAO.deleteTenantAndFreeFlat(tenant.getId());
+                    openMoveOutPopup(tenant);
                     loadTenants();
                 });
             }
@@ -169,7 +165,7 @@ public class TenantController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(new HBox(8, viewBtn, editBtn, deleteBtn));
+                    setGraphic(new HBox(8, viewBtn, editBtn, moveOutBtn));
                 }
             }
         });
@@ -274,7 +270,7 @@ public class TenantController {
     @FXML
     public void loadTenants() {
         masterList = FXCollections.observableArrayList(
-                TenantDAO.getAllTenants()
+                TenantDAO.getActiveTenants()
         );
 
         filteredList = new FilteredList<>(masterList, p -> true);
@@ -340,6 +336,37 @@ public class TenantController {
             TenantDAO.deleteTenant(selectedTenant.getId());
 
             loadTenants();
+        }
+    }
+
+    private void openMoveOutPopup(Tenant tenant) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/move-out-tenant.fxml")
+            );
+
+            Parent root = loader.load();
+
+            MoveOutTenantController controller = loader.getController();
+            controller.setTenant(tenant);
+
+            Stage stage = new Stage();
+            stage.setTitle("Move Out Tenant");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to open Move Out window.").showAndWait();
         }
     }
 }

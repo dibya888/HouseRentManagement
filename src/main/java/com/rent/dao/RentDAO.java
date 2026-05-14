@@ -15,7 +15,7 @@ public class RentDAO {
     private static final DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TS  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // -------------- 1) Load Rent table rows (ONLY OCCUPIED flats) --------------
+    // -------------- 1) Load unpaid/current rent rows --------------
     public static List<RentRow> getCurrentRentRows() {
         List<RentRow> list = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class RentDAO {
             FROM rent_current rc
             JOIN tenants t ON rc.tenant_id = t.id
             JOIN flats f ON rc.flat_no = f.flat_no
-            WHERE f.status = 'Occupied'
+            WHERE rc.status IN ('DUE', 'PARTIAL', 'LATE')
             ORDER BY rc.bill_month DESC, rc.flat_no
             """;
 
@@ -544,5 +544,97 @@ public class RentDAO {
         }
 
         return null;
+    }
+
+    public static boolean deleteArchivePayment(int archiveId) {
+        String sql = """
+            DELETE FROM rent_archive
+            WHERE id = ?
+            """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, archiveId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static List<RentRow> getUnpaidRentRowsByTenant(int tenantId) {
+        List<RentRow> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                rc.id,
+                rc.tenant_id,
+                rc.flat_no,
+                f.meter_no,
+                t.name AS tenant_name,
+                t.phone,
+                rc.bill_month,
+                rc.house_rent,
+                rc.electricity,
+                rc.water,
+                rc.gas,
+                rc.other_bills,
+                rc.fine,
+                rc.discount,
+                rc.total,
+                rc.status,
+                rc.due_date,
+                rc.payment_date,
+                rc.paid_amount,
+                rc.notes
+            FROM rent_current rc
+            JOIN tenants t ON rc.tenant_id = t.id
+            JOIN flats f ON rc.flat_no = f.flat_no
+            WHERE rc.tenant_id = ?
+              AND rc.status IN ('DUE', 'PARTIAL', 'LATE')
+            ORDER BY rc.bill_month ASC, rc.id ASC
+            """;
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, tenantId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    RentRow r = new RentRow();
+
+                    r.setId(rs.getInt("id"));
+                    r.setTenantId(rs.getInt("tenant_id"));
+                    r.setFlatNo(rs.getString("flat_no"));
+                    r.setMeterNo(rs.getString("meter_no"));
+                    r.setTenantName(rs.getString("tenant_name"));
+                    r.setPhone(rs.getString("phone"));
+                    r.setBillMonth(rs.getString("bill_month"));
+                    r.setHouseRent(rs.getDouble("house_rent"));
+                    r.setElectricity(rs.getDouble("electricity"));
+                    r.setWater(rs.getDouble("water"));
+                    r.setGas(rs.getDouble("gas"));
+                    r.setOtherBills(rs.getDouble("other_bills"));
+                    r.setFine(rs.getDouble("fine"));
+                    r.setDiscount(rs.getDouble("discount"));
+                    r.setTotal(rs.getDouble("total"));
+                    r.setStatus(rs.getString("status"));
+                    r.setDueDate(rs.getString("due_date"));
+                    r.setPaymentDate(rs.getString("payment_date"));
+                    r.setPaidAmount(rs.getDouble("paid_amount"));
+                    r.setNotes(rs.getString("notes"));
+
+                    list.add(r);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

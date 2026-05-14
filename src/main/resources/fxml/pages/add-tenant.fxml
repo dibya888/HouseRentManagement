@@ -99,6 +99,38 @@
                 </GridPane>
             </VBox>
 
+            <!-- SECURITY DEPOSIT -->
+            <VBox spacing="16">
+                <Label text="Security Deposit"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                <CheckBox fx:id="depositCheckBox"
+                          text="Security deposit taken"/>
+
+                <GridPane hgap="20" vgap="12">
+
+                    <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <Label text="Deposit Amount" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="depositAmountField"
+                                   promptText="0.00"/>
+                    </VBox>
+
+                    <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <Label text="Deposit Date" style="-fx-font-size:12px;"/>
+                        <DatePicker fx:id="depositDatePicker"/>
+                    </VBox>
+
+                    <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                        <Label text="Deposit Note" style="-fx-font-size:12px;"/>
+                        <TextArea fx:id="depositNoteArea"
+                                  promptText="Optional note"
+                                  prefRowCount="3"
+                                  wrapText="true"/>
+                    </VBox>
+
+                </GridPane>
+            </VBox>
+
             <!-- ACTION -->
             <HBox alignment="CENTER_RIGHT">
                 <Button text="Save Tenant"

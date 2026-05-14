@@ -56,7 +56,7 @@
                     <TableColumn fx:id="colPaymentDate" text="Payment Date" prefWidth="120"/>
                     <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
                     <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
-                    <TableColumn fx:id="colAction" text="Action" prefWidth="240"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="320"/>
                 </columns>
             </TableView>
 

@@ -165,7 +165,8 @@ public class ArchiveController {
             private final Button viewBtn = new Button("View");
             private final Button printBtn = new Button("Print");
             private final Button restoreBtn = new Button("Restore");
-            private final HBox box = new HBox(8, viewBtn, printBtn, restoreBtn);
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(8, viewBtn, printBtn, restoreBtn, deleteBtn);
 
             {
                 viewBtn.setStyle(
@@ -178,6 +179,10 @@ public class ArchiveController {
 
                 restoreBtn.setStyle(
                         "-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-weight:bold;"
+                );
+
+                deleteBtn.setStyle(
+                        "-fx-background-color:#7f1d1d; -fx-text-fill:white; -fx-font-weight:bold;"
                 );
 
                 viewBtn.setOnAction(e -> {
@@ -193,6 +198,11 @@ public class ArchiveController {
                 restoreBtn.setOnAction(e -> {
                     RentRow row = getTableView().getItems().get(getIndex());
                     restoreArchive(row);
+                });
+
+                deleteBtn.setOnAction(e -> {
+                    RentRow row = getTableView().getItems().get(getIndex());
+                    deleteArchivePayment(row);
                 });
             }
 
@@ -322,5 +332,56 @@ public class ArchiveController {
 
     private String nullSafe(String value) {
         return value == null || value.isBlank() ? "-" : value;
+    }
+
+    private void deleteArchivePayment(RentRow row) {
+        if (row == null) return;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Archive Payment");
+        confirm.setHeaderText("Delete this archived payment?");
+        confirm.setContentText("""
+            This will permanently delete this archived payment record.
+
+            Income reports and dashboard totals may decrease.
+            Use this only if this payment was created by mistake.
+
+            Continue?
+            """);
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        boolean deleted = RentDAO.deleteArchivePayment(row.getId());
+
+        if (deleted) {
+            AuditLogDAO.log(
+                    AuditActions.ARCHIVE_PAYMENT_DELETED,
+                    "Archive payment deleted. Receipt No: "
+                            + row.getReceiptNo()
+                            + ", Flat: "
+                            + row.getFlatNo()
+                            + ", Tenant: "
+                            + row.getTenantName()
+                            + ", Month: "
+                            + row.getBillMonth()
+                            + ", Amount: "
+                            + row.getPaidAmount()
+            );
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Archived payment deleted successfully."
+            ).showAndWait();
+
+            loadArchive();
+
+        } else {
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Failed to delete archived payment."
+            ).showAndWait();
+        }
     }
 }
