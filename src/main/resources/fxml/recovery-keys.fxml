@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rent.controller.RecoveryKeysController"
+      spacing="16"
+      prefWidth="560"
+      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+
+    <Label text="🗝 Emergency Recovery Keys"
+           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           maxWidth="Infinity"
+           alignment="CENTER"/>
+
+    <VBox spacing="10"
+          style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
+
+        <Label text="Generate 10 one-time emergency recovery keys."
+               style="-fx-font-weight:bold; -fx-text-fill:#111827;"/>
+
+        <Label text="These keys are shown only once. Save or print them now. Each key can reset your password one time."
+               wrapText="true"
+               style="-fx-text-fill:#6b7280;"/>
+
+        <Label fx:id="remainingKeysLabel"
+               text="Unused keys: 0"
+               style="-fx-font-weight:bold; -fx-text-fill:#374151;"/>
+
+        <TextArea fx:id="keysArea"
+                  editable="false"
+                  wrapText="true"
+                  prefRowCount="12"
+                  promptText="Generated keys will appear here."/>
+
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Close"
+                onAction="#close"/>
+
+        <Button text="Generate 10 Keys"
+                onAction="#generateKeys"
+                style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+        <Button text="Save as PDF"
+                onAction="#saveAsPdf"
+                style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+    </HBox>
+
+</VBox>

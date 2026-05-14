@@ -150,10 +150,10 @@
 
                     <Region VBox.vgrow="ALWAYS"/>
 
-                    <Button text="Coming Soon"
-                            disable="true"
+                    <Button text="Generate / View Recovery Keys"
+                            onAction="#openRecoveryKeys"
                             maxWidth="Infinity"
-                            styleClass="settings-disabled-btn"/>
+                            styleClass="settings-primary-btn"/>
                 </VBox>
 
                 <!-- Factory Reset -->

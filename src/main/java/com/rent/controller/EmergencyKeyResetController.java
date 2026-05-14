@@ -1,7 +1,7 @@
 package com.rent.controller;
 
+import com.rent.dao.EmergencyKeyDAO;
 import com.rent.util.DBUtil;
-import com.rent.util.SecurityUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,22 +12,20 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Modality;
 
-public class ForgotPasswordController {
+import javafx.stage.Window;
+
+public class EmergencyKeyResetController {
 
     @FXML private TextField usernameField;
-    @FXML private PasswordField recoveryPinField;
+    @FXML private TextField emergencyKeyField;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
 
     @FXML
     private void resetPassword() {
         String username = text(usernameField);
-        String recoveryPin = text(recoveryPinField);
+        String emergencyKey = text(emergencyKeyField).toUpperCase();
         String newPassword = text(newPasswordField);
         String confirmPassword = text(confirmPasswordField);
 
@@ -36,8 +34,13 @@ public class ForgotPasswordController {
             return;
         }
 
-        if (recoveryPin.isBlank()) {
-            showWarning("Please enter recovery PIN.");
+        if (!userExists(username)) {
+            showError("User not found.");
+            return;
+        }
+
+        if (emergencyKey.isBlank()) {
+            showWarning("Please enter emergency key.");
             return;
         }
 
@@ -56,71 +59,24 @@ public class ForgotPasswordController {
             return;
         }
 
-        RecoveryPinData pinData = getRecoveryPinData(username);
+        boolean keyAccepted = EmergencyKeyDAO.useEmergencyKey(emergencyKey);
 
-        if (pinData == null) {
-            showError("User not found or recovery PIN is not set.");
-            return;
-        }
-
-        boolean validPin = SecurityUtil.verifySecret(
-                recoveryPin,
-                pinData.hash,
-                pinData.salt
-        );
-
-        if (!validPin) {
-            showError("Invalid recovery PIN.");
+        if (!keyAccepted) {
+            showError("Invalid or already used emergency key.");
             return;
         }
 
         if (updatePassword(username, newPassword)) {
-            showInfo("Password reset successfully. You can now login with your new password.");
-            close();
+            showInfo("Password reset successfully. This emergency key is now used.");
+            closeWithOwner();
         } else {
             showError("Failed to reset password.");
         }
     }
 
-    @FXML
-    private void openEmergencyKeyReset() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/emergency-key-reset.fxml")
-            );
-
-            Scene scene = new Scene(loader.load());
-
-            scene.getStylesheets().add(
-                    getClass()
-                            .getResource("/css/style.css")
-                            .toExternalForm()
-            );
-
-            Stage stage = new Stage();
-            stage.initOwner(usernameField.getScene().getWindow());
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.setTitle("Emergency Key Reset");
-
-            stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
-            );
-
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            new Alert(Alert.AlertType.ERROR,
-                    "Failed to open emergency key reset.").showAndWait();
-        }
-    }
-
-    private RecoveryPinData getRecoveryPinData(String username) {
+    private boolean userExists(String username) {
         String sql = """
-                SELECT recovery_pin_hash, recovery_pin_salt
+                SELECT id
                 FROM users
                 WHERE username = ?
                 """;
@@ -131,24 +87,13 @@ public class ForgotPasswordController {
             ps.setString(1, username);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String hash = rs.getString("recovery_pin_hash");
-                    String salt = rs.getString("recovery_pin_salt");
-
-                    if (hash == null || hash.isBlank()
-                            || salt == null || salt.isBlank()) {
-                        return null;
-                    }
-
-                    return new RecoveryPinData(hash, salt);
-                }
+                return rs.next();
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-
-        return null;
     }
 
     private boolean updatePassword(String username, String newPassword) {
@@ -201,13 +146,17 @@ public class ForgotPasswordController {
         new Alert(Alert.AlertType.ERROR, message).showAndWait();
     }
 
-    private static class RecoveryPinData {
-        String hash;
-        String salt;
+    private void closeWithOwner() {
+        Stage currentStage = (Stage) usernameField
+                .getScene()
+                .getWindow();
 
-        RecoveryPinData(String hash, String salt) {
-            this.hash = hash;
-            this.salt = salt;
+        Window owner = currentStage.getOwner();
+
+        currentStage.close();
+
+        if (owner instanceof Stage ownerStage) {
+            ownerStage.close();
         }
     }
 }

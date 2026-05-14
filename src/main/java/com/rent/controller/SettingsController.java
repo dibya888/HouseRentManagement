@@ -140,6 +140,41 @@ public class SettingsController {
         }
     }
 
+    @FXML
+    private void openRecoveryKeys(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/recovery-keys.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
+            );
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Emergency Recovery Keys");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to open Emergency Recovery Keys.").showAndWait();
+        }
+    }
+
     private void clearSavedLogin() {
         Preferences prefs =
                 Preferences.userNodeForPackage(LoginController.class);

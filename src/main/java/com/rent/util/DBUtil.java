@@ -51,6 +51,19 @@ public class DBUtil {
                 VALUES ('admin', '1234');
             """);
 
+            // EMERGENCY RECOVERY KEYS
+            String emergencyKeysSql = """
+                CREATE TABLE IF NOT EXISTS emergency_keys (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    key_hash TEXT NOT NULL,
+                    key_salt TEXT NOT NULL,
+                    used INTEGER NOT NULL DEFAULT 0,
+                    created_at TEXT,
+                    used_at TEXT
+                )
+                """;
+            stmt.execute(emergencyKeysSql);
+
             // TENANTS TABLE
             String tenantsSql = """
                 CREATE TABLE IF NOT EXISTS tenants (

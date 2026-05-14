@@ -5,12 +5,12 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rent.controller.ForgotPasswordController"
+      fx:controller="com.rent.controller.EmergencyKeyResetController"
       spacing="16"
-      prefWidth="470"
+      prefWidth="500"
       style="-fx-padding:24; -fx-background-color:#f8fafc;">
 
-    <Label text="🔑 Reset Password"
+    <Label text="🗝 Reset Password with Emergency Key"
            style="-fx-font-size:22px; -fx-font-weight:bold;"
            maxWidth="Infinity"
            alignment="CENTER"/>
@@ -18,7 +18,7 @@
     <VBox spacing="12"
           style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
 
-        <Label text="Enter your username and recovery PIN to reset your password."
+        <Label text="Use one unused emergency recovery key to reset your password."
                wrapText="true"
                style="-fx-text-fill:#374151;"/>
 
@@ -27,46 +27,43 @@
             <Label text="Username:"/>
             <TextField fx:id="usernameField"
                        GridPane.columnIndex="1"
-                       prefWidth="250"/>
+                       prefWidth="270"/>
 
-            <Label text="Recovery PIN:" GridPane.rowIndex="1"/>
-            <PasswordField fx:id="recoveryPinField"
-                           GridPane.rowIndex="1"
-                           GridPane.columnIndex="1"
-                           prefWidth="250"/>
+            <Label text="Emergency Key:" GridPane.rowIndex="1"/>
+            <TextField fx:id="emergencyKeyField"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="1"
+                       prefWidth="270"
+                       promptText="XXXX-XXXX-XXXX"/>
 
             <Label text="New Password:" GridPane.rowIndex="2"/>
             <PasswordField fx:id="newPasswordField"
                            GridPane.rowIndex="2"
                            GridPane.columnIndex="1"
-                           prefWidth="250"/>
+                           prefWidth="270"/>
 
             <Label text="Confirm Password:" GridPane.rowIndex="3"/>
             <PasswordField fx:id="confirmPasswordField"
                            GridPane.rowIndex="3"
                            GridPane.columnIndex="1"
-                           prefWidth="250"
+                           prefWidth="270"
                            onAction="#resetPassword"/>
 
         </GridPane>
 
-        <Label text="If you lost your password and recovery PIN, use emergency keys, restore backup, or factory reset."
+        <Label text="Each emergency key can be used only once. After use, it becomes invalid."
                wrapText="true"
                style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
 
     </VBox>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Emergency Key"
-                onAction="#openEmergencyKeyReset"
-                style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-weight:bold;"/>
-
         <Button text="Cancel"
                 onAction="#close"/>
 
         <Button text="Reset Password"
                 onAction="#resetPassword"
-                style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-weight:bold;"/>
     </HBox>
 
 </VBox>
