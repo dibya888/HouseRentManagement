@@ -16,6 +16,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
+import com.rent.util.DatabaseResetUtil;
+import java.util.prefs.Preferences;
 
 public class ForgotPasswordController {
 
@@ -118,6 +120,38 @@ public class ForgotPasswordController {
         }
     }
 
+    @FXML
+    private void factoryReset() {
+        Stage stage = (Stage) usernameField
+                .getScene()
+                .getWindow();
+
+        boolean confirmed = DatabaseResetUtil.confirmFactoryReset(stage);
+
+        if (!confirmed) {
+            showInfo("Factory reset cancelled.");
+            return;
+        }
+
+        boolean success = DatabaseResetUtil.factoryReset();
+
+        if (!success) {
+            return;
+        }
+
+        clearSavedLogin();
+
+        showInfo("""
+            Factory reset completed.
+
+            Default login:
+            Username: admin
+            Password: 1234
+            """);
+
+        close();
+    }
+
     private RecoveryPinData getRecoveryPinData(String username) {
         String sql = """
                 SELECT recovery_pin_hash, recovery_pin_salt
@@ -210,4 +244,13 @@ public class ForgotPasswordController {
             this.salt = salt;
         }
     }
+
+    private void clearSavedLogin() {
+        Preferences prefs =
+                Preferences.userNodeForPackage(LoginController.class);
+
+        prefs.remove("loggedInUser");
+    }
+
+
 }

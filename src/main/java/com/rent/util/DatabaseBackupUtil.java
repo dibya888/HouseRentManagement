@@ -61,7 +61,7 @@ public class DatabaseBackupUtil {
         }
     }
 
-    public static void restoreDatabase(Window ownerWindow) {
+    public static boolean restoreDatabase(Window ownerWindow) {
         try {
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Select Database Backup");
@@ -73,12 +73,12 @@ public class DatabaseBackupUtil {
             File selectedBackup = chooser.showOpenDialog(ownerWindow);
 
             if (selectedBackup == null) {
-                return;
+                return false;
             }
 
             if (!selectedBackup.exists()) {
                 showError("Selected backup file does not exist.");
-                return;
+                return false;
             }
 
             Files.copy(
@@ -88,14 +88,17 @@ public class DatabaseBackupUtil {
             );
 
             showInfo("""
-                    Database restored successfully.
+                Database restored successfully.
 
-                    Please restart the app to load restored data.
-                    """);
+                Please restart the app to load restored data.
+                """);
+
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to restore database.");
+            return false;
         }
     }
 

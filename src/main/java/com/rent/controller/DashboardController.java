@@ -7,6 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
+import com.rent.dao.EmergencyKeyDAO;
+import javafx.scene.control.Alert;
 
 import java.util.prefs.Preferences;
 
@@ -20,6 +22,7 @@ public class DashboardController {
     public void initialize() {
         instance = this;
         loadPage("/fxml/pages/dashboard-view.fxml");
+        checkEmergencyKeys();
     }
 
     public static DashboardController getInstance() {
@@ -125,6 +128,32 @@ public class DashboardController {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void checkEmergencyKeys() {
+        int remaining = EmergencyKeyDAO.countUnusedKeys();
+
+        if (remaining == 0) {
+            new Alert(Alert.AlertType.WARNING,
+                    """
+                    You have no unused emergency recovery keys left.
+    
+                    Please go to:
+                    Settings > Recovery Keys
+    
+                    Generate and save new emergency keys.
+                    """).showAndWait();
+
+        } else if (remaining <= 2) {
+            new Alert(Alert.AlertType.INFORMATION,
+                    """
+                    You have only """ + remaining + """
+                 emergency recovery key(s) left.
+
+                Please generate new keys soon from:
+                Settings > Recovery Keys
+                """).showAndWait();
         }
     }
 }
