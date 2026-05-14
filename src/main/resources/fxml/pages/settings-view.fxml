@@ -82,10 +82,17 @@
 
                     <Region VBox.vgrow="ALWAYS"/>
 
-                    <Button text="Coming Soon"
-                            disable="true"
-                            maxWidth="Infinity"
-                            styleClass="settings-disabled-btn"/>
+                    <VBox spacing="8">
+                        <Button text="Change Password"
+                                onAction="#openChangePassword"
+                                maxWidth="Infinity"
+                                styleClass="settings-primary-btn"/>
+
+                        <Button text="Recovery PIN - Coming Soon"
+                                disable="true"
+                                maxWidth="Infinity"
+                                styleClass="settings-disabled-btn"/>
+                    </VBox>
                 </VBox>
 
                 <!-- Backup & Restore -->
@@ -109,10 +116,17 @@
 
                     <Region VBox.vgrow="ALWAYS"/>
 
-                    <Button text="Coming Soon"
-                            disable="true"
-                            maxWidth="Infinity"
-                            styleClass="settings-disabled-btn"/>
+                    <VBox spacing="8">
+                        <Button text="Backup Database"
+                                onAction="#backupDatabase"
+                                maxWidth="Infinity"
+                                styleClass="settings-primary-btn"/>
+
+                        <Button text="Restore Database"
+                                onAction="#restoreDatabase"
+                                maxWidth="Infinity"
+                                styleClass="settings-primary-btn"/>
+                    </VBox>
                 </VBox>
 
                 <!-- Recovery -->
@@ -163,8 +177,8 @@
 
                     <Region VBox.vgrow="ALWAYS"/>
 
-                    <Button text="Coming Soon"
-                            disable="true"
+                    <Button text="Factory Reset"
+                            onAction="#factoryReset"
                             maxWidth="Infinity"
                             styleClass="settings-danger-btn"/>
                 </VBox>
