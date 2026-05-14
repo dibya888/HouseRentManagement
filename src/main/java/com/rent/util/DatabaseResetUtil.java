@@ -54,6 +54,7 @@ public class DatabaseResetUtil {
             Files.deleteIfExists(DB_PATH);
 
             DBUtil.init();
+            com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
 
             return true;
 

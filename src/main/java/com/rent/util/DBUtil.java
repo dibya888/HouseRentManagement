@@ -32,6 +32,19 @@ public class DBUtil {
                 )
             """);
 
+            // PASSWORD HASH COLUMNS
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN password_hash TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN password_salt TEXT");
+            } catch (Exception ignored) {
+                // column already exists
+            }
+
             //Add recovery PIN columns safely
             try {
                 stmt.execute("ALTER TABLE users ADD COLUMN recovery_pin_hash TEXT");

@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
-
+import com.rent.dao.UserSecurityDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,12 +58,12 @@ public class ChangePasswordController {
             return;
         }
 
-        if (!isCurrentPasswordCorrect(username, currentPassword)) {
+        if (!UserSecurityDAO.verifyPassword(username, currentPassword)) {
             showError("Current password is incorrect.");
             return;
         }
 
-        if (updatePassword(username, newPassword)) {
+        if (UserSecurityDAO.updatePassword(username, newPassword)) {
             showInfo("Password changed successfully.");
             close();
         } else {

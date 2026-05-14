@@ -8,7 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+import com.rent.dao.UserSecurityDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,7 +76,7 @@ public class ForgotPasswordController {
             return;
         }
 
-        if (updatePassword(username, newPassword)) {
+        if (UserSecurityDAO.updatePassword(username, newPassword)) {
             showInfo("Password reset successfully. You can now login with your new password.");
             close();
         } else {
@@ -183,27 +183,6 @@ public class ForgotPasswordController {
         }
 
         return null;
-    }
-
-    private boolean updatePassword(String username, String newPassword) {
-        String sql = """
-                UPDATE users
-                SET password = ?
-                WHERE username = ?
-                """;
-
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, newPassword);
-            ps.setString(2, username);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     private String text(TextField field) {

@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
-
+import com.rent.dao.UserSecurityDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,7 +52,7 @@ public class RecoveryPinController {
             return;
         }
 
-        if (!isPasswordCorrect(username, password)) {
+        if (!UserSecurityDAO.verifyPassword(username, password)) {
             showError("Login password is incorrect.");
             return;
         }
@@ -66,32 +66,6 @@ public class RecoveryPinController {
         } else {
             showError("Failed to save recovery PIN.");
         }
-    }
-
-    private boolean isPasswordCorrect(String username, String password) {
-        String sql = """
-                SELECT password
-                FROM users
-                WHERE username = ?
-                """;
-
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String dbPassword = rs.getString("password");
-                    return password.equals(dbPassword);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
     private boolean updateRecoveryPin(String username, String hash, String salt) {

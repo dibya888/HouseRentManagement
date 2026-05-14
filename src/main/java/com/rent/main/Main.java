@@ -17,6 +17,7 @@ public class Main extends Application {
 
         // initialize DB
         DBUtil.init();
+        com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
 
         // read saved login
         Preferences prefs =

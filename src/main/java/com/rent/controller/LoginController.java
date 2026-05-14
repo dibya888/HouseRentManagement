@@ -1,7 +1,5 @@
 package com.rent.controller;
 
-import com.rent.util.DBUtil;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 
@@ -17,10 +15,7 @@ import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
+import com.rent.dao.UserSecurityDAO;
 import java.util.prefs.Preferences;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
@@ -130,28 +125,6 @@ public class LoginController {
     }
 
     private boolean checkLogin(String username, String password) {
-
-        String sql =
-                "SELECT * FROM users WHERE username = ? AND password = ?";
-
-        try (
-                Connection conn = DBUtil.connect();
-
-                PreparedStatement stmt =
-                        conn.prepareStatement(sql)
-        ) {
-
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return false;
-        }
+        return UserSecurityDAO.verifyPassword(username, password);
     }
 }

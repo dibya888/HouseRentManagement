@@ -8,7 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+import com.rent.dao.UserSecurityDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,7 +66,7 @@ public class EmergencyKeyResetController {
             return;
         }
 
-        if (updatePassword(username, newPassword)) {
+        if (UserSecurityDAO.updatePassword(username, newPassword)) {
             showInfo("Password reset successfully. This emergency key is now used.");
             closeWithOwner();
         } else {
@@ -89,27 +89,6 @@ public class EmergencyKeyResetController {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private boolean updatePassword(String username, String newPassword) {
-        String sql = """
-                UPDATE users
-                SET password = ?
-                WHERE username = ?
-                """;
-
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, newPassword);
-            ps.setString(2, username);
-
-            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
