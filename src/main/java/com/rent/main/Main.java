@@ -26,23 +26,22 @@ public class Main extends Application {
                 );
 
         String loggedUser = prefs.get("loggedInUser", null);
+        boolean saveLogin = prefs.getBoolean("saveLogin", false);
 
         FXMLLoader loader;
 
-        if (loggedUser != null && !loggedUser.isEmpty()) {
-
+        if (saveLogin && loggedUser != null && !loggedUser.isEmpty()) {
             loader = new FXMLLoader(
                     getClass().getResource("/fxml/dashboard.fxml")
             );
-
             stage.setTitle("Rent Management System");
-
         } else {
+            prefs.remove("loggedInUser");
+            prefs.putBoolean("saveLogin", false);
 
             loader = new FXMLLoader(
                     getClass().getResource("/fxml/login.fxml")
             );
-
             stage.setTitle("Rent Management - Login");
         }
 

@@ -2,10 +2,9 @@ package com.rent.controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-
 import javafx.scene.Scene;
 import javafx.scene.Node;
-
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -13,9 +12,7 @@ import javafx.scene.control.TextField;
 import com.rent.dao.AuditLogDAO;
 import com.rent.util.AuditActions;
 import javafx.stage.Stage;
-
 import javafx.event.ActionEvent;
-
 import com.rent.dao.UserSecurityDAO;
 import java.util.prefs.Preferences;
 import javafx.scene.image.Image;
@@ -29,6 +26,9 @@ public class LoginController {
 
     @FXML
     private PasswordField passwordField;
+
+    @FXML
+    private CheckBox saveLoginCheckBox;
 
     @FXML
     private Label messageLabel;
@@ -47,7 +47,16 @@ public class LoginController {
                 Preferences prefs =
                         Preferences.userNodeForPackage(LoginController.class);
 
-                prefs.put("loggedInUser", username);
+                boolean saveLogin =
+                        saveLoginCheckBox != null && saveLoginCheckBox.isSelected();
+
+                if (saveLogin) {
+                    prefs.put("loggedInUser", username);
+                    prefs.putBoolean("saveLogin", true);
+                } else {
+                    prefs.remove("loggedInUser");
+                    prefs.putBoolean("saveLogin", false);
+                }
 
                 // load dashboard
                 FXMLLoader loader = new FXMLLoader(
