@@ -63,6 +63,9 @@ public class AddTenantController {
             ).show();
             return;
         }
+        if (!validateTenantIdentity(phone, email, nid)) {
+            return;
+        }
 
         boolean depositTaken = depositCheckBox != null && depositCheckBox.isSelected();
 
@@ -270,5 +273,49 @@ public class AddTenantController {
                 depositNoteArea.clear();
             }
         });
+    }
+
+    private boolean validateTenantIdentity(String phone, String email, String nid) {
+
+        if (!isValidBdMobile(phone)) {
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.WARNING,
+                    "Please enter a valid Bangladeshi mobile number.\nExample: 01XXXXXXXXX"
+            ).show();
+            return false;
+        }
+
+        if (email != null && !email.isBlank() && !isValidEmail(email)) {
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.WARNING,
+                    "Please enter a valid email address."
+            ).show();
+            return false;
+        }
+
+        if (nid != null && !nid.isBlank() && !isValidNid(nid)) {
+            new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.WARNING,
+                    "NID must be exactly 10 or 17 digits."
+            ).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValidBdMobile(String phone) {
+        if (phone == null) return false;
+        return phone.trim().matches("^01[0-9]{9}$");
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null || email.isBlank()) return true;
+        return email.trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    private boolean isValidNid(String nid) {
+        if (nid == null || nid.isBlank()) return true;
+        return nid.trim().matches("^(\\d{10}|\\d{17})$");
     }
 }

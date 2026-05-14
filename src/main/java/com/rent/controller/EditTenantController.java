@@ -108,8 +108,14 @@ public class EditTenantController {
         String name = text(nameField);
         String phone = text(phoneField);
 
+        String email = text(emailField);
+        String nid = text(nidField);
+
         if (name.isBlank() || phone.isBlank()) {
             showWarning("Name and phone are required.");
+            return;
+        }
+        if (!validateTenantIdentity(phone, email, nid)) {
             return;
         }
 
@@ -155,8 +161,8 @@ public class EditTenantController {
 
         tenant.setName(name);
         tenant.setPhone(phone);
-        tenant.setEmail(text(emailField));
-        tenant.setNid(text(nidField));
+        tenant.setEmail(email);
+        tenant.setNid(nid);
         tenant.setAddress(text(addressField));
         tenant.setFlatNo(text(flatNoField));
         tenant.setRent(rent);
@@ -186,5 +192,40 @@ public class EditTenantController {
 
     private void showError(String message) {
         new Alert(Alert.AlertType.ERROR, message).showAndWait();
+    }
+
+    private boolean validateTenantIdentity(String phone, String email, String nid) {
+
+        if (!isValidBdMobile(phone)) {
+            showWarning("Please enter a valid Bangladeshi mobile number.\nExample: 01XXXXXXXXX");
+            return false;
+        }
+
+        if (email != null && !email.isBlank() && !isValidEmail(email)) {
+            showWarning("Please enter a valid email address.");
+            return false;
+        }
+
+        if (nid != null && !nid.isBlank() && !isValidNid(nid)) {
+            showWarning("NID must be exactly 10 or 17 digits.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValidBdMobile(String phone) {
+        if (phone == null) return false;
+        return phone.trim().matches("^01[0-9]{9}$");
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null || email.isBlank()) return true;
+        return email.trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    private boolean isValidNid(String nid) {
+        if (nid == null || nid.isBlank()) return true;
+        return nid.trim().matches("^(\\d{10}|\\d{17})$");
     }
 }
