@@ -229,6 +229,7 @@ public class ForgotPasswordController {
                 Preferences.userNodeForPackage(LoginController.class);
 
         prefs.remove("loggedInUser");
+        prefs.putBoolean("saveLogin", false);
     }
 
 

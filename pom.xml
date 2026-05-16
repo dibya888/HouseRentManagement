@@ -12,27 +12,39 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <javafx.version>21</javafx.version>
+        <javafx.version>21.0.2</javafx.version>
+        <javafx.platform>win</javafx.platform>
     </properties>
 
     <dependencies>
 
-        <!-- JavaFX Controls -->
-        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>21.0.2</version>
+            <classifier>win</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21.0.2</version>
+            <classifier>win</classifier>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>26.0.1</version>
-            <scope>compile</scope>
+            <version>21.0.2</version>
+            <classifier>win</classifier>
         </dependency>
 
-        <!-- JavaFX FXML -->
-        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>26.0.1</version>
-            <scope>compile</scope>
+            <version>21.0.2</version>
+            <classifier>win</classifier>
         </dependency>
 
         <!-- SQLite -->

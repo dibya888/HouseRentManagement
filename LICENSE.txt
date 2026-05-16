@@ -1,0 +1,22 @@
+Proprietary Software License
+
+Copyright (c) 2026 Dibya Jyoti Dhar. All rights reserved.
+
+This software, including its source code, database structure, user interface files, documentation, images, icons, and related assets, is the proprietary property of the copyright holder.
+
+Permission is granted to use this software for private, internal, and personal property/rent management purposes only.
+
+You may not, without prior written permission from the copyright holder:
+
+1. Copy, redistribute, publish, sell, rent, lease, sublicense, or commercially exploit this software.
+2. Modify, reverse engineer, decompile, disassemble, or create derivative works from this software for redistribution.
+3. Remove, alter, or obscure copyright notices, license notices, or ownership information.
+4. Use this software as part of a public, commercial, or hosted service without written permission.
+
+The software may create, store, backup, restore, and process local application data, including tenant, rent, repair, receipt, settlement, and audit information. The user is responsible for protecting local data, backups, recovery keys, and system access.
+
+This software is provided "as is", without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the copyright holder be liable for any claim, damages, data loss, financial loss, business interruption, or other liability arising from the use of this software.
+
+Third-party libraries used by this software remain subject to their respective licenses.
+
+For permission requests, commercial licensing, redistribution rights, or support terms, contact the copyright holder.

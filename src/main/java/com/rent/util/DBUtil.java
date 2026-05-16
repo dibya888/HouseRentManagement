@@ -1,17 +1,58 @@
 package com.rent.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
 public class DBUtil {
 
-    private static final String URL =
-            "jdbc:sqlite:src/main/resources/database/rent.db";
+    private static final String APP_FOLDER_NAME = "HouseRentManagement";
+    private static final String DB_FILE_NAME = "rent.db";
+
+    public static Path getAppDataDir() {
+        String appData = System.getenv("APPDATA");
+
+        if (appData != null && !appData.isBlank()) {
+            return Paths.get(appData, APP_FOLDER_NAME);
+        }
+
+        return Paths.get(
+                System.getProperty("user.home"),
+                "." + APP_FOLDER_NAME
+        );
+    }
+
+    public static Path getDatabaseDir() {
+        return getAppDataDir().resolve("database");
+    }
+
+    public static Path getDatabasePath() {
+        return getDatabaseDir().resolve(DB_FILE_NAME);
+    }
+
+    public static String getJdbcUrl() {
+        return "jdbc:sqlite:" + getDatabasePath().toAbsolutePath();
+    }
+
+    private static void ensureDatabaseDirExists() throws Exception {
+        Files.createDirectories(getDatabaseDir());
+    }
 
     public static Connection connect() {
         try {
-            return DriverManager.getConnection(URL);
+            ensureDatabaseDirExists();
+
+            Connection conn = DriverManager.getConnection(getJdbcUrl());
+
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON");
+            }
+
+            return conn;
+
         } catch (Exception e) {
             System.out.println("DB Connection Failed: " + e.getMessage());
             throw new RuntimeException(e);

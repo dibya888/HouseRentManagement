@@ -185,6 +185,7 @@ public class SettingsController {
                 Preferences.userNodeForPackage(LoginController.class);
 
         prefs.remove("loggedInUser");
+        prefs.putBoolean("saveLogin", false);
     }
 
     private void loadLogin(Stage stage) {

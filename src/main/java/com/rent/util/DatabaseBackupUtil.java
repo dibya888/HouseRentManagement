@@ -3,8 +3,10 @@ package com.rent.util;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+
 import com.rent.dao.AuditLogDAO;
 import com.rent.util.AuditActions;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,15 +16,18 @@ import java.time.format.DateTimeFormatter;
 
 public class DatabaseBackupUtil {
 
-    private static final Path DB_PATH =
-            Path.of("src/main/resources/database/rent.db");
-
     private static final DateTimeFormatter FILE_TIME =
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
+    private static Path getDbPath() {
+        return DBUtil.getDatabasePath();
+    }
+
     public static void backupDatabase(Window ownerWindow) {
         try {
-            if (!Files.exists(DB_PATH)) {
+            Path dbPath = getDbPath();
+
+            if (!Files.exists(dbPath)) {
                 showError("Database file not found.");
                 return;
             }
@@ -49,10 +54,11 @@ public class DatabaseBackupUtil {
             }
 
             Files.copy(
-                    DB_PATH,
+                    dbPath,
                     destination.toPath(),
                     StandardCopyOption.REPLACE_EXISTING
             );
+
             AuditLogDAO.log(
                     AuditActions.DATABASE_BACKUP,
                     "Database backup created: " + destination.getAbsolutePath()
@@ -68,6 +74,8 @@ public class DatabaseBackupUtil {
 
     public static boolean restoreDatabase(Window ownerWindow) {
         try {
+            Path dbPath = getDbPath();
+
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Select Database Backup");
 
@@ -88,19 +96,19 @@ public class DatabaseBackupUtil {
 
             Files.copy(
                     selectedBackup.toPath(),
-                    DB_PATH,
+                    dbPath,
                     StandardCopyOption.REPLACE_EXISTING
             );
+
             AuditLogDAO.log(
                     AuditActions.DATABASE_RESTORE,
                     "Database restored from: " + selectedBackup.getAbsolutePath()
             );
 
             showInfo("""
-                Database restored successfully.
-
-                Please restart the app to load restored data.
-                """);
+                    Database restored successfully.
+                    Please restart the app to load restored data.
+                    """);
 
             return true;
 

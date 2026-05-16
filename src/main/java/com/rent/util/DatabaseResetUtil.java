@@ -3,63 +3,75 @@ package com.rent.util;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Window;
+
 import com.rent.dao.AuditLogDAO;
-import com.rent.util.AuditActions;
+import com.rent.dao.UserSecurityDAO;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
 public class DatabaseResetUtil {
 
-    private static final Path DB_PATH =
-            Path.of("src/main/resources/database/rent.db");
+    private static final String CONFIRM_TEXT = "RESET";
 
     public static boolean confirmFactoryReset(Window ownerWindow) {
-
         Alert warning = new Alert(Alert.AlertType.WARNING);
         warning.initOwner(ownerWindow);
         warning.setTitle("Factory Reset");
-        warning.setHeaderText("This will permanently delete all data.");
+        warning.setHeaderText("This will permanently delete all app data.");
         warning.setContentText("""
-                Factory Reset will delete:
-                
-                - Users
-                - Properties
-                - Flats
-                - Tenants
-                - Rent records
-                - Rent archive
-                - Repairs
-                - Reports data
-                - Settings
-                
-                This action cannot be undone.
+                Factory reset will delete:
+                - tenants
+                - flats
+                - rent records
+                - archive records
+                - receipts
+                - repairs
+                - reports data
+                - audit logs
+                - users and recovery data
+
+                A fresh database will be created with default login:
+                Username: admin
+                Password: 1234
+
+                Continue?
                 """);
 
-        warning.showAndWait();
+        Optional<javafx.scene.control.ButtonType> warningResult =
+                warning.showAndWait();
+
+        if (warningResult.isEmpty()
+                || warningResult.get() != javafx.scene.control.ButtonType.OK) {
+            return false;
+        }
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.initOwner(ownerWindow);
         dialog.setTitle("Confirm Factory Reset");
-        dialog.setHeaderText("Type DELETE ALL DATA to continue");
+        dialog.setHeaderText("Type RESET to confirm factory reset");
         dialog.setContentText("Confirmation:");
 
         Optional<String> result = dialog.showAndWait();
 
         return result.isPresent()
-                && "DELETE ALL DATA".equals(result.get().trim());
+                && CONFIRM_TEXT.equals(result.get().trim());
     }
 
     public static boolean factoryReset() {
         try {
-            Files.deleteIfExists(DB_PATH);
+            Path dbPath = DBUtil.getDatabasePath();
+
+            Files.deleteIfExists(dbPath);
 
             DBUtil.init();
-            com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
+
+            UserSecurityDAO.migratePlainPasswordsIfNeeded();
+
             AuditLogDAO.log(
-                    "SYSTEM",
                     AuditActions.FACTORY_RESET,
-                    "Factory reset performed. Database deleted and recreated."
+                    "Factory reset completed. Fresh database recreated."
             );
 
             return true;
@@ -67,8 +79,10 @@ public class DatabaseResetUtil {
         } catch (Exception e) {
             e.printStackTrace();
 
-            new Alert(Alert.AlertType.ERROR,
-                    "Factory reset failed. Please close the app and try again.").showAndWait();
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Factory reset failed."
+            ).showAndWait();
 
             return false;
         }
