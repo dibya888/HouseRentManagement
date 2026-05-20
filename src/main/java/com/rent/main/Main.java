@@ -3,8 +3,6 @@ package com.rent.main;
 import com.rent.util.AuthBootstrapService;
 import com.rent.util.AuthDBUtil;
 import com.rent.util.CurrentSession;
-import com.rent.util.UserRentDatabaseService;
-import com.rent.util.LegacyAdminMigrationService;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,21 +19,10 @@ public class Main extends Application {
 
         /*
          * Auth DB is global and safe to initialize before login.
+         * Do NOT open/decrypt any user rent.db here.
          */
         AuthDBUtil.init();
         AuthBootstrapService.ensureDefaultAdminExists();
-
-        /*
-         * Ensure default Admin encrypted database exists.
-         * Needed before legacy migration.
-         */
-        UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
-
-        /*
-         * Auto-migrate old single rent.db into Admin's encrypted rent.db.
-         * This is critical for existing users upgrading from older versions.
-         */
-        LegacyAdminMigrationService.migrateLegacyDataToAdminIfNeeded();
 
         /*
          * Encrypted per-user DB must be unlocked by password login.

@@ -65,7 +65,19 @@ public class LoginController {
         }
 
         if (AuthService.login(username, password)) {
-            AuditLogDAO.log(username, AuditActions.LOGIN_SUCCESS, "User logged in successfully.");
+
+            com.rent.util.MigrationResult migrationResult =
+                    com.rent.util.LegacyAdminMigrationService
+                            .migrateLegacyDataForCurrentAdminIfNeeded();
+
+            boolean showMigrationSuccess =
+                    migrationResult == com.rent.util.MigrationResult.MIGRATED;
+
+            AuditLogDAO.log(
+                    username,
+                    AuditActions.LOGIN_SUCCESS,
+                    "User logged in successfully."
+            );
 
             rememberUsernameIfNeeded(username);
 
@@ -91,8 +103,22 @@ public class LoginController {
                 stage.setMaximized(true);
                 stage.show();
 
+                if (showMigrationSuccess) {
+                    new Alert(
+                            Alert.AlertType.INFORMATION,
+                            """
+                            Existing data migrated successfully.
+        
+                            Your previous rent data has been moved into the secure Admin database.
+        
+                            Please create a new backup from Settings.
+                            """
+                    ).showAndWait();
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
+
                 messageLabel.setText("Failed to load dashboard.");
                 messageLabel.setStyle("-fx-text-fill: red;");
             }

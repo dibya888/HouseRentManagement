@@ -1,19 +1,13 @@
 package com.rent.util;
 
-import com.rent.dao.UserAccountDAO;
-import com.rent.model.UserAccount;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public final class LegacyAdminMigrationService {
 
-    private static final String DEFAULT_ADMIN_USERNAME = "admin";
-    private static final String DEFAULT_ADMIN_PASSWORD = "1234";
 
     /*
      * Business-data tables only.
@@ -34,39 +28,24 @@ public final class LegacyAdminMigrationService {
     private LegacyAdminMigrationService() {
     }
 
-    public static MigrationResult migrateLegacyDataToAdminIfNeeded() {
+    public static MigrationResult migrateLegacyDataForCurrentAdminIfNeeded() {
+        if (!CurrentSession.isLoggedIn() || !CurrentSession.isAdmin()) {
+            return MigrationResult.NO_LEGACY_DB;
+        }
+
         Path legacyDbPath = AppPaths.getLegacyDatabasePath();
 
         if (!Files.exists(legacyDbPath)) {
             return MigrationResult.NO_LEGACY_DB;
         }
 
-
-        Optional<UserAccount> optionalAdmin =
-                UserAccountDAO.findByUsername(DEFAULT_ADMIN_USERNAME);
-
-        if (optionalAdmin.isEmpty()) {
-            throw new RuntimeException("Cannot migrate legacy data: admin account not found in auth.db.");
-        }
-
-        UserAccount admin = optionalAdmin.get();
-
-        if (!admin.isActive() || !admin.isAdmin()) {
-            throw new RuntimeException("Cannot migrate legacy data: admin account is invalid.");
-        }
-
-        String dbKey = DbKeyCryptoUtil.decryptDatabaseKey(
-                admin.getEncryptedDbKey(),
-                DEFAULT_ADMIN_PASSWORD,
-                admin.getDbKeySalt()
-        );
-
-        Path adminDbPath = AppPaths.getUserRentDbPath(admin.getId());
+        Path adminDbPath = CurrentSession.getCurrentUserDatabasePath();
+        String adminDbKey = CurrentSession.getDatabaseKey();
 
         try (Connection legacyConn = DriverManager.getConnection(
                 "jdbc:sqlite:" + legacyDbPath.toAbsolutePath()
         );
-             Connection adminConn = EncryptedDbConnectionFactory.open(adminDbPath, dbKey)) {
+             Connection adminConn = EncryptedDbConnectionFactory.open(adminDbPath, adminDbKey)) {
 
             RentDatabaseInitializer.initialize(adminConn);
 
@@ -82,7 +61,10 @@ public final class LegacyAdminMigrationService {
             return MigrationResult.MIGRATED;
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to migrate legacy database data to Admin encrypted database.", e);
+            throw new RuntimeException(
+                    "Failed to migrate legacy database data to Admin encrypted database.",
+                    e
+            );
         }
     }
 
