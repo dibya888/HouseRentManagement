@@ -46,6 +46,22 @@ public final class AuthDBUtil {
             """);
 
             stmt.execute("""
+                CREATE TABLE IF NOT EXISTS recovery_pins (
+                    user_id TEXT PRIMARY KEY,
+                    pin_hash TEXT NOT NULL,
+                    pin_salt TEXT NOT NULL,
+            
+                    encrypted_db_key_by_pin TEXT NOT NULL,
+                    db_key_salt_by_pin TEXT NOT NULL,
+            
+                    updated_at TEXT NOT NULL,
+            
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+            """);
+
+
+            stmt.execute("""
                 CREATE TABLE IF NOT EXISTS emergency_keys (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id TEXT NOT NULL,

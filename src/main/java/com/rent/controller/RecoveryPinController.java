@@ -23,55 +23,89 @@ public class RecoveryPinController {
 
     @FXML
     private void saveRecoveryPin() {
-        String username = getLoggedInUsername();
 
-        if (username == null || username.isBlank()) {
-            showError("Logged-in user not found.");
-            return;
-        }
+        try {
 
-        String password = text(passwordField);
-        String pin = text(recoveryPinField);
-        String confirmPin = text(confirmPinField);
+            if (!com.rent.util.CurrentSession.isLoggedIn()) {
+                showError("No active session.");
+                return;
+            }
 
-        if (password.isBlank()) {
-            showWarning("Please enter your login password.");
-            return;
-        }
+            String userId = com.rent.util.CurrentSession.getUserId();
+            String username = com.rent.util.CurrentSession.getUsername();
 
-        if (pin.isBlank()) {
-            showWarning("Please enter recovery PIN.");
-            return;
-        }
+            String password = text(passwordField);
+            String pin = text(recoveryPinField);
+            String confirmPin = text(confirmPinField);
 
-        if (!pin.matches("\\d{4,8}")) {
-            showWarning("Recovery PIN must be 4 to 8 digits.");
-            return;
-        }
+            if (password.isBlank()) {
+                showWarning("Enter your login password.");
+                return;
+            }
 
-        if (!pin.equals(confirmPin)) {
-            showWarning("Recovery PIN and confirm PIN do not match.");
-            return;
-        }
+            if (pin.isBlank()) {
+                showWarning("Enter recovery PIN.");
+                return;
+            }
 
-        if (!UserSecurityDAO.verifyPassword(username, password)) {
-            showError("Login password is incorrect.");
-            return;
-        }
+            if (!pin.matches("\\d{4,8}")) {
+                showWarning("PIN must be 4–8 digits.");
+                return;
+            }
 
-        String salt = SecurityUtil.generateSalt();
-        String hash = SecurityUtil.hashSecret(pin, salt);
+            if (!pin.equals(confirmPin)) {
+                showWarning("PINs do not match.");
+                return;
+            }
 
-        if (updateRecoveryPin(username, hash, salt)) {
-            AuditLogDAO.log(
-                    AuditActions.RECOVERY_PIN_SET,
-                    "Recovery PIN set or updated for user: " + username
+            // ✅ Verify login password
+            var userOpt = com.rent.dao.UserAccountDAO.findById(userId);
+
+            if (userOpt.isEmpty() ||
+                    !com.rent.util.SecurityUtil.verifySecret(
+                            password,
+                            userOpt.get().getPasswordHash(),
+                            userOpt.get().getPasswordSalt())) {
+
+                showError("Login password is incorrect.");
+                return;
+            }
+
+            // ✅ Hash PIN
+            String pinSalt = com.rent.util.SecurityUtil.generateSalt();
+            String pinHash = com.rent.util.SecurityUtil.hashSecret(pin, pinSalt);
+
+            // ✅ CURRENT DB KEY (critical)
+            String dbKey = com.rent.util.CurrentSession.getDatabaseKey();
+
+            // ✅ Encrypt DB key using PIN
+            String dbKeySaltByPin = com.rent.util.DbKeyCryptoUtil.generateSalt();
+            String encryptedDbKeyByPin =
+                    com.rent.util.DbKeyCryptoUtil.encryptDatabaseKey(
+                            dbKey,
+                            pin,
+                            dbKeySaltByPin
+                    );
+
+            // ✅ Store in auth.db
+            boolean success = com.rent.dao.RecoveryPinDAO.upsertPin(
+                    userId,
+                    pinHash,
+                    pinSalt,
+                    encryptedDbKeyByPin,
+                    dbKeySaltByPin
             );
 
-            showInfo("Recovery PIN saved successfully.");
-            close();
-        } else {
-            showError("Failed to save recovery PIN.");
+            if (success) {
+                showInfo("Recovery PIN saved successfully.");
+                close();
+            } else {
+                showError("Failed to save recovery PIN.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Failed to set recovery PIN.");
         }
     }
 
