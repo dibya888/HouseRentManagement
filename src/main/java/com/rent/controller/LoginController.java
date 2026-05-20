@@ -79,6 +79,20 @@ public class LoginController {
                     "User logged in successfully."
             );
 
+            if (showMigrationSuccess) {
+                AuditLogDAO.log(
+                        username,
+                        "LEGACY_DATA_MIGRATED",
+                        "Existing legacy rent data migrated successfully into the secure Admin database."
+                );
+
+                com.rent.dao.AuthAuditLogDAO.log(
+                        username,
+                        "LEGACY_DATA_MIGRATED",
+                        "Existing legacy rent data migrated successfully into the secure Admin database."
+                );
+            }
+
             rememberUsernameIfNeeded(username);
 
             try {
