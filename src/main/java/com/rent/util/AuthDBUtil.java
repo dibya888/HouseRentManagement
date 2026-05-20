@@ -60,6 +60,9 @@ public final class AuthDBUtil {
                 )
             """);
 
+            safeAddColumn(conn, "recovery_pins", "encrypted_db_key_by_pin TEXT");
+            safeAddColumn(conn, "recovery_pins", "db_key_salt_by_pin TEXT");
+
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS emergency_keys (
@@ -76,6 +79,14 @@ public final class AuthDBUtil {
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize auth database.", e);
+        }
+    }
+
+    private static void safeAddColumn(Connection conn, String table, String columnDef) {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE " + table + " ADD COLUMN " + columnDef);
+        } catch (Exception ignored) {
+            // Column already exists → ignore
         }
     }
 }

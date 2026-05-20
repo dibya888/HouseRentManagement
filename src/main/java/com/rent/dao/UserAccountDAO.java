@@ -278,4 +278,37 @@ public class UserAccountDAO {
             return false;
         }
     }
+
+    public static boolean updatePasswordAndDbKey(String userId,
+                                                 String passwordHash,
+                                                 String passwordSalt,
+                                                 String dbKeySalt,
+                                                 String encryptedDbKey) {
+        String sql = """
+        UPDATE users
+        SET password_hash = ?,
+            password_salt = ?,
+            db_key_salt = ?,
+            encrypted_db_key = ?,
+            updated_at = ?
+        WHERE id = ?
+    """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, passwordHash);
+            ps.setString(2, passwordSalt);
+            ps.setString(3, dbKeySalt);
+            ps.setString(4, encryptedDbKey);
+            ps.setString(5, LocalDateTime.now().format(TS));
+            ps.setString(6, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

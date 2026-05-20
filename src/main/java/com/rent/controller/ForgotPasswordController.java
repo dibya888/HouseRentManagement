@@ -1,22 +1,26 @@
 package com.rent.controller;
 
-import com.rent.util.DBUtil;
+import com.rent.dao.RecoveryPinDAO;
+import com.rent.dao.UserAccountDAO;
+import com.rent.model.UserAccount;
+import com.rent.util.DbKeyCryptoUtil;
+import com.rent.util.EncryptedDbConnectionFactory;
+import com.rent.util.AppPaths;
 import com.rent.util.SecurityUtil;
+import com.rent.util.DatabaseResetUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import com.rent.dao.UserSecurityDAO;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
-import com.rent.util.DatabaseResetUtil;
+
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 public class ForgotPasswordController {
@@ -28,8 +32,9 @@ public class ForgotPasswordController {
 
     @FXML
     private void resetPassword() {
+
         String username = text(usernameField);
-        String recoveryPin = text(recoveryPinField);
+        String pin = text(recoveryPinField);
         String newPassword = text(newPasswordField);
         String confirmPassword = text(confirmPasswordField);
 
@@ -38,8 +43,13 @@ public class ForgotPasswordController {
             return;
         }
 
-        if (recoveryPin.isBlank()) {
+        if (pin.isBlank()) {
             showWarning("Please enter recovery PIN.");
+            return;
+        }
+
+        if (!pin.matches("\\d{4,8}")) {
+            showWarning("Recovery PIN must be 4 to 8 digits.");
             return;
         }
 
@@ -58,30 +68,86 @@ public class ForgotPasswordController {
             return;
         }
 
-        RecoveryPinData pinData = getRecoveryPinData(username);
-
-        if (pinData == null) {
-            showError("User not found or recovery PIN is not set.");
+        // 1) Load user from auth.db
+        Optional<UserAccount> optUser = UserAccountDAO.findByUsername(username);
+        if (optUser.isEmpty()) {
+            showError("User not found.");
             return;
         }
 
-        boolean validPin = SecurityUtil.verifySecret(
-                recoveryPin,
-                pinData.hash,
-                pinData.salt
-        );
+        UserAccount user = optUser.get();
 
+        if (!user.isActive()) {
+            showError("User is disabled.");
+            return;
+        }
+
+        // 2) Get recovery PIN record from auth.db
+        RecoveryPinDAO.PinData pinData = RecoveryPinDAO.getPinDataByUsername(username);
+        if (pinData == null) {
+            showError("Recovery PIN is not set for this user.");
+            return;
+        }
+
+        // 3) Verify entered PIN against stored PIN hash
+        boolean validPin = SecurityUtil.verifySecret(pin, pinData.hash, pinData.salt);
         if (!validPin) {
             showError("Invalid recovery PIN.");
             return;
         }
 
-        if (UserSecurityDAO.updatePassword(username, newPassword)) {
-            showInfo("Password reset successfully. You can now login with your new password.");
-            close();
-        } else {
-            showError("Failed to reset password.");
+        // 4) Decrypt the DB key using PIN wrapper (preserves encrypted rent.db)
+        String dbKey;
+        try {
+            dbKey = DbKeyCryptoUtil.decryptDatabaseKey(
+                    pinData.encryptedDbKeyByPin,
+                    pin,
+                    pinData.dbKeySaltByPin
+            );
+        } catch (Exception e) {
+            showError("Failed to unlock database key with recovery PIN.");
+            return;
         }
+
+        // 5) Verify we can open the user's encrypted rent.db with this key
+        try (var ignored = EncryptedDbConnectionFactory.open(
+                AppPaths.getUserRentDbPath(user.getId()),
+                dbKey
+        )) {
+            // OK
+        } catch (Exception e) {
+            showError("User database could not be opened. Backup/restore may be required.");
+            return;
+        }
+
+        // 6) Create new password hash/salt
+        String newSalt = SecurityUtil.generateSalt();
+        String newHash = SecurityUtil.hashSecret(newPassword, newSalt);
+
+        // 7) Re-wrap SAME dbKey using new password
+        String newDbKeySalt = DbKeyCryptoUtil.generateSalt();
+        String newEncryptedDbKey = DbKeyCryptoUtil.encryptDatabaseKey(
+                dbKey,
+                newPassword,
+                newDbKeySalt
+        );
+
+        // 8) Save back to auth.db
+        boolean updated = UserAccountDAO.updatePasswordAndDbKey(
+                user.getId(),
+                newHash,
+                newSalt,
+                newDbKeySalt,
+                newEncryptedDbKey
+        );
+
+        if (!updated) {
+            showError("Failed to update password.");
+            return;
+        }
+
+        showInfo("Password reset successfully. You can now login with your new password.");
+        close();
     }
 
     @FXML
@@ -90,31 +156,23 @@ public class ForgotPasswordController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/emergency-key-reset.fxml")
             );
-
             Scene scene = new Scene(loader.load());
-
             scene.getStylesheets().add(
-                    getClass()
-                            .getResource("/css/style.css")
-                            .toExternalForm()
+                    getClass().getResource("/css/style.css").toExternalForm()
             );
 
             Stage stage = new Stage();
             stage.initOwner(usernameField.getScene().getWindow());
             stage.initModality(Modality.WINDOW_MODAL);
             stage.setTitle("Emergency Key Reset");
-
             stage.getIcons().add(
                     new Image(getClass().getResourceAsStream("/images/app-icon.png"))
             );
-
             stage.setScene(scene);
             stage.setResizable(false);
             stage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
-
             new Alert(Alert.AlertType.ERROR,
                     "Failed to open emergency key reset.").showAndWait();
         }
@@ -122,19 +180,15 @@ public class ForgotPasswordController {
 
     @FXML
     private void factoryReset() {
-        Stage stage = (Stage) usernameField
-                .getScene()
-                .getWindow();
+        Stage stage = (Stage) usernameField.getScene().getWindow();
 
         boolean confirmed = DatabaseResetUtil.confirmFactoryReset(stage);
-
         if (!confirmed) {
             showInfo("Factory reset cancelled.");
             return;
         }
 
         boolean success = DatabaseResetUtil.factoryReset();
-
         if (!success) {
             return;
         }
@@ -142,47 +196,12 @@ public class ForgotPasswordController {
         clearSavedLogin();
 
         showInfo("""
-            Factory reset completed.
-
-            Default login:
-            Username: admin
-            Password: 1234
-            """);
-
+                Factory reset completed.
+                Default login:
+                Username: admin
+                Password: 1234
+                """);
         close();
-    }
-
-    private RecoveryPinData getRecoveryPinData(String username) {
-        String sql = """
-                SELECT recovery_pin_hash, recovery_pin_salt
-                FROM users
-                WHERE username = ?
-                """;
-
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String hash = rs.getString("recovery_pin_hash");
-                    String salt = rs.getString("recovery_pin_salt");
-
-                    if (hash == null || hash.isBlank()
-                            || salt == null || salt.isBlank()) {
-                        return null;
-                    }
-
-                    return new RecoveryPinData(hash, salt);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     private String text(TextField field) {
@@ -195,10 +214,7 @@ public class ForgotPasswordController {
 
     @FXML
     private void close() {
-        Stage stage = (Stage) usernameField
-                .getScene()
-                .getWindow();
-
+        Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
     }
 
@@ -214,23 +230,10 @@ public class ForgotPasswordController {
         new Alert(Alert.AlertType.ERROR, message).showAndWait();
     }
 
-    private static class RecoveryPinData {
-        String hash;
-        String salt;
-
-        RecoveryPinData(String hash, String salt) {
-            this.hash = hash;
-            this.salt = salt;
-        }
-    }
-
     private void clearSavedLogin() {
-        Preferences prefs =
-                Preferences.userNodeForPackage(LoginController.class);
-
+        Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
         prefs.remove("loggedInUser");
         prefs.putBoolean("saveLogin", false);
+        prefs.remove("rememberedUsername");
     }
-
-
 }
