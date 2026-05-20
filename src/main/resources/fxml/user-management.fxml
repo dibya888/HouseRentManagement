@@ -28,6 +28,21 @@
                 onAction="#addUser"
                 styleClass="settings-primary-btn"/>
 
+        <Button fx:id="enableUserButton"
+                text="Enable"
+                onAction="#enableSelectedUser"
+                styleClass="settings-primary-btn"/>
+
+        <Button fx:id="disableUserButton"
+                text="Disable"
+                onAction="#disableSelectedUser"
+                styleClass="settings-primary-btn"/>
+
+        <Button fx:id="deleteUserButton"
+                text="Delete"
+                onAction="#deleteSelectedUser"
+                styleClass="settings-danger-btn"/>
+
         <Button fx:id="refreshButton"
                 text="Refresh"
                 onAction="#refreshUsers"

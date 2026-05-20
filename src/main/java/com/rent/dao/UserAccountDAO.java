@@ -208,4 +208,47 @@ public class UserAccountDAO {
             return true;
         }
     }
+
+    public static boolean updateStatus(String userId, String status) {
+        String sql = """
+        UPDATE users
+        SET status = ?,
+            updated_at = ?
+        WHERE id = ?
+          AND role <> 'ADMIN'
+    """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setString(2, LocalDateTime.now().format(TS));
+            ps.setString(3, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean deleteById(String userId) {
+        String sql = """
+        DELETE FROM users
+        WHERE id = ?
+          AND role <> 'ADMIN'
+    """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

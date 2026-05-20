@@ -4,6 +4,7 @@ import com.rent.dao.UserAccountDAO;
 import com.rent.model.UserAccount;
 import com.rent.util.CurrentSession;
 import com.rent.util.UserCreationService;
+import com.rent.util.UserManagementService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserManagementController {
 
@@ -47,6 +49,15 @@ public class UserManagementController {
 
     @FXML
     private Button addUserButton;
+
+    @FXML
+    private Button enableUserButton;
+
+    @FXML
+    private Button disableUserButton;
+
+    @FXML
+    private Button deleteUserButton;
 
     @FXML
     private Button refreshButton;
@@ -165,14 +176,96 @@ public class UserManagementController {
 
             } catch (Exception e) {
                 e.printStackTrace();
-
-                Throwable root = e.getCause() != null ? e.getCause() : e;
-
-                showError(root.getMessage() == null
-                        ? "Failed to create user."
-                        : root.getMessage());
+                showError(rootMessage(e, "Failed to create user."));
             }
         });
+    }
+
+    @FXML
+    private void enableSelectedUser() {
+        UserAccount selected = getSelectedUser();
+        if (selected == null) {
+            return;
+        }
+
+        try {
+            UserManagementService.enableUser(selected.getId());
+            loadUsers();
+
+            new Alert(Alert.AlertType.INFORMATION,
+                    "User enabled successfully.").showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError(rootMessage(e, "Failed to enable user."));
+        }
+    }
+
+    @FXML
+    private void disableSelectedUser() {
+        UserAccount selected = getSelectedUser();
+        if (selected == null) {
+            return;
+        }
+
+        Optional<ButtonType> confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Disable user '" + selected.getUsername() + "'?",
+                ButtonType.YES,
+                ButtonType.NO
+        ).showAndWait();
+
+        if (confirm.isEmpty() || confirm.get() != ButtonType.YES) {
+            return;
+        }
+
+        try {
+            UserManagementService.disableUser(selected.getId());
+            loadUsers();
+
+            new Alert(Alert.AlertType.INFORMATION,
+                    "User disabled successfully.").showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError(rootMessage(e, "Failed to disable user."));
+        }
+    }
+
+    @FXML
+    private void deleteSelectedUser() {
+        UserAccount selected = getSelectedUser();
+        if (selected == null) {
+            return;
+        }
+
+        Alert confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Permanently delete user '" + selected.getUsername() + "' and their database?\n\nThis cannot be undone.",
+                ButtonType.YES,
+                ButtonType.NO
+        );
+
+        confirm.setTitle("Delete User");
+        confirm.setHeaderText("Permanent Delete");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+
+        if (result.isEmpty() || result.get() != ButtonType.YES) {
+            return;
+        }
+
+        try {
+            UserManagementService.deleteUser(selected.getId());
+            loadUsers();
+
+            new Alert(Alert.AlertType.INFORMATION,
+                    "User deleted successfully.").showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError(rootMessage(e, "Failed to delete user."));
+        }
     }
 
     @FXML
@@ -186,6 +279,29 @@ public class UserManagementController {
             Stage stage = (Stage) closeButton.getScene().getWindow();
             stage.close();
         }
+    }
+
+    private UserAccount getSelectedUser() {
+        UserAccount selected = usersTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showError("Please select a user first.");
+            return null;
+        }
+
+        return selected;
+    }
+
+    private String rootMessage(Exception e, String fallback) {
+        Throwable root = e;
+
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+
+        return root.getMessage() == null || root.getMessage().isBlank()
+                ? fallback
+                : root.getMessage();
     }
 
     private String nullSafe(String value) {
