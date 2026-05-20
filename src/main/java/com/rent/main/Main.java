@@ -3,9 +3,6 @@ package com.rent.main;
 import com.rent.util.AuthBootstrapService;
 import com.rent.util.AuthDBUtil;
 import com.rent.util.CurrentSession;
-import com.rent.util.DBUtil;
-import com.rent.util.LegacyAdminMigrationService;
-import com.rent.util.UserRentDatabaseService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,27 +17,19 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
 
         /*
-         * OLD system still initializes for now.
-         * We will remove this after DBUtil is switched to per-user DB.
-         */
-        DBUtil.init();
-        com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
-
-        /*
-         * NEW secure auth + user DB system.
+         * Auth DB is global and safe to initialize before login.
          */
         AuthDBUtil.init();
         AuthBootstrapService.ensureDefaultAdminExists();
-        UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
-        LegacyAdminMigrationService.migrateLegacyDataToAdminIfNeeded();
 
         /*
-         * Important:
-         * Encrypted user DB requires password unlock.
-         * So app must always start at login page.
+         * Encrypted per-user DB must be unlocked by password login.
          */
         CurrentSession.clear();
 
+        /*
+         * Remove old unsafe auto-login behavior.
+         */
         Preferences prefs = Preferences.userNodeForPackage(
                 com.rent.controller.LoginController.class
         );

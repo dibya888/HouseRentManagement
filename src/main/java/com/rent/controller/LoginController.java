@@ -37,15 +37,11 @@ public class LoginController {
     public void initialize() {
         Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
 
-        /*
-         * New behavior:
-         * Save Login only remembers username.
-         * It does NOT auto-open dashboard anymore.
-         */
         String rememberedUsername = prefs.get("rememberedUsername", "");
 
         if (!rememberedUsername.isBlank()) {
             usernameField.setText(rememberedUsername);
+
             if (saveLoginCheckBox != null) {
                 saveLoginCheckBox.setSelected(true);
             }
@@ -102,8 +98,11 @@ public class LoginController {
             }
 
         } else {
-            AuditLogDAO.log(username, AuditActions.LOGIN_FAILED, "Failed login attempt.");
-
+            /*
+             * No AuditLogDAO here.
+             * Failed login has no active CurrentSession, so no user rent DB is open.
+             * Auth-level failed-login logging can be added later in auth.db.
+             */
             messageLabel.setText("Invalid username or password.");
             messageLabel.setStyle("-fx-text-fill: red;");
         }
@@ -114,9 +113,6 @@ public class LoginController {
 
         boolean remember = saveLoginCheckBox != null && saveLoginCheckBox.isSelected();
 
-        /*
-         * Remove old unsafe auto-login keys.
-         */
         prefs.remove("loggedInUser");
         prefs.putBoolean("saveLogin", false);
 

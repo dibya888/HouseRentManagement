@@ -3,6 +3,7 @@ package com.rent.util;
 import com.rent.dao.UserAccountDAO;
 import com.rent.model.UserAccount;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 public final class AuthService {
@@ -39,26 +40,22 @@ public final class AuthService {
             return false;
         }
 
-        String databaseKey = DbKeyCryptoUtil.decryptDatabaseKey(
-                user.getEncryptedDbKey(),
-                password,
-                user.getDbKeySalt()
-        );
+        String databaseKey;
 
-        /*
-         * Open once immediately to verify this user's encrypted rent database.
-         * If wrong/corrupt, login fails before dashboard opens.
-         */
-        try (var ignored = EncryptedDbConnectionFactory.open(
-                AppPaths.getUserRentDbPath(user.getId()),
-                databaseKey
-        )) {
-            // verified
+        try {
+            databaseKey = DbKeyCryptoUtil.decryptDatabaseKey(
+                    user.getEncryptedDbKey(),
+                    password,
+                    user.getDbKeySalt()
+            );
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
 
+        /*
+         * Start session before schema init so DBUtil and DAOs can use it.
+         */
         CurrentSession.start(
                 user.getId(),
                 user.getUsername(),
@@ -66,6 +63,21 @@ public final class AuthService {
                 user.getRole(),
                 databaseKey
         );
+
+        /*
+         * Open + initialize the user's encrypted rent database.
+         * If DB file does not exist, it is created here.
+         */
+        try (Connection conn = EncryptedDbConnectionFactory.open(
+                AppPaths.getUserRentDbPath(user.getId()),
+                databaseKey
+        )) {
+            RentDatabaseInitializer.initialize(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+            CurrentSession.clear();
+            return false;
+        }
 
         UserAccountDAO.updateLastLogin(user.getId());
 
