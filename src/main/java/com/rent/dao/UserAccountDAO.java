@@ -185,4 +185,27 @@ public class UserAccountDAO {
 
         return u;
     }
+
+    public static boolean usernameExists(String username) {
+        String sql = "SELECT 1 FROM users WHERE username = ? LIMIT 1";
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            /*
+             * Fail safe:
+             * if we cannot check, behave as if username exists.
+             */
+            return true;
+        }
+    }
 }
