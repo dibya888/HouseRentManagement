@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserAccountDAO {
@@ -55,6 +57,32 @@ public class UserAccountDAO {
         }
 
         return Optional.empty();
+    }
+
+    public static List<UserAccount> getAllUsers() {
+        List<UserAccount> users = new ArrayList<>();
+
+        String sql = """
+            SELECT *
+            FROM users
+            ORDER BY
+                CASE WHEN role = 'ADMIN' THEN 0 ELSE 1 END,
+                username COLLATE NOCASE
+        """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                users.add(map(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
     public static boolean hasAnyUser() {

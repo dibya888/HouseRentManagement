@@ -235,6 +235,35 @@
                            style="-fx-text-fill:#6b7280; -fx-font-weight:bold;"/>
                 </VBox>
 
+                <!-- User Management -->
+                <VBox GridPane.columnIndex="1"
+                      GridPane.rowIndex="2"
+                      spacing="12"
+                      prefWidth="330"
+                      styleClass="settings-card">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="👥"
+                               style="-fx-font-size:24px;"/>
+
+                        <VBox spacing="2">
+                            <Label text="User Management"
+                                   styleClass="settings-card-title"/>
+
+                            <Label text="Create and manage app users. Each user has a separate secure database."
+                                   wrapText="true"
+                                   styleClass="settings-card-desc"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <Button text="Open User Management"
+                            onAction="#openUserManagement"
+                            maxWidth="Infinity"
+                            styleClass="settings-primary-btn"/>
+                </VBox>
+
             </GridPane>
 
         </VBox>

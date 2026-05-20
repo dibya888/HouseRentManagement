@@ -223,4 +223,45 @@ public class SettingsController {
                     .showAndWait();
         }
     }
+
+    @FXML
+    private void openUserManagement(ActionEvent event) {
+        try {
+            if (!com.rent.util.CurrentSession.isAdmin()) {
+                new Alert(Alert.AlertType.WARNING,
+                        "Only Admin can manage users.").showAndWait();
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/user-management.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
+            );
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("User Management");
+
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/images/app-icon.png"))
+            );
+
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to open User Management.").showAndWait();
+        }
+    }
 }
