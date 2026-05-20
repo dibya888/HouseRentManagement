@@ -215,14 +215,17 @@
                       GridPane.rowIndex="2"
                       spacing="12"
                       prefWidth="330"
-                      styleClass="settings-card">
+                      styleClass="settings-card"
+                      onMouseClicked="#openWhatsNew">
 
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <Label text="ℹ"
                                style="-fx-font-size:24px;"/>
+
                         <VBox spacing="2">
                             <Label text="App Information"
                                    styleClass="settings-card-title"/>
+
                             <Label text="House Rent Management System - offline desktop edition."
                                    wrapText="true"
                                    styleClass="settings-card-desc"/>
@@ -231,8 +234,17 @@
 
                     <Region VBox.vgrow="ALWAYS"/>
 
-                    <Label text="Version 1.0"
-                           style="-fx-text-fill:#6b7280; -fx-font-weight:bold;"/>
+                    <VBox spacing="4">
+                        <Label text="Version 2.0.0"
+                               style="-fx-text-fill:#111827; -fx-font-weight:bold;"/>
+
+                        <Label text="What's New: Multi-user, DB Security, encrypted user databases..."
+                               wrapText="true"
+                               style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
+
+                        <Label text="Click to view details"
+                               style="-fx-text-fill:#2563eb; -fx-font-size:12px; -fx-font-weight:bold;"/>
+                    </VBox>
                 </VBox>
 
                 <!-- User Management -->

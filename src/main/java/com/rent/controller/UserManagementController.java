@@ -175,7 +175,6 @@ public class UserManagementController {
                 ).showAndWait();
 
             } catch (Exception e) {
-                e.printStackTrace();
                 showError(rootMessage(e, "Failed to create user."));
             }
         });
@@ -196,7 +195,6 @@ public class UserManagementController {
                     "User enabled successfully.").showAndWait();
 
         } catch (Exception e) {
-            e.printStackTrace();
             showError(rootMessage(e, "Failed to enable user."));
         }
     }
@@ -227,7 +225,6 @@ public class UserManagementController {
                     "User disabled successfully.").showAndWait();
 
         } catch (Exception e) {
-            e.printStackTrace();
             showError(rootMessage(e, "Failed to disable user."));
         }
     }
@@ -263,7 +260,6 @@ public class UserManagementController {
                     "User deleted successfully.").showAndWait();
 
         } catch (Exception e) {
-            e.printStackTrace();
             showError(rootMessage(e, "Failed to delete user."));
         }
     }

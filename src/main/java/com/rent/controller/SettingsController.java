@@ -264,4 +264,23 @@ public class SettingsController {
                     "Failed to open User Management.").showAndWait();
         }
     }
+
+    @FXML
+    private void openWhatsNew() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("What's New");
+        alert.setHeaderText("Version 2.0.0 - Secure Multi-User Release");
+
+        alert.setContentText("""
+            What's New:
+
+            • Multi-user support
+            • Each user has a separate private rent database
+            • DB Security upgraded with encrypted user databases
+            • Admin-controlled user creation, enable, disable, and delete
+            • Save Login now remembers username only for better security
+            """);
+
+        alert.showAndWait();
+    }
 }
