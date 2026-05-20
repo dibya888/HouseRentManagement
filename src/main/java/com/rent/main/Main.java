@@ -1,12 +1,16 @@
 package com.rent.main;
 
+import com.rent.util.AuthBootstrapService;
+import com.rent.util.AuthDBUtil;
+import com.rent.util.CurrentSession;
 import com.rent.util.DBUtil;
+import com.rent.util.LegacyAdminMigrationService;
+import com.rent.util.UserRentDatabaseService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.scene.image.Image;
-
+import javafx.stage.Stage;
 
 import java.util.prefs.Preferences;
 
@@ -15,41 +19,37 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        // initialize DB
+        /*
+         * OLD system still initializes for now.
+         * We will remove this after DBUtil is switched to per-user DB.
+         */
         DBUtil.init();
         com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
 
-        com.rent.util.AuthDBUtil.init();
-        com.rent.util.AuthBootstrapService.ensureDefaultAdminExists();
-        com.rent.util.UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
-        com.rent.util.LegacyAdminMigrationService.migrateLegacyDataToAdminIfNeeded();
+        /*
+         * NEW secure auth + user DB system.
+         */
+        AuthDBUtil.init();
+        AuthBootstrapService.ensureDefaultAdminExists();
+        UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
+        LegacyAdminMigrationService.migrateLegacyDataToAdminIfNeeded();
 
+        /*
+         * Important:
+         * Encrypted user DB requires password unlock.
+         * So app must always start at login page.
+         */
+        CurrentSession.clear();
 
-        // read saved login
-        Preferences prefs =
-                Preferences.userNodeForPackage(
-                        com.rent.controller.LoginController.class
-                );
+        Preferences prefs = Preferences.userNodeForPackage(
+                com.rent.controller.LoginController.class
+        );
+        prefs.remove("loggedInUser");
+        prefs.putBoolean("saveLogin", false);
 
-        String loggedUser = prefs.get("loggedInUser", null);
-        boolean saveLogin = prefs.getBoolean("saveLogin", false);
-
-        FXMLLoader loader;
-
-        if (saveLogin && loggedUser != null && !loggedUser.isEmpty()) {
-            loader = new FXMLLoader(
-                    getClass().getResource("/fxml/dashboard.fxml")
-            );
-            stage.setTitle("Rent Management System");
-        } else {
-            prefs.remove("loggedInUser");
-            prefs.putBoolean("saveLogin", false);
-
-            loader = new FXMLLoader(
-                    getClass().getResource("/fxml/login.fxml")
-            );
-            stage.setTitle("Rent Management - Login");
-        }
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/login.fxml")
+        );
 
         Scene scene = new Scene(loader.load(), 900, 600);
 
@@ -59,24 +59,16 @@ public class Main extends Application {
                         .toExternalForm()
         );
 
+        stage.setTitle("Rent Management - Login");
 
         stage.getIcons().add(
                 new Image(getClass().getResourceAsStream("/images/app-icon.png"))
         );
-
 
         stage.setScene(scene);
         stage.setResizable(true);
-
-        if (loggedUser != null && !loggedUser.isEmpty()) {
-            // ✅ Auto-login → Dashboard → MAXIMIZED
-            stage.setMaximized(true);
-        }
-        stage.getIcons().add(
-                new Image(getClass().getResourceAsStream("/images/app-icon.png"))
-        );
+        stage.setMaximized(false);
         stage.show();
-
     }
 
     public static void main(String[] args) {

@@ -6,9 +6,14 @@ import com.rent.util.AuthDBUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class UserAccountDAO {
+
+    private static final DateTimeFormatter TS =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Optional<UserAccount> findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
@@ -63,11 +68,6 @@ public class UserAccountDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
-
-            /*
-             * Fail closed:
-             * if auth DB cannot be checked, do not auto-create users blindly.
-             */
             return true;
         }
     }
@@ -108,6 +108,27 @@ public class UserAccountDAO {
             ps.setString(11, user.getCreatedAt());
             ps.setString(12, user.getUpdatedAt());
             ps.setString(13, user.getLastLoginAt());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean updateLastLogin(String userId) {
+        String sql = """
+            UPDATE users
+            SET last_login_at = ?
+            WHERE id = ?
+        """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, LocalDateTime.now().format(TS));
+            ps.setString(2, userId);
 
             return ps.executeUpdate() > 0;
 

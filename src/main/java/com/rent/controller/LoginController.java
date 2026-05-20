@@ -1,23 +1,23 @@
 package com.rent.controller;
 
+import com.rent.dao.AuditLogDAO;
+import com.rent.util.AuditActions;
+import com.rent.util.AuthService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import com.rent.dao.AuditLogDAO;
-import com.rent.util.AuditActions;
-import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import com.rent.dao.UserSecurityDAO;
-import java.util.prefs.Preferences;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.util.prefs.Preferences;
 
 public class LoginController {
 
@@ -34,69 +34,96 @@ public class LoginController {
     private Label messageLabel;
 
     @FXML
+    public void initialize() {
+        Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
+
+        /*
+         * New behavior:
+         * Save Login only remembers username.
+         * It does NOT auto-open dashboard anymore.
+         */
+        String rememberedUsername = prefs.get("rememberedUsername", "");
+
+        if (!rememberedUsername.isBlank()) {
+            usernameField.setText(rememberedUsername);
+            if (saveLoginCheckBox != null) {
+                saveLoginCheckBox.setSelected(true);
+            }
+        }
+    }
+
+    @FXML
     public void handleLogin(ActionEvent event) {
+        String username = usernameField.getText() == null
+                ? ""
+                : usernameField.getText().trim();
 
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
+        String password = passwordField.getText() == null
+                ? ""
+                : passwordField.getText();
 
-        if (checkLogin(username, password)) {
+        if (username.isBlank() || password.isBlank()) {
+            messageLabel.setText("Username and password are required.");
+            messageLabel.setStyle("-fx-text-fill: red;");
+            return;
+        }
+
+        if (AuthService.login(username, password)) {
             AuditLogDAO.log(username, AuditActions.LOGIN_SUCCESS, "User logged in successfully.");
+
+            rememberUsernameIfNeeded(username);
+
             try {
-
-                // save login session
-                Preferences prefs =
-                        Preferences.userNodeForPackage(LoginController.class);
-
-                boolean saveLogin =
-                        saveLoginCheckBox != null && saveLoginCheckBox.isSelected();
-
-                if (saveLogin) {
-                    prefs.put("loggedInUser", username);
-                    prefs.putBoolean("saveLogin", true);
-                } else {
-                    prefs.remove("loggedInUser");
-                    prefs.putBoolean("saveLogin", false);
-                }
-
-                // load dashboard
                 FXMLLoader loader = new FXMLLoader(
                         getClass().getResource("/fxml/dashboard.fxml")
                 );
 
                 Scene scene = new Scene(loader.load(), 1200, 750);
 
-                // load css
                 scene.getStylesheets().add(
                         getClass()
                                 .getResource("/css/style.css")
                                 .toExternalForm()
                 );
 
-                // current stage
                 Stage stage = (Stage) ((Node) event.getSource())
                         .getScene()
                         .getWindow();
 
                 stage.setTitle("Rent Management Dashboard");
                 stage.setScene(scene);
-
-                // maximize window
                 stage.setMaximized(true);
-
                 stage.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
-
-                messageLabel.setText("Failed to load dashboard");
+                messageLabel.setText("Failed to load dashboard.");
                 messageLabel.setStyle("-fx-text-fill: red;");
             }
 
         } else {
             AuditLogDAO.log(username, AuditActions.LOGIN_FAILED, "Failed login attempt.");
-            messageLabel.setText("Invalid username or password");
-            messageLabel.setStyle("-fx-text-fill: red;");
 
+            messageLabel.setText("Invalid username or password.");
+            messageLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+
+    private void rememberUsernameIfNeeded(String username) {
+        Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
+
+        boolean remember = saveLoginCheckBox != null && saveLoginCheckBox.isSelected();
+
+        /*
+         * Remove old unsafe auto-login keys.
+         */
+        prefs.remove("loggedInUser");
+        prefs.putBoolean("saveLogin", false);
+
+        if (remember) {
+            prefs.put("rememberedUsername", username);
+        } else {
+            prefs.remove("rememberedUsername");
         }
     }
 
@@ -130,12 +157,10 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
 
-            new Alert(Alert.AlertType.ERROR,
-                    "Failed to open password recovery.").showAndWait();
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Failed to open password recovery."
+            ).showAndWait();
         }
-    }
-
-    private boolean checkLogin(String username, String password) {
-        return UserSecurityDAO.verifyPassword(username, password);
     }
 }
