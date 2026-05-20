@@ -19,6 +19,11 @@ public class Main extends Application {
         DBUtil.init();
         com.rent.dao.UserSecurityDAO.migratePlainPasswordsIfNeeded();
 
+        com.rent.util.AuthDBUtil.init();
+        com.rent.util.AuthBootstrapService.ensureDefaultAdminExists();
+        com.rent.util.UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
+
+
         // read saved login
         Preferences prefs =
                 Preferences.userNodeForPackage(

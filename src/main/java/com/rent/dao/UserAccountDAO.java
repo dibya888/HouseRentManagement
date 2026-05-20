@@ -1,0 +1,139 @@
+package com.rent.dao;
+
+import com.rent.model.UserAccount;
+import com.rent.util.AuthDBUtil;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Optional;
+
+public class UserAccountDAO {
+
+    public static Optional<UserAccount> findByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(map(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<UserAccount> findById(String userId) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(map(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    public static boolean hasAnyUser() {
+        String sql = "SELECT COUNT(*) FROM users";
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            return rs.next() && rs.getInt(1) > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            /*
+             * Fail closed:
+             * if auth DB cannot be checked, do not auto-create users blindly.
+             */
+            return true;
+        }
+    }
+
+    public static boolean insert(UserAccount user) {
+        String sql = """
+            INSERT INTO users (
+                id,
+                username,
+                display_name,
+                password_hash,
+                password_salt,
+                db_key_salt,
+                encrypted_db_key,
+                role,
+                status,
+                db_folder,
+                created_at,
+                updated_at,
+                last_login_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getUsername());
+            ps.setString(3, user.getDisplayName());
+            ps.setString(4, user.getPasswordHash());
+            ps.setString(5, user.getPasswordSalt());
+            ps.setString(6, user.getDbKeySalt());
+            ps.setString(7, user.getEncryptedDbKey());
+            ps.setString(8, user.getRole());
+            ps.setString(9, user.getStatus());
+            ps.setString(10, user.getDbFolder());
+            ps.setString(11, user.getCreatedAt());
+            ps.setString(12, user.getUpdatedAt());
+            ps.setString(13, user.getLastLoginAt());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static UserAccount map(ResultSet rs) throws Exception {
+        UserAccount u = new UserAccount();
+
+        u.setId(rs.getString("id"));
+        u.setUsername(rs.getString("username"));
+        u.setDisplayName(rs.getString("display_name"));
+        u.setPasswordHash(rs.getString("password_hash"));
+        u.setPasswordSalt(rs.getString("password_salt"));
+        u.setDbKeySalt(rs.getString("db_key_salt"));
+        u.setEncryptedDbKey(rs.getString("encrypted_db_key"));
+        u.setRole(rs.getString("role"));
+        u.setStatus(rs.getString("status"));
+        u.setDbFolder(rs.getString("db_folder"));
+        u.setCreatedAt(rs.getString("created_at"));
+        u.setUpdatedAt(rs.getString("updated_at"));
+        u.setLastLoginAt(rs.getString("last_login_at"));
+
+        return u;
+    }
+}

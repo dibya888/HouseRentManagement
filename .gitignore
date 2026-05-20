@@ -83,3 +83,6 @@ Thumbs.db
 *.log
 tmp/
 temp/
+
+# Structure
+structure.txt
