@@ -1,17 +1,11 @@
 package com.rent.controller;
 
 import com.rent.dao.EmergencyKeyDAO;
-import com.rent.util.DBUtil;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import com.rent.dao.UserSecurityDAO;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import com.rent.dao.AuditLogDAO;
 import com.rent.util.AuditActions;
 import javafx.stage.Window;
@@ -25,6 +19,7 @@ public class EmergencyKeyResetController {
 
     @FXML
     private void resetPassword() {
+
         String username = text(usernameField);
         String emergencyKey = text(emergencyKeyField).toUpperCase();
         String newPassword = text(newPasswordField);
@@ -32,11 +27,6 @@ public class EmergencyKeyResetController {
 
         if (username.isBlank()) {
             showWarning("Please enter username.");
-            return;
-        }
-
-        if (!userExists(username)) {
-            showError("User not found.");
             return;
         }
 
@@ -60,47 +50,96 @@ public class EmergencyKeyResetController {
             return;
         }
 
-        boolean keyAccepted = EmergencyKeyDAO.useEmergencyKey(emergencyKey);
+        var userOpt = com.rent.dao.UserAccountDAO.findByUsername(username);
 
-        if (!keyAccepted) {
+        if (userOpt.isEmpty()) {
+            showError("User not found.");
+            return;
+        }
+
+        var user = userOpt.get();
+
+        if (!user.isActive()) {
+            showError("User is disabled.");
+            return;
+        }
+
+        var match = com.rent.dao.EmergencyKeyDAO.findMatchingUnusedKeyForUser(
+                user.getId(),
+                emergencyKey
+        );
+
+        if (match == null) {
             showError("Invalid or already used emergency key.");
             return;
         }
 
-        if (UserSecurityDAO.updatePassword(username, newPassword)) {
-            AuditLogDAO.log(
-                    username,
-                    AuditActions.EMERGENCY_KEY_USED,
-                    "Password reset using emergency recovery key for user: " + username
+        if (match.missingDbKeyWrapper) {
+            showError("""
+                This emergency key was generated before the secure recovery upgrade.
+
+                Please use Recovery PIN or restore from portable backup.
+                After login, generate new emergency keys.
+                """);
+            return;
+        }
+
+        String dbKey;
+
+        try {
+            dbKey = com.rent.util.DbKeyCryptoUtil.decryptDatabaseKey(
+                    match.encryptedDbKeyByKey,
+                    emergencyKey,
+                    match.dbKeySaltByKey
             );
-
-            showInfo("Password reset successfully. This emergency key is now used.");
-            closeWithOwner();
-        } else {
-            showError("Failed to reset password.");
-        }
-    }
-
-    private boolean userExists(String username) {
-        String sql = """
-                SELECT id
-                FROM users
-                WHERE username = ?
-                """;
-
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            showError("Failed to unlock database key using emergency key.");
+            return;
         }
+
+        try (var ignored = com.rent.util.EncryptedDbConnectionFactory.open(
+                com.rent.util.AppPaths.getUserRentDbPath(user.getId()),
+                dbKey
+        )) {
+            // DB key verified
+        } catch (Exception e) {
+            showError("User database could not be opened with this emergency key.");
+            return;
+        }
+
+        String newSalt = com.rent.util.SecurityUtil.generateSalt();
+        String newHash = com.rent.util.SecurityUtil.hashSecret(newPassword, newSalt);
+
+        String newDbKeySalt = com.rent.util.DbKeyCryptoUtil.generateSalt();
+        String newEncryptedDbKey =
+                com.rent.util.DbKeyCryptoUtil.encryptDatabaseKey(
+                        dbKey,
+                        newPassword,
+                        newDbKeySalt
+                );
+
+        boolean updated = com.rent.dao.UserAccountDAO.updatePasswordAndDbKey(
+                user.getId(),
+                newHash,
+                newSalt,
+                newDbKeySalt,
+                newEncryptedDbKey
+        );
+
+        if (!updated) {
+            showError("Failed to reset password.");
+            return;
+        }
+
+        boolean markedUsed = com.rent.dao.EmergencyKeyDAO.markKeyUsed(match.id);
+
+        if (!markedUsed) {
+            showWarning("Password was reset, but emergency key could not be marked as used.");
+        }
+
+        showInfo("Password reset successfully. Your data is preserved.");
+
+        closeWithOwner();
     }
 
     private String text(TextField field) {

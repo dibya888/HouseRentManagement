@@ -70,12 +70,20 @@ public final class AuthDBUtil {
                     user_id TEXT NOT NULL,
                     key_hash TEXT NOT NULL,
                     key_salt TEXT NOT NULL,
+            
+                    encrypted_db_key_by_key TEXT,
+                    db_key_salt_by_key TEXT,
+            
                     used INTEGER NOT NULL DEFAULT 0,
                     created_at TEXT NOT NULL,
                     used_at TEXT,
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
                 )
             """);
+
+            safeAddColumn(conn, "emergency_keys", "encrypted_db_key_by_key TEXT");
+            safeAddColumn(conn, "emergency_keys", "db_key_salt_by_key TEXT");
+
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize auth database.", e);

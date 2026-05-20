@@ -2,6 +2,7 @@ package com.rent.dao;
 
 import com.rent.util.AuthDBUtil;
 import com.rent.util.CurrentSession;
+import com.rent.util.DbKeyCryptoUtil;
 import com.rent.util.SecurityUtil;
 
 import java.sql.Connection;
@@ -16,14 +17,11 @@ public class EmergencyKeyDAO {
     private static final DateTimeFormatter TS =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    /*
-     * Generate/replace keys for the currently logged-in user.
-     * This belongs to auth.db, not rent.db.
-     */
     public static void replaceKeys(List<String> plainKeys) {
         CurrentSession.requireLogin();
 
         String userId = CurrentSession.getUserId();
+        String dbKey = CurrentSession.getDatabaseKey();
 
         String deleteSql = """
             DELETE FROM emergency_keys
@@ -32,8 +30,10 @@ public class EmergencyKeyDAO {
 
         String insertSql = """
             INSERT INTO emergency_keys
-            (user_id, key_hash, key_salt, used, created_at, used_at)
-            VALUES (?, ?, ?, 0, ?, NULL)
+            (user_id, key_hash, key_salt,
+             encrypted_db_key_by_key, db_key_salt_by_key,
+             used, created_at, used_at)
+            VALUES (?, ?, ?, ?, ?, 0, ?, NULL)
         """;
 
         try (Connection conn = AuthDBUtil.connect()) {
@@ -46,13 +46,24 @@ public class EmergencyKeyDAO {
 
             try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
                 for (String plainKey : plainKeys) {
-                    String salt = SecurityUtil.generateSalt();
-                    String hash = SecurityUtil.hashSecret(plainKey, salt);
+                    String keySalt = SecurityUtil.generateSalt();
+                    String keyHash = SecurityUtil.hashSecret(plainKey, keySalt);
+
+                    String dbKeySaltByEmergencyKey = DbKeyCryptoUtil.generateSalt();
+                    String encryptedDbKeyByEmergencyKey =
+                            DbKeyCryptoUtil.encryptDatabaseKey(
+                                    dbKey,
+                                    plainKey,
+                                    dbKeySaltByEmergencyKey
+                            );
 
                     ps.setString(1, userId);
-                    ps.setString(2, hash);
-                    ps.setString(3, salt);
-                    ps.setString(4, LocalDateTime.now().format(TS));
+                    ps.setString(2, keyHash);
+                    ps.setString(3, keySalt);
+                    ps.setString(4, encryptedDbKeyByEmergencyKey);
+                    ps.setString(5, dbKeySaltByEmergencyKey);
+                    ps.setString(6, LocalDateTime.now().format(TS));
+
                     ps.addBatch();
                 }
 
@@ -66,10 +77,6 @@ public class EmergencyKeyDAO {
         }
     }
 
-    /*
-     * Count unused keys for current logged-in user.
-     * Dashboard uses this after login.
-     */
     public static int countUnusedKeys() {
         if (!CurrentSession.isLoggedIn()) {
             return 0;
@@ -97,32 +104,22 @@ public class EmergencyKeyDAO {
         }
     }
 
-    /*
-     * Existing recovery flow only gives inputKey, not username/userId.
-     * So this scans all unused keys in auth.db.
-     *
-     * Later we can make this stricter by requiring username during recovery.
-     */
-    public static boolean useEmergencyKey(String inputKey) {
-        String selectSql = """
-            SELECT id, key_hash, key_salt
+    public static EmergencyKeyMatch findMatchingUnusedKeyForUser(String userId, String inputKey) {
+        String sql = """
+            SELECT id, key_hash, key_salt,
+                   encrypted_db_key_by_key,
+                   db_key_salt_by_key
             FROM emergency_keys
-            WHERE used = 0
+            WHERE user_id = ?
+              AND used = 0
         """;
 
-        String updateSql = """
-            UPDATE emergency_keys
-            SET used = 1,
-                used_at = ?
-            WHERE id = ?
-        """;
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try (Connection conn = AuthDBUtil.connect()) {
-            conn.setAutoCommit(false);
+            ps.setString(1, userId);
 
-            try (PreparedStatement selectPs = conn.prepareStatement(selectSql);
-                 ResultSet rs = selectPs.executeQuery()) {
-
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     String hash = rs.getString("key_hash");
@@ -135,24 +132,89 @@ public class EmergencyKeyDAO {
                     );
 
                     if (matched) {
-                        try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
-                            updatePs.setString(1, LocalDateTime.now().format(TS));
-                            updatePs.setInt(2, id);
-                            updatePs.executeUpdate();
+                        String encryptedDbKeyByKey =
+                                rs.getString("encrypted_db_key_by_key");
+
+                        String dbKeySaltByKey =
+                                rs.getString("db_key_salt_by_key");
+
+                        if (encryptedDbKeyByKey == null || encryptedDbKeyByKey.isBlank()
+                                || dbKeySaltByKey == null || dbKeySaltByKey.isBlank()) {
+                            return EmergencyKeyMatch.matchedButMissingDbKeyWrapper(id);
                         }
 
-                        conn.commit();
-                        return true;
+                        return EmergencyKeyMatch.matched(
+                                id,
+                                encryptedDbKeyByKey,
+                                dbKeySaltByKey
+                        );
                     }
                 }
             }
-
-            conn.rollback();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return false;
+        return null;
+    }
+
+    public static boolean markKeyUsed(int keyId) {
+        String sql = """
+            UPDATE emergency_keys
+            SET used = 1,
+                used_at = ?
+            WHERE id = ?
+        """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, LocalDateTime.now().format(TS));
+            ps.setInt(2, keyId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static class EmergencyKeyMatch {
+        public final int id;
+        public final boolean missingDbKeyWrapper;
+        public final String encryptedDbKeyByKey;
+        public final String dbKeySaltByKey;
+
+        private EmergencyKeyMatch(int id,
+                                  boolean missingDbKeyWrapper,
+                                  String encryptedDbKeyByKey,
+                                  String dbKeySaltByKey) {
+            this.id = id;
+            this.missingDbKeyWrapper = missingDbKeyWrapper;
+            this.encryptedDbKeyByKey = encryptedDbKeyByKey;
+            this.dbKeySaltByKey = dbKeySaltByKey;
+        }
+
+        public static EmergencyKeyMatch matched(int id,
+                                                String encryptedDbKeyByKey,
+                                                String dbKeySaltByKey) {
+            return new EmergencyKeyMatch(
+                    id,
+                    false,
+                    encryptedDbKeyByKey,
+                    dbKeySaltByKey
+            );
+        }
+
+        public static EmergencyKeyMatch matchedButMissingDbKeyWrapper(int id) {
+            return new EmergencyKeyMatch(
+                    id,
+                    true,
+                    null,
+                    null
+            );
+        }
     }
 }

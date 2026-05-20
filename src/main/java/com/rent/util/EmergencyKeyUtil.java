@@ -91,7 +91,12 @@ public class EmergencyKeyUtil {
             e.printStackTrace();
 
             new Alert(Alert.AlertType.ERROR,
-                    "Failed to save recovery keys PDF.").showAndWait();
+                    """
+                    Failed to save recovery keys PDF.
+        
+                    If a PDF with the same name is already open,
+                    close it and try again, or choose a different file name.
+                    """).showAndWait();
         }
     }
 
