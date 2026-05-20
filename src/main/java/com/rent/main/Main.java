@@ -22,6 +22,7 @@ public class Main extends Application {
         com.rent.util.AuthDBUtil.init();
         com.rent.util.AuthBootstrapService.ensureDefaultAdminExists();
         com.rent.util.UserRentDatabaseService.ensureDefaultAdminRentDatabaseExists();
+        com.rent.util.LegacyAdminMigrationService.migrateLegacyDataToAdminIfNeeded();
 
 
         // read saved login
