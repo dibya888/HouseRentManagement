@@ -81,6 +81,16 @@ public final class AuthDBUtil {
                 )
             """);
 
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS auth_audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT,
+                    action TEXT NOT NULL,
+                    details TEXT,
+                    created_at TEXT NOT NULL
+                )
+            """);
+
             safeAddColumn(conn, "emergency_keys", "encrypted_db_key_by_key TEXT");
             safeAddColumn(conn, "emergency_keys", "db_key_salt_by_key TEXT");
 

@@ -133,9 +133,16 @@ public class EmergencyKeyResetController {
 
         boolean markedUsed = com.rent.dao.EmergencyKeyDAO.markKeyUsed(match.id);
 
+
         if (!markedUsed) {
             showWarning("Password was reset, but emergency key could not be marked as used.");
         }
+
+        com.rent.dao.AuthAuditLogDAO.log(
+                username,
+                "PASSWORD_RESET_WITH_EMERGENCY_KEY",
+                "Password reset using one-time emergency recovery key."
+        );
 
         showInfo("Password reset successfully. Your data is preserved.");
 

@@ -34,12 +34,13 @@ public final class LegacyAdminMigrationService {
     private LegacyAdminMigrationService() {
     }
 
-    public static void migrateLegacyDataToAdminIfNeeded() {
+    public static MigrationResult migrateLegacyDataToAdminIfNeeded() {
         Path legacyDbPath = AppPaths.getLegacyDatabasePath();
 
         if (!Files.exists(legacyDbPath)) {
-            return;
+            return MigrationResult.NO_LEGACY_DB;
         }
+
 
         Optional<UserAccount> optionalAdmin =
                 UserAccountDAO.findByUsername(DEFAULT_ADMIN_USERNAME);
@@ -70,14 +71,15 @@ public final class LegacyAdminMigrationService {
             RentDatabaseInitializer.initialize(adminConn);
 
             if (!legacyLooksLikeBusinessDb(legacyConn)) {
-                return;
+                return MigrationResult.NO_BUSINESS_DATA;
             }
 
             if (!adminBusinessDbLooksEmpty(adminConn)) {
-                return;
+                return MigrationResult.ALREADY_MIGRATED_OR_ADMIN_DB_NOT_EMPTY;
             }
 
             copyBusinessTables(legacyConn, adminConn);
+            return MigrationResult.MIGRATED;
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to migrate legacy database data to Admin encrypted database.", e);

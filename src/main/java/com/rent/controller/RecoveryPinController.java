@@ -97,6 +97,12 @@ public class RecoveryPinController {
             );
 
             if (success) {
+                com.rent.dao.AuthAuditLogDAO.log(
+                        username,
+                        "RECOVERY_PIN_SET",
+                        "Recovery PIN set or updated."
+                );
+
                 showInfo("Recovery PIN saved successfully.");
                 close();
             } else {

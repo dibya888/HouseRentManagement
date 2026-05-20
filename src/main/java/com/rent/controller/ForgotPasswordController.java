@@ -146,6 +146,12 @@ public class ForgotPasswordController {
             return;
         }
 
+        com.rent.dao.AuthAuditLogDAO.log(
+                username,
+                "PASSWORD_RESET_WITH_RECOVERY_PIN",
+                "Password reset using recovery PIN."
+        );
+
         showInfo("Password reset successfully. You can now login with your new password.");
         close();
     }
