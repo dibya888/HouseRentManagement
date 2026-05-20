@@ -251,4 +251,31 @@ public class UserAccountDAO {
             return false;
         }
     }
+
+    public static boolean updateDatabaseKeyWrapper(String userId,
+                                                   String dbKeySalt,
+                                                   String encryptedDbKey) {
+        String sql = """
+        UPDATE users
+        SET db_key_salt = ?,
+            encrypted_db_key = ?,
+            updated_at = ?
+        WHERE id = ?
+    """;
+
+        try (Connection conn = AuthDBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, dbKeySalt);
+            ps.setString(2, encryptedDbKey);
+            ps.setString(3, LocalDateTime.now().format(TS));
+            ps.setString(4, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

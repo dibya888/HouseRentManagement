@@ -84,4 +84,14 @@ public final class CurrentSession {
             throw new SecurityException("Admin permission required.");
         }
     }
+
+    public static void replaceDatabaseKey(String newDatabaseKey) {
+        requireLogin();
+
+        if (newDatabaseKey == null || newDatabaseKey.isBlank()) {
+            throw new IllegalArgumentException("Database key cannot be empty.");
+        }
+
+        databaseKey = newDatabaseKey;
+    }
 }

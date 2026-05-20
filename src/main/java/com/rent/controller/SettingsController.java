@@ -56,6 +56,7 @@ public class SettingsController {
         }
 
         clearSavedLogin();
+        com.rent.util.CurrentSession.clear();
         loadLogin(stage);
 
         new Alert(Alert.AlertType.INFORMATION,
