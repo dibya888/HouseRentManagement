@@ -1,746 +1,927 @@
-# House Rent Management System
+# House Rent Management System v2.0
 
-An offline JavaFX desktop application for managing flats, tenants, rent billing, rent receipts, repairs, reports, backups, recovery, audit logs, and tenant move-out settlements.
+A secure JavaFX + SQLite desktop application for managing houses, flats, tenants, rent collection, receipts, repairs, reports, backups, and user-based encrypted data.
 
-> Built for local/offline use with JavaFX and SQLite.
+> **Version:** HouseRentManagement v2.0  
+> **Platform:** Windows desktop app  
+> **Technology:** JavaFX, SQLite, JDBC, iText/OpenPDF-style PDF export, Apache POI-style Excel export  
+> **Main launcher class:** `com.houserent.Launcher`
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [What’s New in v2.0](#whats-new-in-v20)
+- [Secure Multi-User Database Design](#secure-multi-user-database-design)
+- [v1.0 Upgrade Notice](#v10-upgrade-notice)
+- [Default Login](#default-login)
 - [Core Features](#core-features)
 - [Accounting Rules](#accounting-rules)
 - [Tenant Lifecycle](#tenant-lifecycle)
-- [Receipt System](#receipt-system)
-- [Repair & Maintenance](#repair--maintenance)
-- [Reports](#reports)
-- [Security & Recovery](#security--recovery)
+- [Receipts](#receipts)
+- [Repair Management](#repair-management)
+- [Reports and Export](#reports-and-export)
+- [Security and User Management](#security-and-user-management)
+- [Recovery System](#recovery-system)
+- [Backup and Restore](#backup-and-restore)
+- [Factory Reset](#factory-reset)
 - [Audit Logs](#audit-logs)
-- [Database Schema](#database-schema)
-- [ER Diagram](#er-diagram)
-- [Project Structure](#project-structure)
-- [Setup & Run](#setup--run)
-- [Default Login](#default-login)
+- [Migration Flow](#migration-flow)
+- [Application Data Locations](#application-data-locations)
+- [Installer and Packaging](#installer-and-packaging)
 - [Release Checklist](#release-checklist)
 - [Known Design Decisions](#known-design-decisions)
+- [Future Improvements](#future-improvements)
+- [Database ER Diagram](#database-er-diagram)
+- [High-Level Database/File Layout](#high-level-databasefile-layout)
+- [License](#license)
 
 ---
 
 ## Overview
 
-House Rent Management System is a local desktop application designed to help a property owner manage:
+**House Rent Management System** is a desktop rent-management application designed for landlords, property managers, and small rental businesses. It manages houses, flats, tenants, rent payments, monthly dues, utility records, repair expenses, receipts, reports, backups, and secure recovery.
 
-- Flats and property information
-- Active and past tenants
-- Monthly rent generation
-- Rent payment and archive records
-- Receipt PDF generation with receipt numbers
-- Repair and maintenance records
-- Owner-paid vs tenant-paid repair tracking
-- Income, due, utility, repair, and net profit reports
-- Move-out settlement preview and settlement PDF
-- Backup, restore, factory reset, and account recovery
-- Audit logs for sensitive actions
+The v2.0 release focuses heavily on:
 
-The application stores data locally in SQLite and is intended for offline use.
+- secure multi-user login,
+- per-user encrypted databases,
+- safe backup/restore rules,
+- recovery without a developer master key,
+- tenant lifecycle tracking,
+- repair and expense management,
+- reporting and export features,
+- improved JavaFX UI behavior,
+- installer-ready packaging.
 
 ---
 
-## Core Features
+## What’s New in v2.0
 
-### Tenant Management
+HouseRentManagement v2.0 introduces major security, database, accounting, and lifecycle improvements over v1.0.
 
-- Add tenants with flat assignment.
-- Edit tenant profile.
-- View tenant details.
-- Validate tenant mobile number, email, and NID.
-- Track optional security deposit.
-- Move tenants out without deleting history.
-- View moved-out tenants in Past Tenants.
-- Delete mistaken tenants when appropriate.
+### Major Changes
 
-### Flat Management
-
-- Add, edit, and delete flats.
-- Track flat number and meter number.
-- Track room details such as bedrooms, bathrooms, kitchens, balconies, dining rooms, and living rooms.
-- Track flat rent and occupancy status.
-- Mark flats available or occupied based on tenant lifecycle.
-
-### Rent Management
-
-- Generate monthly rent rows for active tenants.
-- Fixed house rent comes from the flats table.
-- Supports electricity, water, gas, other bills, fine, and discount.
-- Supports due, partial, late, and paid statuses.
-- Paid rent rows move to rent archive.
-- Archived payments can be restored to due or deleted if created by mistake.
-
-### Receipt Management
-
-- Receipt PDF export.
-- Receipt number stored with archived payment.
-- Immediate payment receipt and archive reprint use the same receipt number.
-- Archive reprint uses original payment date.
-- Receipt can include property name and address.
-- Receipt includes meter number and payment details.
-
-### Repair & Maintenance
-
-- Add, edit, and delete repair records.
-- Track repair date, flat, category, description, cost, paid by, status, and notes.
-- Track vendor name, vendor phone, and invoice number.
-- Owner-paid repair reduces net profit.
-- Tenant-paid repair does not reduce net profit.
-
-### Reports
-
-- Income report.
-- Due rent report.
-- Flat-wise income report.
-- Tenant-wise report.
-- Monthly and yearly income reports.
-- Repair report.
-- Utility bills report.
-- PDF export.
-- Excel export.
-- Print support.
-- Date and month filtering.
-
-### Dashboard
-
-- Summary cards for flats, tenants, income, due, utility bills, repairs, and net profit.
-- Recent payment rows.
-- Recent due rows.
-- Recent repairs.
-- Charts for income, due, occupancy, and repair comparison.
+- Secure multi-user authentication system.
+- Separate authentication database and per-user encrypted rent databases.
+- Migration flow from legacy v1.0 database after Admin login.
+- Recovery PIN support.
+- Locally generated one-time emergency recovery keys.
+- Backup and restore using `.hrmbak` files.
+- Cross-user restore blocking.
+- Factory reset behavior that recreates a fresh database with a default admin.
+- Tenant Move Out lifecycle with settlement snapshot.
+- Past Tenants settlement popup flow.
+- End-to-end repair management.
+- PDF export, Excel export, print, and date-range reports.
+- Meter number support for flats.
+- Improved JavaFX UI behavior and popup stage icons.
 
 ---
 
-## Accounting Rules
+## Secure Multi-User Database Design
 
-The system separates rent income, utility bills, repairs, security deposit, and settlement values.
+v2.0 separates authentication data from each user’s business/rent data.
 
-### Rent Income
-
-Rent income is calculated as:
+### Database Layout
 
 ```text
-Rent Income = house_rent - discount
+AppData/Roaming/HouseRentManagement/
+├── auth/
+│   └── auth.db
+├── users/
+│   └── {userId}/
+│       └── rent.db
+└── backups/
+    └── *.hrmbak
 ```
 
-Discount reduces rent income.
+### Authentication Database
 
-### Utility Bills
-
-Utility bills are tracked separately:
+The authentication database is stored separately:
 
 ```text
-Utility Bills = electricity + water + gas + other_bills
+AppData/Roaming/HouseRentManagement/auth/auth.db
 ```
 
-Utility bills are not counted as rent income.
+It stores user login and security-related information such as:
 
-### Repairs
+- users,
+- password hashes,
+- recovery PIN data,
+- hashed emergency recovery keys,
+- user database ownership metadata,
+- audit information.
 
-Owner-paid repairs reduce net profit:
+### Per-User Rent Databases
+
+Each user has a separate encrypted rent database:
 
 ```text
-Net Profit = Rent Income - Owner Paid Repairs
+AppData/Roaming/HouseRentManagement/users/{userId}/rent.db
 ```
 
-Tenant-paid repairs are tracked but do not reduce owner net profit.
-
-### Security Deposit
-
-Security deposit is optional and is not counted as income.
-
-```text
-Security Deposit = held money / liability
-```
-
-If no deposit is taken:
-
-```text
-security_deposit = 0
-security_deposit_date = null
-security_deposit_note = null
-```
-
-### Refunds
-
-Refunds are settlement/cash-flow information, not rent income reduction.
-
-### Discount / Waiver
-
-If rent is settled for less than the original house rent, the waived amount should be recorded as discount.
+This design prevents one user from directly mixing or overwriting another user’s rental data.
 
 ---
 
-## Tenant Lifecycle
+## v1.0 Upgrade Notice
 
-### Active Tenant
-
-An active tenant is assigned to an occupied flat and can have current rent rows.
-
-### Move Out
-
-Move Out is a lifecycle action, not a payment action.
-
-Move Out does:
-
-- Mark tenant as `Moved Out`.
-- Save move-out date.
-- Save move-out reason.
-- Mark flat as available.
-- Save a settlement snapshot.
-- Keep due rows unchanged if rent is still unpaid.
-
-Move Out does not:
-
-- Mark rent as paid.
-- Move rent to archive.
-- Apply discount.
-- Delete rent records.
-
-### Past Tenants
-
-Moved-out tenants appear in Past Tenants.
-
-Past Tenants supports:
-
-- View tenant details.
-- View settlement details.
-- Print settlement PDF.
-- Delete if safe according to cleanup rules.
-
-### Mistaken Tenant Cleanup
-
-If a tenant was added by mistake:
-
-- If only current due rows exist, the tenant can be deleted with current due rows.
-- If archive/payment history exists, delete the mistaken archive payment first, then delete the tenant.
-
----
-
-## Receipt System
-
-Receipt numbers are stored in `rent_archive.receipt_no`.
-
-Recommended format:
+If you are upgrading from **HouseRentManagement v1.0**, the legacy database may exist at:
 
 ```text
-RCP-YYYY-000001
+AppData/Roaming/HouseRentManagement/database/rent.db
 ```
 
-Receipt behavior:
+### Important Upgrade Rule
 
-- Receipt number is generated when rent moves to archive.
-- Immediate payment receipt fetches archived row and prints stored receipt number.
-- Archive reprint prints the same receipt number.
-- Archive reprint uses original payment date, not today’s date.
-- Deleted mistaken archive payments reduce income/report totals naturally.
+Before installing v2.0, v1.0 may need to be manually uninstalled.
 
----
+> **Do not delete AppData during uninstall.**
 
-## Repair & Maintenance
+The v2.0 migration flow depends on the legacy AppData database remaining available.
 
-Repair records include:
+### Recommended Upgrade Flow
 
-- Flat number
-- Repair date
-- Category
-- Description
-- Cost
-- Paid by: Owner or Tenant
-- Status: Pending or Completed
-- Notes
-- Vendor name
-- Vendor phone
-- Invoice number
-
-Repair logic:
-
-```text
-Owner-paid repair -> reduces net profit
-Tenant-paid repair -> tracked separately, does not reduce net profit
-```
-
----
-
-## Reports
-
-Reports support:
-
-- Income summary
-- Due summary
-- Utility bills summary
-- Repair summary
-- Net profit summary
-- Monthly income
-- Yearly income
-- Flat-wise income
-- Tenant-wise income
-- Repair report
-- Utility report
-- PDF export
-- Excel export
-- Printing
-
-Important report rules:
-
-```text
-Rent Income = house_rent - discount
-Utility Bills = electricity + water + gas + other_bills
-Net Profit = Rent Income - Owner Paid Repairs
-Security Deposit = not income
-Refund = not income
-```
-
----
-
-## Security & Recovery
-
-### Login
-
-- Login required unless user explicitly chooses Save Login.
-- Save Login can auto-open dashboard on next app start.
-- Logout clears saved login.
-
-### Password Security
-
-- Supports password hashing and salt migration from older plain password data.
-
-### Recovery PIN
-
-- Recovery PIN can be set and used for password recovery.
-
-### Emergency Recovery Keys
-
-- Generates local one-time emergency recovery keys.
-- Keys are stored hashed.
-- Used keys are invalidated.
-- No developer master key exists.
-
-### Backup / Restore
-
-- Database backup requires login.
-- Restore backup is available through recovery flow.
-
-### Factory Reset
-
-Factory reset deletes the current database and recreates a fresh database with default admin user.
-
----
-
-## Audit Logs
-
-Audit logs track important business and security actions.
-
-Examples:
-
-- Login success / failed
-- Logout
-- Database backup
-- Database restore
-- Factory reset
-- Password changed
-- Recovery PIN set
-- Emergency keys generated
-- Emergency key used
-- Rent payment
-- Receipt printed
-- Archive restored
-- Archive payment deleted
-- Tenant added / updated / deleted / moved out
-- Flat added / updated / deleted
-- Property added / updated / deleted
-- Repair added / updated / deleted
-- Report exported / printed
-- Settlement created / settled / PDF exported
-
-Audit retention policy:
-
-```text
-Keep audit logs for 365 days.
-No manual clear button.
-Automatic cleanup after new log insert.
-```
-
----
-
-## Database Schema
-
-Main SQLite database path during development:
-
-```text
-src/main/resources/database/rent.db
-```
-
-> For release, it is recommended to move runtime data outside `src/main/resources`, for example into an application data folder.
-
-### Main Tables
-
-| Table | Purpose |
-|---|---|
-| `users` | Login users, password hash/salt, recovery PIN hash/salt |
-| `emergency_keys` | One-time emergency recovery keys |
-| `properties` | Property name, address, phone, logo, default flag |
-| `flats` | Flat details, meter number, rent, occupancy, property link |
-| `tenants` | Tenant profile, status, move-out info, security deposit |
-| `bill_defaults` | Global default utility bill values |
-| `rent_current` | Current unpaid/due/partial/late rent rows |
-| `rent_archive` | Paid/archived rent rows and receipt numbers |
-| `repairs` | Repair and maintenance records with vendor details |
-| `audit_logs` | App activity and security events |
-| `move_out_settlements` | Move-out settlement snapshot records |
-
----
-
-## ER Diagram
-
-```mermaid
-erDiagram
-    USERS {
-        INTEGER id PK
-        TEXT username
-        TEXT password
-        TEXT password_hash
-        TEXT password_salt
-        TEXT recovery_pin_hash
-        TEXT recovery_pin_salt
-    }
-
-    EMERGENCY_KEYS {
-        INTEGER id PK
-        TEXT key_hash
-        TEXT key_salt
-        INTEGER used
-        TEXT created_at
-        TEXT used_at
-    }
-
-    PROPERTIES {
-        INTEGER id PK
-        TEXT name
-        TEXT address
-        TEXT phone
-        TEXT logo_path
-        INTEGER is_default
-    }
-
-    FLATS {
-        INTEGER id PK
-        TEXT flat_no UK
-        TEXT meter_no
-        INTEGER bedrooms
-        INTEGER bathrooms
-        INTEGER kitchens
-        INTEGER balconies
-        INTEGER dining_rooms
-        INTEGER living_rooms
-        REAL rent
-        TEXT status
-        INTEGER property_id FK
-    }
-
-    TENANTS {
-        INTEGER id PK
-        TEXT name
-        TEXT phone
-        TEXT email
-        TEXT nid
-        TEXT address
-        TEXT flat_no FK
-        REAL rent
-        TEXT nid_path
-        TEXT doc_path
-        TEXT status
-        TEXT move_in_date
-        TEXT move_out_date
-        TEXT move_out_reason
-        REAL security_deposit
-        TEXT security_deposit_date
-        TEXT security_deposit_note
-    }
-
-    BILL_DEFAULTS {
-        INTEGER id PK
-        REAL electricity
-        REAL gas
-        REAL water
-    }
-
-    RENT_CURRENT {
-        INTEGER id PK
-        INTEGER tenant_id FK
-        TEXT flat_no FK
-        TEXT bill_month
-        REAL house_rent
-        REAL electricity
-        REAL water
-        REAL gas
-        REAL other_bills
-        REAL fine
-        REAL discount
-        REAL total
-        REAL paid_amount
-        TEXT payment_date
-        TEXT due_date
-        TEXT status
-        TEXT notes
-    }
-
-    RENT_ARCHIVE {
-        INTEGER id PK
-        INTEGER original_id
-        INTEGER tenant_id FK
-        TEXT flat_no FK
-        TEXT bill_month
-        REAL house_rent
-        REAL electricity
-        REAL water
-        REAL gas
-        REAL other_bills
-        REAL fine
-        REAL discount
-        REAL total
-        REAL paid_amount
-        TEXT payment_date
-        TEXT due_date
-        TEXT status
-        TEXT notes
-        TEXT archived_at
-        TEXT receipt_no
-    }
-
-    REPAIRS {
-        INTEGER id PK
-        TEXT flat_no FK
-        TEXT repair_date
-        TEXT category
-        TEXT description
-        REAL cost
-        TEXT paid_by
-        TEXT status
-        TEXT notes
-        TEXT created_at
-        TEXT vendor_name
-        TEXT vendor_phone
-        TEXT invoice_no
-    }
-
-    AUDIT_LOGS {
-        INTEGER id PK
-        TEXT username
-        TEXT action
-        TEXT details
-        TEXT created_at
-    }
-
-    MOVE_OUT_SETTLEMENTS {
-        INTEGER id PK
-        INTEGER tenant_id FK
-        TEXT tenant_name
-        TEXT tenant_phone
-        TEXT flat_no
-        TEXT move_out_date
-        REAL unpaid_due
-        REAL security_deposit
-        REAL refund_amount
-        REAL payable_amount
-        TEXT result
-        TEXT reason
-        TEXT created_at
-    }
-
-    PROPERTIES ||--o{ FLATS : owns
-    FLATS ||--o{ TENANTS : assigned_to
-    TENANTS ||--o{ RENT_CURRENT : has_due
-    TENANTS ||--o{ RENT_ARCHIVE : has_paid_history
-    FLATS ||--o{ RENT_CURRENT : billed_for
-    FLATS ||--o{ RENT_ARCHIVE : archived_for
-    FLATS ||--o{ REPAIRS : has_repairs
-    TENANTS ||--o{ MOVE_OUT_SETTLEMENTS : has_settlement
-```
-
----
-
-## Project Structure
-
-Recommended structure:
-
-```text
-src/main/java/com/rent/
-├── controller/
-│   ├── LoginController.java
-│   ├── DashboardController.java
-│   ├── TenantController.java
-│   ├── RentController.java
-│   ├── ArchiveController.java
-│   ├── RepairController.java
-│   ├── ReportsController.java
-│   └── ...
-├── dao/
-│   ├── TenantDAO.java
-│   ├── FlatDAO.java
-│   ├── RentDAO.java
-│   ├── RepairDAO.java
-│   ├── ReportDAO.java
-│   ├── DashboardDAO.java
-│   └── ...
-├── model/
-│   ├── Tenant.java
-│   ├── Flat.java
-│   ├── RentRow.java
-│   ├── Repair.java
-│   ├── ReportRow.java
-│   └── ...
-├── util/
-│   ├── DBUtil.java
-│   ├── AuditActions.java
-│   ├── StatusBadgeCellFactory.java
-│   └── ...
-└── main/
-    └── Main.java
-
-src/main/resources/
-├── fxml/
-│   ├── pages/
-│   └── ...
-├── css/
-├── images/
-└── database/
-```
-
----
-
-## Setup & Run
-
-### Requirements
-
-- Java 17 or later recommended
-- JavaFX SDK
-- SQLite JDBC
-- Apache PDFBox
-- Apache POI for Excel export
-- Maven project structure recommended
-
-### Run from IntelliJ IDEA
-
-1. Open the project in IntelliJ IDEA.
-2. Make sure JavaFX SDK is configured.
-3. Make sure Maven dependencies are loaded.
-4. Run `com.rent.main.Main`.
-
-### Database Initialization
-
-On app start:
-
-- Database tables are created if missing.
-- Missing columns are added through safe migrations.
-- Default admin user is inserted if missing.
+1. Close HouseRentManagement v1.0.
+2. Uninstall v1.0 if required.
+3. Do **not** delete AppData.
+4. Install HouseRentManagement v2.0.
+5. Login as Admin.
+6. Run the migration flow when prompted.
+7. Verify migrated houses, flats, tenants, rents, receipts, repairs, and reports.
+8. Create a fresh v2.0 backup.
 
 ---
 
 ## Default Login
 
-Default user after fresh database creation:
+After a fresh installation or factory reset, the default admin account is:
 
 ```text
 Username: admin
 Password: 1234
 ```
 
-Change the default password after first login.
+> Change the default password after first login for better security.
+
+---
+
+## Core Features
+
+### House Management
+
+- Add, edit, delete, and view house records.
+- Track house-level information.
+- Use houses as parent records for flats.
+
+### Flat Management
+
+- Add, edit, delete, and view flats.
+- Assign flats to houses.
+- Track flat status.
+- Track fixed monthly rent.
+- Track meter number using the `meterNo` field.
+- Free a flat when a tenant moves out.
+
+### Tenant Management
+
+- Add, edit, delete, and view tenants.
+- Assign tenants to available flats.
+- Rent is loaded from the selected flat and is not manually edited while adding tenants.
+- Optional security deposit support.
+- Track tenant status such as Active or Moved Out.
+- Move tenants to Past Tenants through lifecycle actions.
+
+### Rent Management
+
+- Record monthly rent collections.
+- Track discount separately.
+- Calculate rent income using accounting rules.
+- Track due rent.
+- Keep utilities separate from base rent.
+
+### Utility Tracking
+
+- Track utility charges separately from rent.
+- Keep utility records independent from rent income calculations.
+
+### Repair Management
+
+- Add, edit, delete, and view repairs.
+- Track repair type/details.
+- Track repair vendor.
+- Track repair contact number.
+- Track paid-by information.
+- Track repair status.
+- Filter repairs by paid-by, status, date, and search keyword.
+
+### Reporting
+
+- Income reports.
+- Due reports.
+- Flat summaries.
+- Tenant summaries.
+- Grouped reports.
+- Date-range filtering.
+- PDF export.
+- Excel export.
+- Print support.
+
+---
+
+## Accounting Rules
+
+The application follows these accounting rules consistently across rent, reports, and summaries.
+
+### Rent Amount
+
+Rent is fixed from the `flats` table.
+
+When adding a tenant, rent is selected from the assigned flat and should not be manually edited in the tenant form.
+
+### Security Deposit
+
+Security deposit is optional.
+
+Security deposit is **not counted as income**.
+
+### Rent Income
+
+Rent income is calculated as:
+
+```text
+rent income = house_rent - discount
+```
+
+### Utilities
+
+Utilities are tracked separately.
+
+Utility charges should not be mixed with base rent income unless a report explicitly includes utilities as a separate category.
+
+### Repairs
+
+Repair accounting depends on who paid the repair cost.
+
+```text
+Owner-paid repair  → reduces net profit
+Tenant-paid repair → does not reduce owner net profit
+```
+
+Repair costs must never be counted as rent due.
+
+---
+
+## Tenant Lifecycle
+
+Tenant Move Out is a lifecycle-only action.
+
+When a tenant moves out, the system should:
+
+1. Mark the tenant as `Moved Out`.
+2. Free the assigned flat.
+3. Save a settlement snapshot.
+4. Move the tenant to Past Tenants history.
+
+Actual settlement or payment handling is done later from:
+
+```text
+Past Tenants > Settlement Popup
+```
+
+This keeps move-out status changes separate from final settlement transactions.
+
+---
+
+## Receipts
+
+The system supports receipt handling for rent-related records.
+
+Receipts are intended to support:
+
+- rent payment confirmation,
+- tenant payment history,
+- printable records,
+- PDF export,
+- future receipt enhancements.
+
+Receipt records should follow the accounting rules defined above:
+
+- rent income excludes security deposit,
+- discount reduces rent income,
+- utilities remain separate,
+- repair costs are not rent due.
+
+---
+
+## Repair Management
+
+Repair management is end-to-end in v2.0.
+
+### Repair Fields
+
+Repair records may include:
+
+- repair ID,
+- house or flat reference,
+- tenant reference if applicable,
+- repair description,
+- vendor name,
+- vendor/contact number,
+- repair cost,
+- paid by,
+- repair status,
+- repair date,
+- notes.
+
+### Repair Filters
+
+Repair view supports filtering by:
+
+- paid by,
+- status,
+- date,
+- search keyword.
+
+### Repair Accounting
+
+Owner-paid repairs reduce net profit.
+
+Tenant-paid repairs do not reduce owner net profit.
+
+Repair costs must never appear as rent due.
+
+---
+
+## Reports and Export
+
+The reporting module includes summary and grouped reporting features.
+
+### Supported Reports
+
+- Income report.
+- Due report.
+- Flat report.
+- Tenant report.
+- Grouped reports.
+- Date-range reports.
+
+### Export and Print
+
+Reports support:
+
+- PDF export,
+- Excel export,
+- print.
+
+### Date Range Filtering
+
+Reports should allow filtering by date range where applicable, especially for:
+
+- rent collections,
+- income summaries,
+- due summaries,
+- repairs,
+- profit summaries.
+
+### Future Extensibility
+
+The reporting module is designed for future expansion such as:
+
+- dashboard charts,
+- yearly summaries,
+- owner-wise reports,
+- property-wise profit/loss reports,
+- tenant payment history exports.
+
+---
+
+## Security and User Management
+
+v2.0 includes a secure login and user-management model.
+
+### Save Login
+
+The Save Login checkbox controls auto-login behavior.
+
+- If Save Login is enabled, login can be remembered.
+- Logout clears the saved login.
+
+### Database Ownership
+
+The installed application owns and manages its database files.
+
+Live data must be stored in a user-writable AppData location and never inside Program Files.
+
+### No Developer Master Key
+
+There is no developer master key.
+
+Recovery is handled locally through approved recovery options only.
+
+---
+
+## Recovery System
+
+The recovery system is designed to protect user data while avoiding a developer-controlled backdoor.
+
+### Recovery Methods
+
+Pre-login recovery mode allows only approved recovery actions:
+
+- Recovery PIN.
+- One-time emergency recovery key.
+- Restore backup.
+- Factory reset.
+
+### Recovery PIN
+
+Recovery PIN allows account recovery while preserving user data.
+
+### Emergency Recovery Keys
+
+The application generates 10 local one-time emergency recovery keys.
+
+Emergency keys are:
+
+- generated locally,
+- stored as hashes,
+- usable one time only,
+- invalidated after use,
+- available for PDF save or print.
+
+Users should store emergency keys safely outside the application.
+
+---
+
+## Backup and Restore
+
+Backups use the `.hrmbak` extension.
+
+### Backup Rules
+
+- Backup requires login.
+- Backup should include enough metadata to verify ownership.
+- Backup files should be stored safely by the user.
+
+### Restore Rules
+
+Restore can be available from recovery mode or authenticated mode depending on the flow.
+
+The restore system must block cross-user restore when the backup does not belong to the current user or permitted recovery context.
+
+### Backup Extension
+
+```text
+*.hrmbak
+```
+
+---
+
+## Factory Reset
+
+Factory reset is a destructive recovery option.
+
+Factory reset deletes the active rent database and recreates a fresh database with the default admin account.
+
+After factory reset, the default login is restored:
+
+```text
+Username: admin
+Password: 1234
+```
+
+Factory reset should be used only when recovery PIN, emergency keys, and backup restore are not available or not desired.
+
+---
+
+## Audit Logs
+
+Audit logs are included as part of the v2.0 security and accountability plan.
+
+Audit logs may be used to track important events such as:
+
+- login,
+- logout,
+- failed login,
+- password or recovery changes,
+- backup creation,
+- restore attempt,
+- restore success/failure,
+- factory reset,
+- migration,
+- user management actions.
+
+---
+
+## Migration Flow
+
+Migration is intended for users upgrading from v1.0.
+
+### Legacy v1.0 Path
+
+```text
+AppData/Roaming/HouseRentManagement/database/rent.db
+```
+
+### v2.0 Path
+
+```text
+AppData/Roaming/HouseRentManagement/users/{userId}/rent.db
+```
+
+### Migration Flow After Admin Login
+
+1. User installs v2.0.
+2. User logs in as Admin.
+3. Application checks for legacy v1.0 database.
+4. Application prompts for migration if legacy data exists.
+5. Application migrates data into the Admin/user database.
+6. Application verifies migrated records.
+7. User creates a fresh `.hrmbak` backup.
+
+---
+
+## Application Data Locations
+
+Live application data must be stored under AppData, not Program Files.
+
+### Legacy v1.0 Database
+
+```text
+AppData/Roaming/HouseRentManagement/database/rent.db
+```
+
+### v2.0 Authentication Database
+
+```text
+AppData/Roaming/HouseRentManagement/auth/auth.db
+```
+
+### v2.0 Per-User Database
+
+```text
+AppData/Roaming/HouseRentManagement/users/{userId}/rent.db
+```
+
+---
+
+## Installer and Packaging
+
+The application is packaged as a Windows desktop application.
+
+### Main Class
+
+```text
+com.houserent.Launcher
+```
+
+### Packaging Requirements
+
+The `dist/input` folder should include the required runtime dependencies, application JAR, libraries, license file, and other resources needed by the installer.
+
+### License File
+
+Include:
+
+```text
+LICENSE
+```
+
+### jpackage Command Example
+
+Use a fixed upgrade UUID so future installers can upgrade the same app line consistently.
+
+```bash
+jpackage \
+  --type exe \
+  --name "House Rent Management System" \
+  --app-version "2.0.0" \
+  --vendor "HouseRentManagement" \
+  --input dist/input \
+  --main-jar HouseRentManagement.jar \
+  --main-class com.houserent.Launcher \
+  --dest dist/installer \
+  --win-dir-chooser \
+  --win-menu \
+  --win-shortcut \
+  --win-upgrade-uuid 6f2a37f8-6e9f-4c1e-a2f7-9f18f7c6b431 \
+  --license-file LICENSE
+```
+
+> Keep the `--win-upgrade-uuid` unchanged for v2.x upgrades.
 
 ---
 
 ## Release Checklist
 
-Before release, verify:
+Use this checklist before publishing v2.0.
 
-- [ ] Login works.
+### Database and Migration
+
+- [ ] Fresh install creates `auth/auth.db`.
+- [ ] Fresh install creates per-user `users/{userId}/rent.db`.
+- [ ] Legacy v1.0 database path is detected correctly.
+- [ ] Migration runs after Admin login.
+- [ ] Migration does not delete legacy data automatically.
+- [ ] Migrated houses, flats, tenants, rents, receipts, repairs, and reports are verified.
+
+### Authentication and Recovery
+
+- [ ] Default admin login works.
+- [ ] Password change works.
 - [ ] Save Login checkbox works.
 - [ ] Logout clears saved login.
-- [ ] Add/edit/delete flat works.
-- [ ] Add/edit tenant works.
-- [ ] Tenant validation works for mobile, email, and NID.
-- [ ] Move Out works.
-- [ ] Past Tenants works.
-- [ ] Rent generation creates rows only for active tenants.
-- [ ] Payment moves rent to archive.
-- [ ] Receipt number appears on immediate receipt and archive reprint.
-- [ ] Archive Restore works.
-- [ ] Archive Delete works for mistaken payment cleanup.
-- [ ] Discount reduces income.
-- [ ] Utility bills are separate from income.
+- [ ] Recovery PIN works.
+- [ ] Emergency keys are generated locally.
+- [ ] Emergency keys are stored hashed.
+- [ ] Emergency keys become invalid after use.
+- [ ] Emergency key PDF save/print works.
+- [ ] No developer master key exists.
+
+### Backup and Restore
+
+- [ ] Backup requires login.
+- [ ] `.hrmbak` backup is created successfully.
+- [ ] Restore works for valid owner/user.
+- [ ] Cross-user restore is blocked.
+- [ ] Restore failure does not corrupt current data.
+
+### Factory Reset
+
+- [ ] Factory reset deletes active rent database.
+- [ ] Factory reset recreates a fresh database.
+- [ ] Default admin is recreated.
+- [ ] Factory reset warning is clear.
+
+### House, Flat, Tenant
+
+- [ ] House CRUD works.
+- [ ] Flat CRUD works.
+- [ ] `meterNo` appears in DAO, controllers, and views.
+- [ ] Tenant CRUD works.
+- [ ] Tenant rent is loaded from flat rent.
+- [ ] Tenant rent is non-editable while adding tenant.
+- [ ] Security deposit is optional.
+- [ ] Tenant Move Out marks tenant as Moved Out.
+- [ ] Tenant Move Out frees the flat.
+- [ ] Settlement snapshot is saved.
+
+### Rent, Repairs, Reports
+
+- [ ] Rent income calculation follows `house_rent - discount`.
 - [ ] Security deposit is not counted as income.
-- [ ] Repair vendor/contact/invoice fields save and reload.
-- [ ] Status badges display correctly.
-- [ ] Reports export PDF.
-- [ ] Reports export Excel.
-- [ ] Settlement PDF exports.
-- [ ] Backup works.
-- [ ] Restore works.
-- [ ] Factory reset works.
-- [ ] Audit logs record important actions.
-- [ ] Emergency recovery keys generate and validate.
+- [ ] Utilities are separate.
+- [ ] Owner-paid repairs reduce net profit.
+- [ ] Tenant-paid repairs do not reduce net profit.
+- [ ] Repair costs never count as rent due.
+- [ ] Repair filters work by paid-by, status, date, and search.
+- [ ] Vendor/contact fields work.
+- [ ] Income report works.
+- [ ] Due report works.
+- [ ] Flat summary works.
+- [ ] Tenant summary works.
+- [ ] Grouped reports work.
+- [ ] Date-range filtering works.
+- [ ] PDF export works.
+- [ ] Excel export works.
+- [ ] Print works.
+
+### UI/UX
+
+- [ ] GridPane rowIndex overlap issues are fixed.
+- [ ] TableView columnResizePolicy is set in controllers.
+- [ ] Stage icons appear on all popups.
+- [ ] Status color badges are implemented or tracked as remaining work.
+
+### Installer
+
+- [ ] `dist/input` contains all required dependencies.
+- [ ] `LICENSE` is included.
+- [ ] Launcher main class is correct.
+- [ ] Installer uses `--win-dir-chooser`.
+- [ ] Installer uses `--win-menu`.
+- [ ] Installer uses `--win-shortcut`.
+- [ ] Installer uses fixed upgrade UUID.
+- [ ] v1.0 manual uninstall note is included in release notes.
 
 ---
 
 ## Known Design Decisions
 
-### Move Out vs Delete
+- Rent is fixed from the `flats` table.
+- Rent is not editable while adding tenants.
+- Security deposit is optional.
+- Security deposit is not counted as income.
+- Rent income equals `house_rent - discount`.
+- Utilities are tracked separately.
+- Owner-paid repairs reduce net profit.
+- Tenant-paid repairs do not reduce owner net profit.
+- Repair costs are never counted as rent due.
+- Tenant Move Out is lifecycle-only.
+- Actual settlement/payment is handled later from Past Tenants settlement popup.
+- Live data is stored in AppData, not Program Files.
+- v2.0 uses separate auth and per-user encrypted rent databases.
+- Recovery does not use a developer master key.
+- Emergency keys are local, one-time, and stored hashed.
+- v1.0 may require manual uninstall without deleting AppData before installing v2.0.
 
-```text
-Move Out = real tenant leaves, history preserved.
-Delete = mistake cleanup.
-```
+---
 
-### Archive Restore vs Archive Delete
+## Future Improvements
 
-```text
-Restore = payment was marked paid by mistake, but rent is still due.
-Delete = archive/payment record was created by mistake and should not exist.
-```
+Planned or possible future improvements:
 
-### Security Deposit
+- Status color badges across tables and forms.
+- Dashboard charts.
+- Advanced yearly and monthly analytics.
+- SMS/email receipt sending.
+- Cloud backup option.
+- More detailed role permissions.
+- Multi-property owner support.
+- Import/export templates.
+- More advanced audit log viewer.
+- Automated database health check.
+- Dark mode.
 
-```text
-Security deposit is optional and not income.
-```
+---
 
-### Settlement
+## Database ER Diagram
 
-```text
-Move Out saves a settlement snapshot.
-Settlement can be reviewed and printed from Past Tenants.
-```
+```mermaid
+erDiagram
+    USERS ||--o{ USER_DATABASES : owns
+    USERS ||--o{ AUDIT_LOGS : creates
+    USERS ||--o{ EMERGENCY_KEYS : has
 
-### Repairs
+    HOUSES ||--o{ FLATS : contains
+    FLATS ||--o| TENANTS : assigned_to
+    TENANTS ||--o{ RENT_PAYMENTS : pays
+    TENANTS ||--o{ RECEIPTS : receives
+    TENANTS ||--o{ REPAIRS : related_to
+    TENANTS ||--o{ PAST_TENANTS : moves_to
 
-```text
-Owner-paid repairs reduce net profit.
-Tenant-paid repairs are tracked separately.
+    FLATS ||--o{ REPAIRS : has
+    HOUSES ||--o{ REPAIRS : has
+
+    PAST_TENANTS ||--o{ SETTLEMENTS : has
+
+    USERS {
+        int userId PK
+        string username
+        string passwordHash
+        string role
+        string recoveryPinHash
+        datetime createdAt
+    }
+
+    USER_DATABASES {
+        int id PK
+        int userId FK
+        string dbPath
+        string dbOwnerHash
+        datetime createdAt
+    }
+
+    EMERGENCY_KEYS {
+        int id PK
+        int userId FK
+        string keyHash
+        boolean used
+        datetime usedAt
+    }
+
+    AUDIT_LOGS {
+        int id PK
+        int userId FK
+        string action
+        string details
+        datetime createdAt
+    }
+
+    HOUSES {
+        int houseId PK
+        string houseName
+        string address
+    }
+
+    FLATS {
+        int flatId PK
+        int houseId FK
+        string flatNo
+        string meterNo
+        decimal rent
+        string status
+    }
+
+    TENANTS {
+        int tenantId PK
+        int flatId FK
+        string tenantName
+        string phone
+        decimal securityDeposit
+        string status
+        date moveInDate
+    }
+
+    RENT_PAYMENTS {
+        int rentId PK
+        int tenantId FK
+        decimal houseRent
+        decimal discount
+        decimal utilityAmount
+        decimal paidAmount
+        date paymentDate
+    }
+
+    RECEIPTS {
+        int receiptId PK
+        int tenantId FK
+        int rentId FK
+        string receiptNo
+        date receiptDate
+        decimal amount
+    }
+
+    REPAIRS {
+        int repairId PK
+        int houseId FK
+        int flatId FK
+        int tenantId FK
+        string description
+        string vendorName
+        string vendorContact
+        decimal cost
+        string paidBy
+        string status
+        date repairDate
+    }
+
+    PAST_TENANTS {
+        int pastTenantId PK
+        int tenantId FK
+        int flatId FK
+        string tenantName
+        date moveOutDate
+        string snapshotJson
+    }
+
+    SETTLEMENTS {
+        int settlementId PK
+        int pastTenantId FK
+        decimal finalAmount
+        string settlementStatus
+        date settlementDate
+    }
 ```
 
 ---
 
-## Suggested Future Improvements
+## High-Level Database/File Layout
 
-Only if needed after release:
+```mermaid
+flowchart TD
+    A[HouseRentManagement App] --> B[auth/auth.db]
+    A --> C[users/{userId}/rent.db]
+    A --> D[backups/*.hrmbak]
 
-- Move runtime database outside `src/main/resources`.
-- Add app installer packaging.
-- Add print preview.
-- Add cash-flow ledger for deposit/refund tracking.
-- Add repair invoice attachment upload.
-- Add multi-row move-out settlement automation.
+    B --> B1[Users]
+    B --> B2[Password Hashes]
+    B --> B3[Recovery PIN Hash]
+    B --> B4[Emergency Key Hashes]
+    B --> B5[Audit Logs]
+
+    C --> C1[Houses]
+    C --> C2[Flats]
+    C --> C3[Tenants]
+    C --> C4[Rent Payments]
+    C --> C5[Receipts]
+    C --> C6[Repairs]
+    C --> C7[Past Tenants]
+    C --> C8[Settlements]
+
+    D --> D1[Backup Metadata]
+    D --> D2[Encrypted User Data]
+    D --> D3[Owner Validation]
+```
 
 ---
 
 ## License
 
-This project is intended for private/offline property management use. Add a formal license if you plan to distribute it publicly.
+This project should include a `LICENSE` file in the release package.
+
+If no license has been selected yet, add one before public distribution.
+
+Recommended options:
+
+- MIT License for simple open-source distribution.
+- Proprietary license for private/commercial distribution.
+
+---
+
+## Final Notes
+
+House Rent Management System v2.0 is designed to be safer, more structured, and more maintainable than v1.0. The main goals are accurate rent accounting, clear tenant lifecycle management, secure user-based data separation, reliable recovery, and installer-ready deployment.
