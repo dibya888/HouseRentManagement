@@ -883,28 +883,28 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    A[HouseRentManagement App] --> B[auth/auth.db]
-    A --> C[users/{userId}/rent.db]
-    A --> D[backups/*.hrmbak]
+    A["HouseRentManagement App"] --> B["auth/auth.db"]
+    A --> C["users/{userId}/rent.db"]
+    A --> D["backups/*.hrmbak"]
 
-    B --> B1[Users]
-    B --> B2[Password Hashes]
-    B --> B3[Recovery PIN Hash]
-    B --> B4[Emergency Key Hashes]
-    B --> B5[Audit Logs]
+    B --> B1["Users"]
+    B --> B2["Password Hashes"]
+    B --> B3["Recovery PIN Hash"]
+    B --> B4["Emergency Key Hashes"]
+    B --> B5["Audit Logs"]
 
-    C --> C1[Houses]
-    C --> C2[Flats]
-    C --> C3[Tenants]
-    C --> C4[Rent Payments]
-    C --> C5[Receipts]
-    C --> C6[Repairs]
-    C --> C7[Past Tenants]
-    C --> C8[Settlements]
+    C --> C1["Houses"]
+    C --> C2["Flats"]
+    C --> C3["Tenants"]
+    C --> C4["Rent Payments"]
+    C --> C5["Receipts"]
+    C --> C6["Repairs"]
+    C --> C7["Past Tenants"]
+    C --> C8["Settlements"]
 
-    D --> D1[Backup Metadata]
-    D --> D2[Encrypted User Data]
-    D --> D3[Owner Validation]
+    D --> D1["Backup Metadata"]
+    D --> D2["Encrypted User Data"]
+    D --> D3["Owner Validation"]
 ```
 
 ---
