@@ -5,7 +5,7 @@ import com.rent.model.ChartItem;
 import com.rent.model.DashboardSummary;
 import com.rent.model.Repair;
 import com.rent.model.ReportRow;
-
+import com.rent.util.StatusBadgeCellFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
@@ -81,6 +81,7 @@ public class DashboardHomeController {
         dueColTenant.setCellValueFactory(new PropertyValueFactory<>("tenant"));
         dueColDue.setCellValueFactory(new PropertyValueFactory<>("due"));
         dueColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        dueColStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         dueTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
@@ -92,6 +93,7 @@ public class DashboardHomeController {
         repairColCost.setCellValueFactory(new PropertyValueFactory<>("cost"));
         repairColPaidBy.setCellValueFactory(new PropertyValueFactory<>("paidBy"));
         repairColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        repairColStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         repairTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
@@ -107,6 +109,7 @@ public class DashboardHomeController {
         paymentColTenant.setCellValueFactory(new PropertyValueFactory<>("tenant"));
         paymentColPaid.setCellValueFactory(new PropertyValueFactory<>("paid"));
         paymentColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        paymentColStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         paymentTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN

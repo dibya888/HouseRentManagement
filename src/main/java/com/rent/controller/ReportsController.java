@@ -104,7 +104,17 @@ public class ReportsController {
         colExtra.setCellValueFactory(new PropertyValueFactory<>("extraInfo"));
         colPaid.setCellValueFactory(new PropertyValueFactory<>("paid"));
         colDue.setCellValueFactory(new PropertyValueFactory<>("due"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        // Derived status: flags overdue-with-no-payment rows as LATE for
+        // display, without changing the stored database status. Safe for
+        // every report type since getDisplayStatus() only overrides rows
+        // whose status is exactly "DUE" with a real parseable due date —
+        // it returns the original status unchanged for everything else
+        // (Repair Report, Utility Bills Report, Paid Rent rows, etc.).
+        colStatus.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cellData.getValue().getDisplayStatus()
+                )
+        );
         colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         reportTable.setColumnResizePolicy(

@@ -73,6 +73,34 @@ public class ReportRow {
         return status;
     }
 
+    /**
+     * Display-only derived status, mirroring RentRow.getDisplayStatus().
+     * If status is "DUE" and the date field holds a real, parseable
+     * due date that has already passed, returns "LATE" for display
+     * purposes only — the underlying status/database is untouched.
+     *
+     * This is safe across every DAO query that produces a "DUE"-status
+     * ReportRow: those queries consistently populate the date field
+     * from rc.due_date (not payment_date), since payment_date only
+     * ever appears on already-PAID rows, which never carry status
+     * "DUE". One exception (Tenant-wise Due, an aggregated row with
+     * no real date) is safely handled by the parse failure fallback.
+     */
+    public String getDisplayStatus() {
+        if ("DUE".equalsIgnoreCase(status) && date != null && !date.isBlank()) {
+            try {
+                java.time.LocalDate due = java.time.LocalDate.parse(date);
+                if (java.time.LocalDate.now().isAfter(due)) {
+                    return "LATE";
+                }
+            } catch (Exception e) {
+                // Not a real/parseable due date (e.g. aggregated rows) —
+                // fall through and show the stored status as-is.
+            }
+        }
+        return status;
+    }
+
     public String getExtraInfo() {
         return extraInfo;
     }

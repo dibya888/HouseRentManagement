@@ -24,8 +24,6 @@ import com.rent.util.AuditActions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import com.rent.util.StatusBadgeCellFactory;
-import javafx.util.StringConverter;
-import javafx.scene.control.DateCell;
 import java.time.YearMonth;
 
 
@@ -81,7 +79,17 @@ public class RentController {
         colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
 
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // Use the derived display status (auto-flags overdue DUE rows as
+        // LATE for display) instead of the raw stored status, so a row
+        // that's never had a payment attempt still shows correctly once
+        // its due date has passed. The underlying database value is
+        // untouched — this only affects what's rendered in this table.
+        colStatus.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cellData.getValue().getDisplayStatus()
+                )
+        );
         colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         // action buttons
