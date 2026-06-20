@@ -21,6 +21,7 @@ public class RentPaymentController {
     @FXML private Label tenantNameLabel;
     @FXML private Label flatLabel;
     @FXML private Label monthLabel;
+    @FXML private Label flatRentLabel;
 
     @FXML private TextField electricityField;
     @FXML private TextField waterField;
@@ -44,6 +45,8 @@ public class RentPaymentController {
 
         YearMonth ym = YearMonth.parse(row.getBillMonth());
         monthLabel.setText("📅 " + ym.format(DateTimeFormatter.ofPattern("MMMM, yyyy")));
+
+        flatRentLabel.setText("🏠 Flat Rent: ৳ " + String.format("%.2f", row.getHouseRent()));
 
         electricityField.setText(String.valueOf(row.getElectricity()));
         waterField.setText(String.valueOf(row.getWater()));

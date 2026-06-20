@@ -24,6 +24,7 @@
         <Label fx:id="tenantNameLabel" style="-fx-font-size:14px;"/>
         <Label fx:id="flatLabel"/>
         <Label fx:id="monthLabel"/>
+        <Label fx:id="flatRentLabel" style="-fx-font-weight:bold;"/>
     </VBox>
 
     <!-- PAYMENT FORM -->
