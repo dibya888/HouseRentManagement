@@ -98,12 +98,20 @@ public class DashboardDAO {
     public static List<ChartItem> getPaidDueChartData() {
         List<ChartItem> list = new ArrayList<>();
 
-        try (Connection conn = DBUtil.connect()) {
-            double paid = getDouble(conn,
-                    "SELECT COALESCE(SUM(MAX(house_rent - discount, 0)), 0) FROM rent_archive");
+        // Use the same currentMonth definition used throughout this class
+        // (getSummary, getIncomeRepairChartData) for consistency.
+        String currentMonth = YearMonth.now().toString();
 
+        try (Connection conn = DBUtil.connect()) {
+            // Paid: only archive rows whose bill_month matches the current month
+            double paid = getDouble(conn,
+                    "SELECT COALESCE(SUM(MAX(house_rent - discount, 0)), 0) FROM rent_archive WHERE bill_month=?",
+                    currentMonth);
+
+            // Due: rent_current already holds only active/current month balances
             double due = getDouble(conn,
-                    "SELECT COALESCE(SUM(total - paid_amount), 0) FROM rent_current");
+                    "SELECT COALESCE(SUM(total - paid_amount), 0) FROM rent_current WHERE bill_month=?",
+                    currentMonth);
 
             list.add(new ChartItem("Paid", paid));
             list.add(new ChartItem("Due", due));

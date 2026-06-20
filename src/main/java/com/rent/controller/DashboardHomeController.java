@@ -20,6 +20,13 @@ import java.time.format.DateTimeFormatter;
 
 public class DashboardHomeController {
 
+    // ── Shared chart color constants ──────────────────────────────────────────
+    // Changing a value here updates BOTH the pie slice AND the legend symbol.
+    private static final String COLOR_GREEN  = "#16a34a";
+    private static final String COLOR_RED    = "#dc2626";
+    private static final String COLOR_TEAL   = "#0f766e";
+    // ─────────────────────────────────────────────────────────────────────────
+
     @FXML private Label totalFlatsLabel;
     @FXML private Label occupiedFlatsLabel;
     @FXML private Label availableFlatsLabel;
@@ -173,18 +180,23 @@ public class DashboardHomeController {
 
         PieChart chart = new PieChart();
 
-        for (ChartItem item : DashboardDAO.getPaidDueChartData()) {
-            PieChart.Data data = new PieChart.Data(
-                    item.getLabel() + " - " + money(item.getValue()),
-                    item.getValue()
-            );
+        // Order matters: index 0 -> default-color0, index 1 -> default-color1, etc.
+        // JavaFX colors BOTH the slice and the auto-generated legend symbol
+        // using these same .default-colorN classes, so overriding them in our
+        // injected stylesheet (see applyPieColorOverride) keeps both in sync
+        // with zero lookup/timing race.
+        java.util.List<String> orderedColors = java.util.List.of(COLOR_GREEN, COLOR_RED);
+        java.util.List<String> orderedLabels = java.util.List.of("Paid", "Due");
 
-            chart.getData().add(data);
-
-            if ("Paid".equalsIgnoreCase(item.getLabel())) {
-                setPieColor(data, "#16a34a"); // green
-            } else if ("Due".equalsIgnoreCase(item.getLabel())) {
-                setPieColor(data, "#dc2626"); // red
+        for (String label : orderedLabels) {
+            for (ChartItem item : DashboardDAO.getPaidDueChartData()) {
+                if (item.getLabel().equalsIgnoreCase(label)) {
+                    chart.getData().add(new PieChart.Data(
+                            item.getLabel() + " - " + money(item.getValue()),
+                            item.getValue()
+                    ));
+                    break;
+                }
             }
         }
 
@@ -192,6 +204,8 @@ public class DashboardHomeController {
         chart.setAnimated(false);
 
         paidDueChartBox.getChildren().add(chart);
+
+        applyPieColorOverride(chart, orderedColors);
     }
 
     private void loadIncomeRepairChart() {
@@ -228,18 +242,18 @@ public class DashboardHomeController {
 
         PieChart chart = new PieChart();
 
-        for (ChartItem item : DashboardDAO.getOccupancyChartData()) {
-            PieChart.Data data = new PieChart.Data(
-                    item.getLabel() + " - " + (int) item.getValue(),
-                    item.getValue()
-            );
+        java.util.List<String> orderedColors = java.util.List.of(COLOR_GREEN, COLOR_TEAL);
+        java.util.List<String> orderedLabels = java.util.List.of("Occupied", "Available");
 
-            chart.getData().add(data);
-
-            if ("Occupied".equalsIgnoreCase(item.getLabel())) {
-                setPieColor(data, "#16a34a"); // green
-            } else if ("Available".equalsIgnoreCase(item.getLabel())) {
-                setPieColor(data, "#0f766e"); // teal
+        for (String label : orderedLabels) {
+            for (ChartItem item : DashboardDAO.getOccupancyChartData()) {
+                if (item.getLabel().equalsIgnoreCase(label)) {
+                    chart.getData().add(new PieChart.Data(
+                            item.getLabel() + " - " + (int) item.getValue(),
+                            item.getValue()
+                    ));
+                    break;
+                }
             }
         }
 
@@ -247,6 +261,8 @@ public class DashboardHomeController {
         chart.setAnimated(false);
 
         occupancyChartBox.getChildren().add(chart);
+
+        applyPieColorOverride(chart, orderedColors);
     }
 
     private void loadTables() {
@@ -261,6 +277,40 @@ public class DashboardHomeController {
         repairTable.setItems(FXCollections.observableArrayList(
                 DashboardDAO.getRecentRepairs()
         ));
+    }
+
+    /**
+     * Overrides JavaFX's built-in .default-colorN classes for THIS chart instance
+     * by injecting a scoped inline stylesheet. JavaFX colors both the pie slice
+     * AND its auto-generated legend symbol using the same .default-colorN class
+     * per data index — that's the one styling hook guaranteed to affect both.
+     * Setting -fx-pie-color directly on individual Data nodes (the old approach)
+     * only ever affected the slice, never the legend, which is why the legend
+     * was stuck on Modena's defaults no matter how many times we retried.
+     *
+     * @param chart         the PieChart to color
+     * @param orderedColors hex colors in the same order as chart.getData()
+     */
+    private void applyPieColorOverride(PieChart chart, java.util.List<String> orderedColors) {
+        StringBuilder css = new StringBuilder();
+        for (int i = 0; i < orderedColors.size(); i++) {
+            css.append(".default-color").append(i)
+                    .append(".chart-pie { -fx-pie-color: ").append(orderedColors.get(i)).append("; }\n");
+            css.append(".default-color").append(i)
+                    .append(".chart-legend-item-symbol { -fx-background-color: ")
+                    .append(orderedColors.get(i)).append("; }\n");
+        }
+
+        try {
+            java.io.File tmp = java.io.File.createTempFile("piechart-colors-", ".css");
+            tmp.deleteOnExit();
+            try (java.io.Writer w = new java.io.FileWriter(tmp)) {
+                w.write(css.toString());
+            }
+            chart.getStylesheets().add(tmp.toURI().toURL().toExternalForm());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setBarColor(XYChart.Data<String, Number> data, String color) {

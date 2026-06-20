@@ -125,7 +125,7 @@
                       prefWidth="460"
                       styleClass="dashboard-panel">
 
-                    <Label text="Paid vs Due"
+                    <Label text="Monthly Paid vs Due"
                            styleClass="dashboard-panel-title"/>
 
                     <VBox fx:id="paidDueChartBox"
