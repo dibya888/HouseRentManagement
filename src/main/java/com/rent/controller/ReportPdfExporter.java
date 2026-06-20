@@ -60,7 +60,8 @@ public class ReportPdfExporter {
     };
 
     public static boolean exportReport(ReportSummary summary,
-                                    ObservableList<ReportRow> rows) {
+                                       ObservableList<ReportRow> rows,
+                                       ReportExportContext context) {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Report PDF");
@@ -83,7 +84,7 @@ public class ReportPdfExporter {
         }
 
         try {
-            createPdf(summary, rows, file);
+            createPdf(summary, rows, context, file);
 
             new Alert(Alert.AlertType.INFORMATION,
                     "PDF report exported successfully:\n" + file.getAbsolutePath()
@@ -104,123 +105,86 @@ public class ReportPdfExporter {
 
     private static void createPdf(ReportSummary summary,
                                   ObservableList<ReportRow> rows,
+                                  ReportExportContext context,
                                   File file) throws Exception {
 
         try (PDDocument document = new PDDocument()) {
+
+            float margin = 40;
+            float topStart = 560;
+
+            int[] pageNumber = {1};
 
             PDPage page = new PDPage(landscapeA4());
             document.addPage(page);
 
             PDPageContentStream cs = new PDPageContentStream(document, page);
 
-            float margin = 35;
-            float y = 540;
+            float y = topStart;
 
-            // Title
-            drawText(cs, "House Rent Management - Reports", FONT_BOLD, 16, margin, y);
+            // ── Report Header ──────────────────────────────────────────────
+            drawText(cs, "House Rent Management", FONT_BOLD, 17, margin, y);
             y -= 20;
 
-            drawText(cs,
-                    "Generated: " + LocalDateTime.now()
-                            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")),
-                    FONT_REGULAR,
-                    9,
-                    margin,
-                    y
-            );
-
-            y -= 25;
-
-            // Summary
-            drawText(cs, "Summary", FONT_BOLD, 13, margin, y);
-            y -= 18;
-
-            drawText(cs, "Total Income: Tk. " + money(summary.getTotalIncome()), FONT_REGULAR, 10, margin, y);
+            drawText(cs, "Report Type: " + safe(context.getReportType()), FONT_BOLD, 11, margin, y);
             y -= 14;
 
-            drawText(cs, "This Month Income: Tk. " + money(summary.getMonthIncome()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "This Year Income: Tk. " + money(summary.getYearIncome()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Total Due: Tk. " + money(summary.getTotalDue()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Total Repair Cost: Tk. " + money(summary.getTotalRepairCost()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Owner Paid Repairs: Tk. " + money(summary.getOwnerPaidRepairCost()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Tenant Paid Repairs: Tk. " + money(summary.getTenantPaidRepairCost()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "This Month Repair: Tk. " + money(summary.getMonthRepairCost()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "This Year Repair: Tk. " + money(summary.getYearRepairCost()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Net Income: Tk. " + money(summary.getNetProfit()), FONT_BOLD, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "Total Utility Bills: Tk. " + money(summary.getTotalUtilityBills()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "This Month Utility Bills: Tk. " + money(summary.getMonthUtilityBills()), FONT_REGULAR, 10, margin, y);
-            y -= 14;
-
-            drawText(cs, "This Year Utility Bills: Tk. " + money(summary.getYearUtilityBills()), FONT_REGULAR, 10, margin, y);
+            drawText(cs, "Date Range: " + safe(context.getDateRangeText()), FONT_REGULAR, 10, margin, y);
             y -= 14;
 
             drawText(cs,
-                    "Utility Breakdown: Electricity Tk. " + money(summary.getElectricityBills())
-                            + " | Water Tk. " + money(summary.getWaterBills())
-                            + " | Gas Tk. " + money(summary.getGasBills())
-                            + " | Other Tk. " + money(summary.getOtherBills()),
-                    FONT_REGULAR,
-                    9,
-                    margin,
-                    y
-            );
-            y -= 14;
-
-            drawText(cs,
-                    "Flats: " + summary.getTotalFlats()
-                            + " | Occupied: " + summary.getOccupiedFlats()
-                            + " | Available: " + summary.getAvailableFlats()
-                            + " | Tenants: " + summary.getTotalTenants(),
+                    "Generated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a"))
+                            + (context.getGeneratedBy() != null && !context.getGeneratedBy().isBlank()
+                            ? "   |   By: " + context.getGeneratedBy()
+                            : ""),
                     FONT_REGULAR,
                     10,
                     margin,
                     y
             );
-
-            y -= 30;
-
-            // Table title
-            drawText(cs, "Report Details", FONT_BOLD, 13, margin, y);
-            y -= 24;
-
-            drawTableHeader(cs, margin, y);
             y -= 18;
 
-            // Table rows with wrapping
+            cs.setLineWidth(1f);
+            cs.moveTo(margin, y);
+            cs.lineTo(770, y);
+            cs.stroke();
+            y -= 18;
+
+            // ── Relevant Summary (only fields meaningful to this report type) ─
+            drawText(cs, "Summary", FONT_BOLD, 13, margin, y);
+            y -= 18;
+
+            for (String[] line : relevantSummaryLines(summary, context.getReportType())) {
+                boolean bold = "1".equals(line[2]);
+                drawText(cs, line[0] + ": Tk. " + line[1], bold ? FONT_BOLD : FONT_REGULAR, 10, margin, y);
+                y -= 14;
+            }
+
+            y -= 16;
+
+            // ── Detailed Data Table ─────────────────────────────────────────
+            drawText(cs, "Detailed Report", FONT_BOLD, 13, margin, y);
+            y -= 22;
+
+            drawTableHeaderBox(cs, margin, y);
+            y -= 18;
+
             for (ReportRow row : rows) {
 
                 float rowHeight = calculateRowHeight(row);
 
-                if (y - rowHeight < 60) {
+                if (y - rowHeight < 55) {
+                    drawPageFooter(cs, pageNumber[0]);
                     cs.close();
 
+                    pageNumber[0]++;
                     page = new PDPage(landscapeA4());
                     document.addPage(page);
                     cs = new PDPageContentStream(document, page);
 
-                    y = 540;
+                    y = topStart;
 
-                    drawTableHeader(cs, margin, y);
+                    drawTableHeaderBox(cs, margin, y);
                     y -= 18;
                 }
 
@@ -228,9 +192,93 @@ public class ReportPdfExporter {
                 y -= rowHeight;
             }
 
+            drawPageFooter(cs, pageNumber[0]);
             cs.close();
+
+            // ── Stamp total page count on every page ───────────────────────
+            int totalPages = document.getNumberOfPages();
+            if (totalPages > 1) {
+                for (int i = 0; i < totalPages; i++) {
+                    PDPage p = document.getPage(i);
+                    try (PDPageContentStream footerCs =
+                                 new PDPageContentStream(document, p, PDPageContentStream.AppendMode.APPEND, true)) {
+                        drawText(footerCs, " of " + totalPages, FONT_REGULAR, 8, 735, 25);
+                    }
+                }
+            }
+
             document.save(file);
         }
+    }
+
+    /**
+     * Returns only the summary lines relevant to the selected report type,
+     * instead of always dumping every ReportSummary field. {line, value, isBold}.
+     */
+    private static List<String[]> relevantSummaryLines(ReportSummary summary, String reportType) {
+        List<String[]> lines = new ArrayList<>();
+
+        switch (reportType) {
+            case "Repair Report" -> {
+                lines.add(new String[]{"Total Repair Cost", money(summary.getTotalRepairCost()), "1"});
+                lines.add(new String[]{"This Month Repair", money(summary.getMonthRepairCost()), "0"});
+                lines.add(new String[]{"This Year Repair", money(summary.getYearRepairCost()), "0"});
+                lines.add(new String[]{"Owner Paid Repairs", money(summary.getOwnerPaidRepairCost()), "0"});
+                lines.add(new String[]{"Tenant Paid Repairs", money(summary.getTenantPaidRepairCost()), "0"});
+            }
+            case "Utility Bills Report" -> {
+                lines.add(new String[]{"Total Utility Bills", money(summary.getTotalUtilityBills()), "1"});
+                lines.add(new String[]{"This Month Utility Bills", money(summary.getMonthUtilityBills()), "0"});
+                lines.add(new String[]{"This Year Utility Bills", money(summary.getYearUtilityBills()), "0"});
+                lines.add(new String[]{"Electricity", money(summary.getElectricityBills()), "0"});
+                lines.add(new String[]{"Water", money(summary.getWaterBills()), "0"});
+                lines.add(new String[]{"Gas", money(summary.getGasBills()), "0"});
+                lines.add(new String[]{"Other", money(summary.getOtherBills()), "0"});
+            }
+            case "Due Rent" -> {
+                lines.add(new String[]{"Total Due", money(summary.getTotalDue()), "1"});
+                lines.add(new String[]{"Total Tenants", String.valueOf(summary.getTotalTenants()), "0"});
+            }
+            case "Monthly Income", "Yearly Income", "Flat-wise Income", "Tenant-wise Report" -> {
+                lines.add(new String[]{"Total Collected Rent", money(summary.getTotalIncome()), "1"});
+                lines.add(new String[]{"This Month Income", money(summary.getMonthIncome()), "0"});
+                lines.add(new String[]{"This Year Income", money(summary.getYearIncome()), "0"});
+                lines.add(new String[]{"Total Due", money(summary.getTotalDue()), "0"});
+            }
+            default -> {
+                // "All Reports" — the only case where a fuller, still-curated summary applies
+                lines.add(new String[]{"Total Collected Rent", money(summary.getTotalIncome()), "1"});
+                lines.add(new String[]{"Total Due", money(summary.getTotalDue()), "0"});
+                lines.add(new String[]{"Total Repair Cost", money(summary.getTotalRepairCost()), "0"});
+                lines.add(new String[]{"Total Utility Bills", money(summary.getTotalUtilityBills()), "0"});
+                lines.add(new String[]{"Net Income", money(summary.getNetProfit()), "1"});
+                lines.add(new String[]{"Total Tenants", String.valueOf(summary.getTotalTenants()), "0"});
+            }
+        }
+
+        return lines;
+    }
+
+    private static void drawPageFooter(PDPageContentStream cs, int pageNumber) throws Exception {
+        drawText(cs, "Page " + pageNumber, FONT_REGULAR, 8, 700, 25);
+    }
+
+    /**
+     * Draws the table header text plus a visible bottom border and light
+     * background-style top border, so the header is clearly separated from
+     * data rows on every page (including repeated headers after a page break).
+     */
+    private static void drawTableHeaderBox(PDPageContentStream cs, float x, float y) throws Exception {
+        cs.setLineWidth(0.75f);
+        cs.moveTo(x, y + 12);
+        cs.lineTo(770, y + 12);
+        cs.stroke();
+
+        drawTableHeader(cs, x, y);
+
+        cs.moveTo(x, y - 6);
+        cs.lineTo(770, y - 6);
+        cs.stroke();
     }
 
     private static void drawTableHeader(PDPageContentStream cs,

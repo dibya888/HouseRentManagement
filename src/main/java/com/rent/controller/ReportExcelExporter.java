@@ -9,6 +9,7 @@ import javafx.stage.FileChooser;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.common.usermodel.HyperlinkType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +19,8 @@ import java.time.format.DateTimeFormatter;
 public class ReportExcelExporter {
 
     public static boolean exportReport(ReportSummary summary,
-                                    ObservableList<ReportRow> rows) {
+                                       ObservableList<ReportRow> rows,
+                                       ReportExportContext context) {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Report Excel");
@@ -41,7 +43,7 @@ public class ReportExcelExporter {
         }
 
         try {
-            createExcel(summary, rows, file);
+            createExcel(summary, rows, context, file);
 
             new Alert(Alert.AlertType.INFORMATION,
                     "Excel report exported successfully:\n" + file.getAbsolutePath()
@@ -60,16 +62,18 @@ public class ReportExcelExporter {
 
     private static void createExcel(ReportSummary summary,
                                     ObservableList<ReportRow> rows,
+                                    ReportExportContext context,
                                     File file) throws Exception {
 
         try (Workbook workbook = new XSSFWorkbook()) {
 
             CellStyle titleStyle = createTitleStyle(workbook);
+            CellStyle subTitleStyle = createSubTitleStyle(workbook);
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle moneyStyle = createMoneyStyle(workbook);
 
-            createSummarySheet(workbook, summary, titleStyle, headerStyle, moneyStyle);
-            createDetailsSheet(workbook, rows, titleStyle, headerStyle, moneyStyle);
+            createSummarySheet(workbook, summary, context, titleStyle, subTitleStyle, headerStyle, moneyStyle);
+            createDetailsSheet(workbook, rows, context, titleStyle, subTitleStyle, headerStyle, moneyStyle);
 
             try (FileOutputStream out = new FileOutputStream(file)) {
                 workbook.write(out);
@@ -79,7 +83,9 @@ public class ReportExcelExporter {
 
     private static void createSummarySheet(Workbook workbook,
                                            ReportSummary summary,
+                                           ReportExportContext context,
                                            CellStyle titleStyle,
+                                           CellStyle subTitleStyle,
                                            CellStyle headerStyle,
                                            CellStyle moneyStyle) {
 
@@ -89,40 +95,100 @@ public class ReportExcelExporter {
 
         Row titleRow = sheet.createRow(rowIndex++);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("House Rent Management - Reports Summary");
+        titleCell.setCellValue("House Rent Management - Report Summary");
         titleCell.setCellStyle(titleStyle);
 
+        rowIndex = writeContextLines(sheet, rowIndex, context, subTitleStyle);
         rowIndex++;
 
-        rowIndex = createSummaryRow(sheet, rowIndex, "Total Income", summary.getTotalIncome(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Month Income", summary.getMonthIncome(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Year Income", summary.getYearIncome(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Total Due", summary.getTotalDue(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Total Repair Cost", summary.getTotalRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Owner Paid Repairs", summary.getOwnerPaidRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Tenant Paid Repairs", summary.getTenantPaidRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Month Repair", summary.getMonthRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Year Repair", summary.getYearRepairCost(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Net Income", summary.getNetProfit(), headerStyle, moneyStyle);
+        for (String[] line : relevantSummaryLines(summary, context.getReportType())) {
+            boolean isCount = line[2].equals("count");
+            if (isCount) {
+                rowIndex = createNumberSummaryRow(sheet, rowIndex, line[0],
+                        (int) Double.parseDouble(line[1]), headerStyle);
+            } else {
+                rowIndex = createSummaryRow(sheet, rowIndex, line[0],
+                        Double.parseDouble(line[1]), headerStyle, moneyStyle);
+            }
+        }
 
-        rowIndex = createSummaryRow(sheet, rowIndex, "Total Utility Bills", summary.getTotalUtilityBills(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Month Utility Bills", summary.getMonthUtilityBills(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "This Year Utility Bills", summary.getYearUtilityBills(), headerStyle, moneyStyle);
+        sheet.setColumnWidth(0, 28 * 256);
+        sheet.setColumnWidth(1, 18 * 256);
+    }
 
-        rowIndex = createSummaryRow(sheet, rowIndex, "Electricity Bills", summary.getElectricityBills(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Water Bills", summary.getWaterBills(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Gas Bills", summary.getGasBills(), headerStyle, moneyStyle);
-        rowIndex = createSummaryRow(sheet, rowIndex, "Other Bills", summary.getOtherBills(), headerStyle, moneyStyle);
+    /**
+     * Returns only the summary lines relevant to the selected report type
+     * instead of always exporting every ReportSummary field. Each entry is
+     * {label, rawNumericValue, "money"|"count"}.
+     */
+    private static java.util.List<String[]> relevantSummaryLines(ReportSummary summary, String reportType) {
+        java.util.List<String[]> lines = new java.util.ArrayList<>();
 
-        rowIndex++;
+        switch (reportType) {
+            case "Repair Report" -> {
+                lines.add(new String[]{"Total Repair Cost", String.valueOf(summary.getTotalRepairCost()), "money"});
+                lines.add(new String[]{"This Month Repair", String.valueOf(summary.getMonthRepairCost()), "money"});
+                lines.add(new String[]{"This Year Repair", String.valueOf(summary.getYearRepairCost()), "money"});
+                lines.add(new String[]{"Owner Paid Repairs", String.valueOf(summary.getOwnerPaidRepairCost()), "money"});
+                lines.add(new String[]{"Tenant Paid Repairs", String.valueOf(summary.getTenantPaidRepairCost()), "money"});
+            }
+            case "Utility Bills Report" -> {
+                lines.add(new String[]{"Total Utility Bills", String.valueOf(summary.getTotalUtilityBills()), "money"});
+                lines.add(new String[]{"This Month Utility Bills", String.valueOf(summary.getMonthUtilityBills()), "money"});
+                lines.add(new String[]{"This Year Utility Bills", String.valueOf(summary.getYearUtilityBills()), "money"});
+                lines.add(new String[]{"Electricity", String.valueOf(summary.getElectricityBills()), "money"});
+                lines.add(new String[]{"Water", String.valueOf(summary.getWaterBills()), "money"});
+                lines.add(new String[]{"Gas", String.valueOf(summary.getGasBills()), "money"});
+                lines.add(new String[]{"Other", String.valueOf(summary.getOtherBills()), "money"});
+            }
+            case "Due Rent" -> {
+                lines.add(new String[]{"Total Due", String.valueOf(summary.getTotalDue()), "money"});
+                lines.add(new String[]{"Total Tenants", String.valueOf(summary.getTotalTenants()), "count"});
+            }
+            case "Monthly Income", "Yearly Income", "Flat-wise Income", "Tenant-wise Report" -> {
+                lines.add(new String[]{"Total Collected Rent", String.valueOf(summary.getTotalIncome()), "money"});
+                lines.add(new String[]{"This Month Income", String.valueOf(summary.getMonthIncome()), "money"});
+                lines.add(new String[]{"This Year Income", String.valueOf(summary.getYearIncome()), "money"});
+                lines.add(new String[]{"Total Due", String.valueOf(summary.getTotalDue()), "money"});
+            }
+            default -> {
+                lines.add(new String[]{"Total Collected Rent", String.valueOf(summary.getTotalIncome()), "money"});
+                lines.add(new String[]{"Total Due", String.valueOf(summary.getTotalDue()), "money"});
+                lines.add(new String[]{"Total Repair Cost", String.valueOf(summary.getTotalRepairCost()), "money"});
+                lines.add(new String[]{"Total Utility Bills", String.valueOf(summary.getTotalUtilityBills()), "money"});
+                lines.add(new String[]{"Net Income", String.valueOf(summary.getNetProfit()), "money"});
+                lines.add(new String[]{"Total Tenants", String.valueOf(summary.getTotalTenants()), "count"});
+            }
+        }
 
-        rowIndex = createNumberSummaryRow(sheet, rowIndex, "Total Flats", summary.getTotalFlats(), headerStyle);
-        rowIndex = createNumberSummaryRow(sheet, rowIndex, "Occupied Flats", summary.getOccupiedFlats(), headerStyle);
-        rowIndex = createNumberSummaryRow(sheet, rowIndex, "Available Flats", summary.getAvailableFlats(), headerStyle);
-        createNumberSummaryRow(sheet, rowIndex, "Total Tenants", summary.getTotalTenants(), headerStyle);
+        return lines;
+    }
 
-        sheet.autoSizeColumn(0);
-        sheet.autoSizeColumn(1);
+    private static int writeContextLines(Sheet sheet, int rowIndex,
+                                         ReportExportContext context,
+                                         CellStyle subTitleStyle) {
+
+        rowIndex = writeLabelValue(sheet, rowIndex, "Report Type:", context.getReportType(), subTitleStyle);
+        rowIndex = writeLabelValue(sheet, rowIndex, "Date Range:", context.getDateRangeText(), subTitleStyle);
+        rowIndex = writeLabelValue(sheet, rowIndex, "Generated:",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")),
+                subTitleStyle);
+
+        if (context.getGeneratedBy() != null && !context.getGeneratedBy().isBlank()) {
+            rowIndex = writeLabelValue(sheet, rowIndex, "Generated By:", context.getGeneratedBy(), subTitleStyle);
+        }
+
+        return rowIndex;
+    }
+
+    private static int writeLabelValue(Sheet sheet, int rowIndex, String label, String value, CellStyle style) {
+        Row row = sheet.createRow(rowIndex);
+        Cell labelCell = row.createCell(0);
+        labelCell.setCellValue(label);
+        labelCell.setCellStyle(style);
+
+        row.createCell(1).setCellValue(value);
+        return rowIndex + 1;
     }
 
     private static int createSummaryRow(Sheet sheet,
@@ -165,7 +231,9 @@ public class ReportExcelExporter {
 
     private static void createDetailsSheet(Workbook workbook,
                                            ObservableList<ReportRow> rows,
+                                           ReportExportContext context,
                                            CellStyle titleStyle,
+                                           CellStyle subTitleStyle,
                                            CellStyle headerStyle,
                                            CellStyle moneyStyle) {
 
@@ -175,11 +243,13 @@ public class ReportExcelExporter {
 
         Row titleRow = sheet.createRow(rowIndex++);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Report Details");
+        titleCell.setCellValue("House Rent Management - " + context.getReportType());
         titleCell.setCellStyle(titleStyle);
 
+        rowIndex = writeLabelValue(sheet, rowIndex, "Date Range:", context.getDateRangeText(), subTitleStyle);
         rowIndex++;
 
+        int headerRowIndex = rowIndex;
         Row header = sheet.createRow(rowIndex++);
 
         String[] headers = {
@@ -194,39 +264,65 @@ public class ReportExcelExporter {
                 "Status"
         };
 
+        CellStyle borderedHeader = withThinBorder(workbook, headerStyle);
+        CellStyle borderedText = withThinBorder(workbook, null);
+        CellStyle borderedMoney = withThinBorder(workbook, moneyStyle);
+
         for (int i = 0; i < headers.length; i++) {
             Cell cell = header.createCell(i);
             cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
+            cell.setCellStyle(borderedHeader);
         }
 
         for (ReportRow reportRow : rows) {
             Row row = sheet.createRow(rowIndex++);
 
-            row.createCell(0).setCellValue(nz(reportRow.getTitle()));
-            row.createCell(1).setCellValue(nz(reportRow.getMonth()));
-            row.createCell(2).setCellValue(nz(reportRow.getDate()));
-            row.createCell(3).setCellValue(nz(reportRow.getFlatNo()));
-            row.createCell(4).setCellValue(nz(reportRow.getTenant()));
+            createTextCell(row, 0, nz(reportRow.getTitle()), borderedText);
+            createTextCell(row, 1, nz(reportRow.getMonth()), borderedText);
+            createTextCell(row, 2, nz(reportRow.getDate()), borderedText);
+            createTextCell(row, 3, nz(reportRow.getFlatNo()), borderedText);
+            createTextCell(row, 4, nz(reportRow.getTenant()), borderedText);
 
             Cell totalCell = row.createCell(5);
             totalCell.setCellValue(reportRow.getTotal());
-            totalCell.setCellStyle(moneyStyle);
+            totalCell.setCellStyle(borderedMoney);
 
             Cell paidCell = row.createCell(6);
             paidCell.setCellValue(reportRow.getPaid());
-            paidCell.setCellStyle(moneyStyle);
+            paidCell.setCellStyle(borderedMoney);
 
             Cell dueCell = row.createCell(7);
             dueCell.setCellValue(reportRow.getDue());
-            dueCell.setCellStyle(moneyStyle);
+            dueCell.setCellStyle(borderedMoney);
 
-            row.createCell(8).setCellValue(nz(reportRow.getStatus()));
+            createTextCell(row, 8, nz(reportRow.getStatus()), borderedText);
         }
 
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
         }
+
+        // Freeze the header row so it stays visible while scrolling a long
+        // detail sheet — directly addresses "freeze header row" requirement.
+        sheet.createFreezePane(0, headerRowIndex + 1);
+    }
+
+    private static void createTextCell(Row row, int col, String value, CellStyle style) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
+
+    private static CellStyle withThinBorder(Workbook workbook, CellStyle base) {
+        CellStyle style = workbook.createCellStyle();
+        if (base != null) {
+            style.cloneStyleFrom(base);
+        }
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
     }
 
     private static CellStyle createTitleStyle(Workbook workbook) {
@@ -240,12 +336,28 @@ public class ReportExcelExporter {
         return style;
     }
 
-    private static CellStyle createHeaderStyle(Workbook workbook) {
+    private static CellStyle createSubTitleStyle(Workbook workbook) {
         Font font = workbook.createFont();
         font.setBold(true);
+        font.setFontHeightInPoints((short) 11);
+        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
 
         CellStyle style = workbook.createCellStyle();
         style.setFont(font);
+
+        return style;
+    }
+
+    private static CellStyle createHeaderStyle(Workbook workbook) {
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
 
         return style;
     }

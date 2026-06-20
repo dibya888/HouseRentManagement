@@ -195,7 +195,9 @@ public class ReportsController {
             return;
         }
 
-        boolean exported = ReportPdfExporter.exportReport(summary, exportRows);
+        ReportExportContext context = buildExportContext();
+
+        boolean exported = ReportPdfExporter.exportReport(summary, exportRows, context);
 
         if (exported) {
             AuditLogDAO.log(
@@ -230,7 +232,9 @@ public class ReportsController {
             return;
         }
 
-        boolean exported = ReportExcelExporter.exportReport(summary, exportRows);
+        ReportExportContext context = buildExportContext();
+
+        boolean exported = ReportExcelExporter.exportReport(summary, exportRows, context);
 
         if (exported) {
             AuditLogDAO.log(
@@ -241,6 +245,43 @@ public class ReportsController {
                             + exportRows.size()
             );
         }
+    }
+
+    /**
+     * Bundles the currently selected report type and date range so both
+     * exporters can render an accurate header and decide which summary
+     * fields are actually relevant — instead of always dumping every
+     * ReportSummary field regardless of what report was generated.
+     */
+    private ReportExportContext buildExportContext() {
+        String reportType = reportTypeCombo.getValue() != null
+                ? reportTypeCombo.getValue()
+                : "All Reports";
+
+        String dateRangeText;
+
+        LocalDate from = fromDatePicker.getValue();
+        LocalDate to = toDatePicker.getValue();
+
+        java.time.format.DateTimeFormatter fmt =
+                java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        if (monthPicker.getValue() != null) {
+            dateRangeText = java.time.YearMonth.from(monthPicker.getValue())
+                    .format(java.time.format.DateTimeFormatter.ofPattern("MMMM, yyyy"));
+        } else if (from != null && to != null) {
+            dateRangeText = from.format(fmt) + " to " + to.format(fmt);
+        } else if (from != null) {
+            dateRangeText = "From " + from.format(fmt);
+        } else if (to != null) {
+            dateRangeText = "Up to " + to.format(fmt);
+        } else {
+            dateRangeText = "All Time";
+        }
+
+        String generatedBy = com.rent.util.CurrentSession.getUsername();
+
+        return new ReportExportContext(reportType, dateRangeText, generatedBy);
     }
 
     @FXML
@@ -299,34 +340,48 @@ public class ReportsController {
 
         final String monthFinal = selectedMonth;
 
+        // These report types are pre-aggregated (grouped by flat / year / tenant
+        // across all time) by their DAO query, so each row does not carry a
+        // real per-row month or date value. Applying the Month/date-range
+        // filter to them would compare against an empty or year-only string
+        // and incorrectly drop every row. They are filtered only by type.
+        boolean isAggregatedReport = type != null && (
+                type.equals("Flat-wise Income")
+                        || type.equals("Yearly Income")
+                        || type.equals("Tenant-wise Report")
+        );
+
         filteredList.setPredicate(row -> {
 
-            // Month filter
-            if (monthFinal != null) {
-                if (row.getMonth() == null || !row.getMonth().equals(monthFinal)) {
-                    return false;
-                }
-            }
+            if (!isAggregatedReport) {
 
-            // Date range filter
-            if (fromDate != null || toDate != null) {
-                if (row.getDate() == null || row.getDate().isBlank()) {
-                    return false;
+                // Month filter
+                if (monthFinal != null) {
+                    if (row.getMonth() == null || !row.getMonth().equals(monthFinal)) {
+                        return false;
+                    }
                 }
 
-                try {
-                    LocalDate rowDate = LocalDate.parse(row.getDate());
-
-                    if (fromDate != null && rowDate.isBefore(fromDate)) {
+                // Date range filter
+                if (fromDate != null || toDate != null) {
+                    if (row.getDate() == null || row.getDate().isBlank()) {
                         return false;
                     }
 
-                    if (toDate != null && rowDate.isAfter(toDate)) {
+                    try {
+                        LocalDate rowDate = LocalDate.parse(row.getDate());
+
+                        if (fromDate != null && rowDate.isBefore(fromDate)) {
+                            return false;
+                        }
+
+                        if (toDate != null && rowDate.isAfter(toDate)) {
+                            return false;
+                        }
+
+                    } catch (Exception e) {
                         return false;
                     }
-
-                } catch (Exception e) {
-                    return false;
                 }
             }
 
@@ -392,17 +447,37 @@ public class ReportsController {
         String currentMonth = java.time.YearMonth.now().toString();
         String currentYear = String.valueOf(java.time.Year.now().getValue());
 
+        // Flat-wise / Yearly / Tenant-wise rows are pre-aggregated across all
+        // time and never carry a real per-row month value (it's set to "" or
+        // a bare year), so computing "This Month/Year Income" from them here
+        // would always be zero. For those report types, pull the real
+        // month/year income directly from the database instead.
+        String type = reportTypeCombo.getValue();
+        boolean isAggregatedReport = type != null && (
+                type.equals("Flat-wise Income")
+                        || type.equals("Yearly Income")
+                        || type.equals("Tenant-wise Report")
+        );
+
         for (ReportRow row : filteredList) {
             totalIncome += row.getPaid();
             totalDue += row.getDue();
 
-            if (row.getMonth() != null && row.getMonth().equals(currentMonth)) {
-                monthIncome += row.getPaid();
-            }
+            if (!isAggregatedReport) {
+                if (row.getMonth() != null && row.getMonth().equals(currentMonth)) {
+                    monthIncome += row.getPaid();
+                }
 
-            if (row.getMonth() != null && row.getMonth().startsWith(currentYear + "-")) {
-                yearIncome += row.getPaid();
+                if (row.getMonth() != null && row.getMonth().startsWith(currentYear + "-")) {
+                    yearIncome += row.getPaid();
+                }
             }
+        }
+
+        if (isAggregatedReport) {
+            ReportSummary realTimeSummary = ReportDAO.getSummary();
+            monthIncome = realTimeSummary.getMonthIncome();
+            yearIncome = realTimeSummary.getYearIncome();
         }
 
         double totalRepair = RepairDAO.getTotalRepairCost();

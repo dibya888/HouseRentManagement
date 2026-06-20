@@ -3,223 +3,227 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
+<ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.rent.controller.ReportsController"
+            fitToWidth="true"
             style="-fx-background-color:#f4f6f7;">
 
-    <center>
-        <VBox spacing="16" style="-fx-padding:20;">
+    <content>
+        <StackPane style="-fx-padding:20; -fx-background-color:#f4f6f7;">
+            <VBox spacing="20" maxWidth="1180">
 
-            <!-- Header -->
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label text="📈 Reports"
-                       style="-fx-font-size:22px; -fx-font-weight:bold;"/>
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="📈 Reports"
+                           styleClass="dashboard-title"/>
 
-                <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS"/>
 
-                <Button text="Export PDF"
-                        onAction="#exportPdf"
-                        style="-fx-background-color:#dc2626; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                    <Button text="🖨 Print"
+                            onAction="#printReport"
+                            styleClass="reports-action-btn"
+                            style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
 
-                <Button text="Export Excel"
-                        onAction="#exportExcel"
-                        style="-fx-background-color:#16a34a; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                    <Button text="📊 Export Excel"
+                            onAction="#exportExcel"
+                            styleClass="reports-action-btn"
+                            style="-fx-background-color:#16a34a; -fx-text-fill:white;"/>
 
-                <Button text="Print"
-                        onAction="#printReport"
-                        style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
-            </HBox>
+                    <Button text="📄 Export PDF"
+                            onAction="#exportPdf"
+                            styleClass="reports-action-btn"
+                            style="-fx-background-color:#dc2626; -fx-text-fill:white;"/>
+                </HBox>
 
-            <!-- Filter Area -->
-            <HBox spacing="10" alignment="CENTER_LEFT"
-                  style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
+                <!-- Filter Area -->
+                <VBox spacing="10" styleClass="reports-filter-bar">
 
-                <Label text="Report:"/>
-                <ComboBox fx:id="reportTypeCombo" prefWidth="180"/>
+                    <Label text="FILTERS" styleClass="reports-section-label"/>
 
-                <Label text="Month:"/>
-                <DatePicker fx:id="monthPicker" prefWidth="150"/>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
 
-                <Label text="From:"/>
-                <DatePicker fx:id="fromDatePicker" prefWidth="150"/>
+                        <VBox spacing="4">
+                            <Label text="Report Type" styleClass="reports-card-label"/>
+                            <ComboBox fx:id="reportTypeCombo" prefWidth="190"/>
+                        </VBox>
 
-                <Label text="To:"/>
-                <DatePicker fx:id="toDatePicker" prefWidth="150"/>
+                        <VBox spacing="4">
+                            <Label text="Month" styleClass="reports-card-label"/>
+                            <DatePicker fx:id="monthPicker" prefWidth="150"/>
+                        </VBox>
 
-                <Button text="Generate"
-                        onAction="#generateReport"
-                        style="-fx-background-color:#111827; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                        <VBox spacing="4">
+                            <Label text="From" styleClass="reports-card-label"/>
+                            <DatePicker fx:id="fromDatePicker" prefWidth="150"/>
+                        </VBox>
 
-                <Button text="Clear"
-                        onAction="#clearFilters"
-                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
-            </HBox>
+                        <VBox spacing="4">
+                            <Label text="To" styleClass="reports-card-label"/>
+                            <DatePicker fx:id="toDatePicker" prefWidth="150"/>
+                        </VBox>
 
-            <!-- Summary Cards -->
-            <GridPane hgap="14" vgap="14">
+                        <Region HBox.hgrow="ALWAYS"/>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="0" GridPane.rowIndex="0">
-                    <Label text="Total Income" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalIncomeLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                        <Button text="Generate"
+                                onAction="#generateReport"
+                                styleClass="reports-action-btn"
+                                style="-fx-background-color:#111827; -fx-text-fill:white;"/>
+
+                        <Button text="Clear"
+                                onAction="#clearFilters"
+                                styleClass="reports-action-btn"
+                                style="-fx-background-color:#e5e7eb; -fx-text-fill:#374151;"/>
+
+                    </HBox>
                 </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="1" GridPane.rowIndex="0">
-                    <Label text="This Month Income" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="monthIncomeLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                <!-- Summary Cards -->
+                <VBox spacing="10">
+                    <Label text="INCOME &amp; OCCUPANCY SUMMARY" styleClass="reports-section-label"/>
+
+                    <FlowPane hgap="14" vgap="14">
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Income" styleClass="reports-card-label"/>
+                            <Label fx:id="totalIncomeLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Month Income" styleClass="reports-card-label"/>
+                            <Label fx:id="monthIncomeLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Year Income" styleClass="reports-card-label"/>
+                            <Label fx:id="yearIncomeLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Due" styleClass="reports-card-label"/>
+                            <Label fx:id="totalDueLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Flats" styleClass="reports-card-label"/>
+                            <Label fx:id="totalFlatsLabel" text="0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Occupied Flats" styleClass="reports-card-label"/>
+                            <Label fx:id="occupiedFlatsLabel" text="0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Available Flats" styleClass="reports-card-label"/>
+                            <Label fx:id="availableFlatsLabel" text="0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Tenants" styleClass="reports-card-label"/>
+                            <Label fx:id="totalTenantsLabel" text="0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                    </FlowPane>
                 </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="0" GridPane.rowIndex="2">
-                    <Label text="Total Repair Cost" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalRepairLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                <VBox spacing="10">
+                    <Label text="REPAIR &amp; PROFIT SUMMARY" styleClass="reports-section-label"/>
+
+                    <FlowPane hgap="14" vgap="14">
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Repair Cost" styleClass="reports-card-label"/>
+                            <Label fx:id="totalRepairLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Month Repair" styleClass="reports-card-label"/>
+                            <Label fx:id="monthRepairLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Year Repair" styleClass="reports-card-label"/>
+                            <Label fx:id="yearRepairLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Owner Paid Repairs" styleClass="reports-card-label"/>
+                            <Label fx:id="ownerRepairLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Tenant Paid Repairs" styleClass="reports-card-label"/>
+                            <Label fx:id="tenantRepairLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220" style="-fx-border-color:#16a34a; -fx-border-width:0 0 0 4; -fx-border-radius:14;">
+                            <Label text="Net Income" styleClass="reports-card-label"/>
+                            <Label fx:id="netProfitLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                    </FlowPane>
                 </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="1" GridPane.rowIndex="2">
-                    <Label text="This Month Repair" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="monthRepairLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="0" GridPane.rowIndex="3">
-                    <Label text="Owner Paid Repairs" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="ownerRepairLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
+                <VBox spacing="10">
+                    <Label text="UTILITY BILLS SUMMARY" styleClass="reports-section-label"/>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="1" GridPane.rowIndex="3">
-                    <Label text="Tenant Paid Repairs" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="tenantRepairLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
+                    <FlowPane hgap="14" vgap="14">
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="2" GridPane.rowIndex="2">
-                    <Label text="This Year Repair" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="yearRepairLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="Total Utility Bills" styleClass="reports-card-label"/>
+                            <Label fx:id="totalUtilityLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="3" GridPane.rowIndex="2">
-                    <Label text="Net Income" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="netProfitLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Month Utility Bills" styleClass="reports-card-label"/>
+                            <Label fx:id="monthUtilityLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="220">
+                            <Label text="This Year Utility Bills" styleClass="reports-card-label"/>
+                            <Label fx:id="yearUtilityLabel" text="৳ 0" styleClass="reports-card-value"/>
+                        </VBox>
+
+                        <VBox styleClass="dashboard-panel" minWidth="280">
+                            <Label text="Utility Breakdown" styleClass="reports-card-label"/>
+                            <Label fx:id="utilityBreakdownLabel" text="৳ 0"
+                                   style="-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:#111827;"
+                                   wrapText="true"/>
+                        </VBox>
+
+                    </FlowPane>
                 </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="2" GridPane.rowIndex="0">
-                    <Label text="This Year Income" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="yearIncomeLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                <!-- Report Table -->
+                <VBox spacing="10">
+                    <Label text="DETAILED REPORT" styleClass="reports-section-label"/>
+
+                    <TableView fx:id="reportTable"
+                               styleClass="dashboard-table"
+                               prefHeight="420"
+                               VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colTitle" text="Title" prefWidth="180"/>
+                            <TableColumn fx:id="colMonth" text="Month" prefWidth="100"/>
+                            <TableColumn fx:id="colDate" text="Date" prefWidth="110"/>
+                            <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
+                            <TableColumn fx:id="colTenant" text="Tenant" prefWidth="160"/>
+                            <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
+                            <TableColumn fx:id="colExtra" text="Info" prefWidth="120" visible="false"/>
+                            <TableColumn fx:id="colPaid" text="Paid" prefWidth="120"/>
+                            <TableColumn fx:id="colDue" text="Due" prefWidth="120"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No report data for the selected filters."
+                                   style="-fx-text-fill:#9ca3af; -fx-font-size:13px;"/>
+                        </placeholder>
+                    </TableView>
                 </VBox>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="3" GridPane.rowIndex="0">
-                    <Label text="Total Due" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalDueLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
+            </VBox>
+        </StackPane>
+    </content>
 
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="0" GridPane.rowIndex="1">
-                    <Label text="Total Flats" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalFlatsLabel"
-                           text="0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <Label text="Occupied Flats" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="occupiedFlatsLabel"
-                           text="0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <Label text="Available Flats" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="availableFlatsLabel"
-                           text="0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="3" GridPane.rowIndex="1">
-                    <Label text="Total Tenants" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalTenantsLabel"
-                           text="0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="0" GridPane.rowIndex="4">
-                    <Label text="Total Utility Bills" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="totalUtilityLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="1" GridPane.rowIndex="4">
-                    <Label text="This Month Utility Bills" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="monthUtilityLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="2" GridPane.rowIndex="4">
-                    <Label text="This Year Utility Bills" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="yearUtilityLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:20px; -fx-font-weight:bold;"/>
-                </VBox>
-
-                <VBox style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:12;"
-                      GridPane.columnIndex="3" GridPane.rowIndex="4">
-                    <Label text="Utility Breakdown" style="-fx-text-fill:#6b7280;"/>
-                    <Label fx:id="utilityBreakdownLabel"
-                           text="৳ 0"
-                           style="-fx-font-size:14px; -fx-font-weight:bold;"/>
-                </VBox>
-
-            </GridPane>
-
-            <!-- Report Table -->
-            <TableView fx:id="reportTable">
-                <columns>
-                    <TableColumn fx:id="colTitle" text="Title" prefWidth="180"/>
-                    <TableColumn fx:id="colMonth" text="Month" prefWidth="100"/>
-                    <TableColumn fx:id="colDate" text="Date" prefWidth="110"/>
-                    <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="100"/>
-                    <TableColumn fx:id="colTenant" text="Tenant" prefWidth="160"/>
-                    <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
-                    <TableColumn fx:id="colExtra" text="Info" prefWidth="120" visible="false"/>
-                    <TableColumn fx:id="colPaid" text="Paid" prefWidth="120"/>
-                    <TableColumn fx:id="colDue" text="Due" prefWidth="120"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
-                </columns>
-            </TableView>
-
-        </VBox>
-    </center>
-
-</BorderPane>
+</ScrollPane>

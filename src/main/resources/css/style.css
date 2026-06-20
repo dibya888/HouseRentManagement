@@ -270,3 +270,36 @@
     -fx-background-radius: 8;
     -fx-padding: 9 12;
 }
+
+/* ================= REPORTS ================= */
+
+.reports-filter-bar {
+    -fx-background-color: white;
+    -fx-padding: 16;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+}
+
+.reports-section-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+}
+
+.reports-card-label {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+}
+
+.reports-card-value {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.reports-action-btn {
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}

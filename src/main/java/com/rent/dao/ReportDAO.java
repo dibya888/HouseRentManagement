@@ -384,7 +384,8 @@ public class ReportDAO {
     public static List<ReportRow> getTenantWiseIncomeRows() {
         List<ReportRow> list = new ArrayList<>();
 
-        String sql = """
+        // Paid history, grouped by tenant + flat
+        String paidSql = """
             SELECT
                 t.name AS tenant_name,
                 ra.flat_no,
@@ -396,22 +397,57 @@ public class ReportDAO {
             ORDER BY t.name
             """;
 
-        try (Connection conn = DBUtil.connect();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        // Outstanding due rent, grouped by tenant + flat
+        String dueSql = """
+            SELECT
+                t.name AS tenant_name,
+                rc.flat_no,
+                SUM(rc.total) AS total_amount,
+                SUM(rc.paid_amount) AS paid_amount,
+                SUM(rc.total - rc.paid_amount) AS due_amount
+            FROM rent_current rc
+            JOIN tenants t ON rc.tenant_id = t.id
+            WHERE (rc.total - rc.paid_amount) > 0
+            GROUP BY rc.tenant_id, t.name, rc.flat_no
+            ORDER BY t.name
+            """;
 
-            while (rs.next()) {
-                list.add(new ReportRow(
-                        "Tenant-wise Income",
-                        "",
-                        "",
-                        rs.getString("flat_no"),
-                        rs.getString("tenant_name"),
-                        rs.getDouble("total_amount"),
-                        rs.getDouble("paid_amount"),
-                        0,
-                        "PAID"
-                ));
+        try (Connection conn = DBUtil.connect()) {
+
+            try (PreparedStatement ps = conn.prepareStatement(paidSql);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(new ReportRow(
+                            "Tenant-wise Income",
+                            "",
+                            "",
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total_amount"),
+                            rs.getDouble("paid_amount"),
+                            0,
+                            "PAID"
+                    ));
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(dueSql);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(new ReportRow(
+                            "Tenant-wise Due",
+                            "",
+                            "",
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total_amount"),
+                            rs.getDouble("paid_amount"),
+                            rs.getDouble("due_amount"),
+                            "DUE"
+                    ));
+                }
             }
 
         } catch (Exception e) {
