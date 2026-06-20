@@ -161,6 +161,8 @@ public class DashboardHomeController {
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
+        int index = 0;
+
         for (ChartItem item : DashboardDAO.getMonthlyIncomeChartData()) {
             String displayMonth = formatMonth(item.getLabel());
 
@@ -169,12 +171,16 @@ public class DashboardHomeController {
 
             series.getData().add(data);
 
-            // If you already added setBarColor helper
-            setBarColor(data, "#2563eb");
+            String color = index % 2 == 0
+                    ? "#2563eb"   // original blue
+                    : "#93c5fd";  // lighter blue
+
+            setBarColor(data, color);
+
+            index++;
         }
 
         chart.getData().add(series);
-
         monthlyIncomeChartBox.getChildren().add(chart);
     }
 
