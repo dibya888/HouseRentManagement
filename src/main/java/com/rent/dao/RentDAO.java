@@ -110,7 +110,7 @@ public class RentDAO {
         """;
 
         String selectGlobalDefaults = """
-            SELECT electricity, gas, water
+            SELECT electricity, gas, water, due_day
             FROM bill_defaults
             WHERE id = 1
             """;
@@ -171,6 +171,36 @@ public class RentDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Convenience overload that reads the saved Rent Due Day from
+     * bill_defaults instead of requiring the caller to hardcode it.
+     * Falls back to day 5 if no value has been configured yet, which
+     * matches the previous hardcoded behavior exactly.
+     */
+    public static void ensureMonthGenerated(String billMonth) {
+        int dueDay = 5;
+
+        String sql = "SELECT due_day FROM bill_defaults WHERE id = 1";
+
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                int stored = rs.getInt("due_day");
+                if (stored >= 1 && stored <= 28) {
+                    dueDay = stored;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Falls back to day 5 on any read failure.
+        }
+
+        ensureMonthGenerated(billMonth, dueDay);
     }
 
     // -------------- 3) Payment update + archive if cleared --------------

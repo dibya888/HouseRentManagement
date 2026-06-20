@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import com.rent.util.MonthYearPicker?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -30,7 +31,7 @@
 
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Bill Month:"/>
-                <DatePicker fx:id="monthPicker" prefWidth="160"/>
+                <MonthYearPicker fx:id="monthPicker" prefWidth="160"/>
                 <Button text="All"
                         onAction="#clearMonthFilter"/>
 

@@ -78,9 +78,17 @@ public final class RentDatabaseInitializer {
                 )
             """);
 
+            addColumnIfMissing(stmt, "bill_defaults", "due_day INTEGER DEFAULT 5");
+
             stmt.execute("""
-                INSERT OR IGNORE INTO bill_defaults (id, electricity, gas, water)
-                VALUES (1, 0, 0, 0)
+                INSERT OR IGNORE INTO bill_defaults (id, electricity, gas, water, due_day)
+                VALUES (1, 0, 0, 0, 5)
+            """);
+
+            stmt.execute("""
+                UPDATE bill_defaults
+                SET due_day = 5
+                WHERE due_day IS NULL
             """);
 
             // CURRENT RENT

@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import com.rent.util.MonthYearPicker?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -50,7 +51,7 @@
 
                         <VBox spacing="4">
                             <Label text="Month" styleClass="reports-card-label"/>
-                            <DatePicker fx:id="monthPicker" prefWidth="150"/>
+                            <MonthYearPicker fx:id="monthPicker" prefWidth="150"/>
                         </VBox>
 
                         <VBox spacing="4">

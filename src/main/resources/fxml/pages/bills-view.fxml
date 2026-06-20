@@ -39,6 +39,11 @@
                                GridPane.rowIndex="2"
                                GridPane.columnIndex="1"/>
 
+                    <Label text="Rent Due Day (1-28):" GridPane.rowIndex="3"/>
+                    <TextField fx:id="dueDayField"
+                               GridPane.rowIndex="3"
+                               GridPane.columnIndex="1"/>
+
                 </GridPane>
 
             </VBox>

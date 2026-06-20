@@ -20,7 +20,7 @@ public class ReportsController {
 
     @FXML private ComboBox<String> reportTypeCombo;
 
-    @FXML private DatePicker monthPicker;
+    @FXML private com.rent.util.MonthYearPicker monthPicker;
     @FXML private DatePicker fromDatePicker;
     @FXML private DatePicker toDatePicker;
 

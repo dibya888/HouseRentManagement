@@ -51,7 +51,7 @@ public class RentController {
     @FXML private TableColumn<RentRow, Void> colAction;
 
     @FXML private TextField searchField;
-    @FXML private DatePicker monthPicker;
+    @FXML private com.rent.util.MonthYearPicker monthPicker;
 
     private ObservableList<RentRow> masterList = FXCollections.observableArrayList();
     private FilteredList<RentRow> filteredList;
@@ -60,36 +60,10 @@ public class RentController {
 
     @FXML
     public void initialize() {
-        // month default
-        // Month picker = current month (day forced to 1)
+        // Month picker defaults to the current month.
         monthPicker.setValue(LocalDate.now().withDayOfMonth(1));
 
-// show only YYYY-MM, ignore day
-        monthPicker.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(LocalDate date) {
-                if (date == null) return "";
-                return YearMonth.from(date).toString(); // yyyy-MM
-            }
-            @Override
-            public LocalDate fromString(String text) {
-                if (text == null || text.isBlank()) return null;
-                YearMonth ym = YearMonth.parse(text.trim());
-                return ym.atDay(1);
-            }
-        });
-
-// allow selecting only day 1 (forces month selection behavior)
-        monthPicker.setDayCellFactory(dp -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) return;
-                setDisable(item.getDayOfMonth() != 1);
-            }
-        });
-
-// when month changes -> filter table
+        // when month changes -> filter table
         monthPicker.valueProperty().addListener((obs, oldV, newV) -> applyFilters());
 
         // column bindings
@@ -141,13 +115,11 @@ public class RentController {
 
         String month = YearMonth.from(monthPicker.getValue()).toString(); // yyyy-MM
 
-        RentDAO.ensureMonthGenerated(month, 5);
+        RentDAO.ensureMonthGenerated(month);
 
         AuditLogDAO.log(
                 AuditActions.MONTH_GENERATED,
-                "Billing month generated. Month: "
-                        + month
-                        + ", Due day: 5"
+                "Billing month generated. Month: " + month
         );
 
         loadRentRows();
