@@ -31,6 +31,8 @@ public final class CurrentSession {
     }
 
     public static void clear() {
+        SessionConnectionHolder.invalidate();
+
         userId = null;
         username = null;
         displayName = null;
@@ -91,6 +93,12 @@ public final class CurrentSession {
         if (newDatabaseKey == null || newDatabaseKey.isBlank()) {
             throw new IllegalArgumentException("Database key cannot be empty.");
         }
+
+        // The on-disk database may have just been restored from a backup
+        // with a different key — the cached connection (opened with the
+        // OLD key) must be closed so the next DBUtil.connect() reopens
+        // fresh with the new key instead of serving a stale connection.
+        SessionConnectionHolder.invalidate();
 
         databaseKey = newDatabaseKey;
     }

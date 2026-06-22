@@ -34,10 +34,12 @@ public class DBUtil {
     public static Connection connect() {
         CurrentSession.requireLogin();
 
-        return EncryptedDbConnectionFactory.open(
-                CurrentSession.getCurrentUserDatabasePath(),
-                CurrentSession.getDatabaseKey()
-        );
+        // Reuses one already-open, already-decrypted connection for the
+        // current session instead of paying the SQLCipher handshake cost
+        // on every single call. Every existing DAO's
+        // try (Connection conn = DBUtil.connect()) { ... } keeps working
+        // unchanged — see SessionConnectionHolder for details.
+        return SessionConnectionHolder.getSharedConnection();
     }
 
     /*
