@@ -106,10 +106,6 @@ public class StatusBadgeCellFactory {
             return "-fx-background-color:#e0e7ff; -fx-text-fill:#3730a3;";
         }
 
-        if (s.equals("COMPLETED")) {
-            return "-fx-background-color:#dcfce7; -fx-text-fill:#166534;";
-        }
-
         return "-fx-background-color:#e5e7eb; -fx-text-fill:#374151;";
     }
 
