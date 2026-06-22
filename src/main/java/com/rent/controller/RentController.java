@@ -80,16 +80,7 @@ public class RentController {
 
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
 
-        // Use the derived display status (auto-flags overdue DUE rows as
-        // LATE for display) instead of the raw stored status, so a row
-        // that's never had a payment attempt still shows correctly once
-        // its due date has passed. The underlying database value is
-        // untouched — this only affects what's rendered in this table.
-        colStatus.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getDisplayStatus()
-                )
-        );
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(StatusBadgeCellFactory.forStatus());
 
         // action buttons

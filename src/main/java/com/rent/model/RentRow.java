@@ -81,29 +81,6 @@ public class RentRow {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    /**
-     * Display-only derived status: if the stored status is still 'DUE'
-     * (meaning no payment action has ever been taken on this row) but
-     * the due date has already passed, this returns 'LATE' instead —
-     * without modifying the underlying stored status or the database.
-     * All other statuses (PARTIAL, LATE, PAID) are returned unchanged,
-     * since those are already set correctly by RentDAO.applyPayment()
-     * at the moment a payment action occurs.
-     */
-    public String getDisplayStatus() {
-        if ("DUE".equalsIgnoreCase(status) && dueDate != null && !dueDate.isBlank()) {
-            try {
-                java.time.LocalDate due = java.time.LocalDate.parse(dueDate);
-                if (java.time.LocalDate.now().isAfter(due)) {
-                    return "LATE";
-                }
-            } catch (Exception e) {
-                // Malformed due date — fall through and show the stored status as-is.
-            }
-        }
-        return status;
-    }
-
     public String getDueDate() { return dueDate; }
     public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 
