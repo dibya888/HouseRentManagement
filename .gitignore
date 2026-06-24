@@ -92,3 +92,6 @@ installer/House Rent Management-1.0.0.exe
 installer/HouseRentManagement-2.0.0.exe
 dist/
 target/
+installer/
+installer-debug/
+*.exe
