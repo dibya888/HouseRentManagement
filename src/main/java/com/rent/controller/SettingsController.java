@@ -270,16 +270,16 @@ public class SettingsController {
     private void openWhatsNew() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("What's New");
-        alert.setHeaderText("Version 2.0.0 - Secure Multi-User Release");
+        alert.setHeaderText("Version 3.0");
 
         alert.setContentText("""
             What's New:
-
-            • Multi-user support
-            • Each user has a separate private rent database
-            • DB Security upgraded with encrypted user databases
-            • Admin-controlled user creation, enable, disable, and delete
-            • Save Login now remembers username only for better security
+        
+            • Fixed Dashboard pie chart color inconsistency. Dashboard chart now displays Monthly Paid vs Due instead of all-time totals
+            • Added read-only Flat Rent display in the Rent Payment popup
+            • Redesigned the Reports interface for improved organization, readability, and usability
+            • Improved PDF and Excel report exports with professional formatting and accurate summaries
+            • Optimized overall application performance by reducing slow operations and improving responsiveness
             """);
 
         alert.showAndWait();

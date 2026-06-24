@@ -235,10 +235,10 @@
                     <Region VBox.vgrow="ALWAYS"/>
 
                     <VBox spacing="4">
-                        <Label text="Version 2.0.0"
+                        <Label text="Version 3.0"
                                style="-fx-text-fill:#111827; -fx-font-weight:bold;"/>
 
-                        <Label text="What's New: Multi-user, DB Security, encrypted user databases..."
+                        <Label text="What's New: Dashboard improvements, redesigned reports, enhanced exports, and performance optimizations."
                                wrapText="true"
                                style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
 
