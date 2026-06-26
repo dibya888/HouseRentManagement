@@ -6,7 +6,8 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.rent.controller.ArchiveController"
-            style="-fx-background-color:#f4f6f7;">
+            styleClass="popup-root"
+            stylesheets="@/css/popups.css">
 
     <center>
         <VBox spacing="14" style="-fx-padding:20;">
@@ -14,18 +15,17 @@
             <!-- Header -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="🗃 Rent Archive"
-                       style="-fx-font-size:22px; -fx-font-weight:bold;"/>
+                       styleClass="popup-title"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <Button text="🔄 Refresh"
                         onAction="#loadArchive"
-                        style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                        styleClass="popup-primary-btn"/>
             </HBox>
 
             <!-- Filters -->
-            <HBox spacing="10" alignment="CENTER_LEFT"
-                  style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:10;">
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="popup-card">
 
                 <TextField fx:id="searchField"
                            promptText="🔍 Search tenant, flat, phone..."
@@ -43,11 +43,11 @@
 
                 <Button text="Clear"
                         onAction="#clearFilters"
-                        style="-fx-background-color:#e5e7eb; -fx-font-weight:bold;"/>
+                        styleClass="popup-secondary-btn"/>
             </HBox>
 
             <!-- Archive Table -->
-            <TableView fx:id="archiveTable">
+            <TableView fx:id="archiveTable" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colFlatNo" text="Flat No" prefWidth="90"/>
                     <TableColumn fx:id="colTenantName" text="Tenant" prefWidth="140"/>

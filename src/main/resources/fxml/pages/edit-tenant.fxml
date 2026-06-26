@@ -7,67 +7,80 @@
       xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.rent.controller.EditTenantController"
-      style="-fx-padding:20;">
+      prefWidth="500"
+      prefHeight="560"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <!-- Header -->
-    <Label text="Edit Tenant"
-           style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+    <Label text="✏ Edit Tenant"
+           styleClass="popup-title"/>
 
-    <GridPane hgap="10" vgap="10">
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="12" styleClass="popup-card">
 
-        <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <GridPane hgap="14" vgap="12">
 
-        <Label text="Phone:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="phoneField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-        <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <TextField fx:id="emailField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label text="Phone:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="phoneField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="NID:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <TextField fx:id="nidField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="emailField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <TextField fx:id="addressField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    <Label text="NID:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="nidField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Flat No:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <TextField fx:id="flatNoField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    <Label text="Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="addressField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Rent:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <TextField fx:id="rentField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                    <Label text="Flat No:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <TextField fx:id="flatNoField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <CheckBox fx:id="depositCheckBox"
-                  text="Security deposit taken"
-                  GridPane.rowIndex="7"
-                  GridPane.columnIndex="1"/>
+                    <Label text="Rent:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <TextField fx:id="rentField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-        <Label text="Deposit Amount:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-        <TextField fx:id="depositAmountField"
-                   GridPane.rowIndex="8"
-                   GridPane.columnIndex="1"/>
+                    <CheckBox fx:id="depositCheckBox"
+                              text="Security deposit taken"
+                              GridPane.rowIndex="7"
+                              GridPane.columnIndex="1"/>
 
-        <Label text="Deposit Date:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="depositDatePicker"
-                    GridPane.rowIndex="9"
-                    GridPane.columnIndex="1"/>
+                    <Label text="Deposit Amount:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                    <TextField fx:id="depositAmountField"
+                               GridPane.rowIndex="8"
+                               GridPane.columnIndex="1"/>
 
-        <Label text="Deposit Note:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
-        <TextArea fx:id="depositNoteArea"
-                  GridPane.rowIndex="10"
-                  GridPane.columnIndex="1"
-                  prefRowCount="3"
-                  wrapText="true"/>
+                    <Label text="Deposit Date:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                    <DatePicker fx:id="depositDatePicker"
+                                GridPane.rowIndex="9"
+                                GridPane.columnIndex="1"/>
 
-    </GridPane>
+                    <Label text="Deposit Note:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="depositNoteArea"
+                              GridPane.rowIndex="10"
+                              GridPane.columnIndex="1"
+                              prefRowCount="3"
+                              wrapText="true"/>
+
+                </GridPane>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <!-- Action Buttons -->
-    <HBox spacing="10">
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel"
+                onAction="#close"
+                styleClass="popup-secondary-btn"/>
+
         <Button text="Update"
                 onAction="#updateTenant"
-                style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
-
-        <Button text="Cancel"
-                onAction="#close"/>
+                styleClass="popup-primary-btn"/>
     </HBox>
 
 </VBox>

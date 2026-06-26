@@ -175,7 +175,8 @@ public class ForgotPasswordController {
                     new Image(getClass().getResourceAsStream("/images/app-icon.png"))
             );
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setMinWidth(440);
+            stage.setMinHeight(420);
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();

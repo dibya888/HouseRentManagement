@@ -2,25 +2,33 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.RecoveryPinController"
       spacing="16"
       prefWidth="460"
-      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
+
+    <ImageView fitWidth="80" preserveRatio="true">
+        <image>
+            <Image url="@/images/app-logo.png" />
+        </image>
+    </ImageView>
 
     <Label text="🔐 Set Recovery PIN"
-           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           styleClass="popup-title"
            maxWidth="Infinity"
            alignment="CENTER"/>
 
-    <VBox spacing="12"
-          style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
+    <VBox spacing="12" styleClass="popup-card">
 
         <Label text="Recovery PIN helps you reset your password if you forget it."
                wrapText="true"
-               style="-fx-text-fill:#374151;"/>
+               styleClass="popup-subtitle"/>
 
         <GridPane hgap="14" vgap="12">
 
@@ -45,17 +53,18 @@
 
         <Label text="PIN must be 4 to 8 digits. Keep it private."
                wrapText="true"
-               style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
+               styleClass="popup-subtitle"/>
 
     </VBox>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancel"
-                onAction="#close"/>
+                onAction="#close"
+                styleClass="popup-secondary-btn"/>
 
         <Button text="Save Recovery PIN"
                 onAction="#saveRecoveryPin"
-                style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                styleClass="popup-primary-btn"/>
     </HBox>
 
 </VBox>

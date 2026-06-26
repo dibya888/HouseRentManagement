@@ -1,0 +1,194 @@
+/* =====================================================================
+   POPUPS.CSS — shared modern design system for every standalone popup,
+   modal dialog, and form window in the app (Settings, Tenant, Flat,
+   Rent, Repair, Auth/Recovery popups, Archive, Bills, Print Options).
+
+   Goal: one consistent visual language across all popups instead of
+   each window having its own ad-hoc inline styling.
+   ===================================================================== */
+
+/* ---------- ROOT ---------- */
+.popup-root {
+    -fx-background-color: #f4f6f7;
+    -fx-font-family: "Segoe UI";
+    -fx-padding: 24;
+}
+
+/* ---------- HEADER ---------- */
+.popup-header {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10;
+}
+
+.popup-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.popup-subtitle {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #6b7280;
+}
+
+/* ---------- CARD ---------- */
+.popup-card {
+    -fx-background-color: white;
+    -fx-padding: 18;
+    -fx-background-radius: 14;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);
+}
+
+.popup-card-flat {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 12;
+    -fx-background-radius: 10;
+}
+
+.popup-section-title {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.popup-field-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+/* ---------- FORM CONTROLS ---------- */
+.popup-root .label {
+    -fx-text-fill: #374151;
+}
+
+.popup-root .text-field,
+.popup-root .text-area,
+.popup-root .combo-box,
+.popup-root .date-picker,
+.popup-root .spinner {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 7;
+}
+
+.popup-root .text-field:focused,
+.popup-root .text-area:focused,
+.popup-root .combo-box:focused,
+.popup-root .date-picker:focused,
+.popup-root .spinner:focused {
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.30), 8, 0, 0, 1);
+}
+
+.popup-root .text-field:disabled {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #6b7280;
+}
+
+.popup-readonly-field {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #6b7280;
+}
+
+.popup-root .check-box {
+    -fx-text-fill: #374151;
+}
+
+.popup-root .separator *.line {
+    -fx-border-color: #e5e7eb;
+}
+
+/* ---------- TABLE (Archive view etc.) ---------- */
+.popup-root .table-view {
+    -fx-background-radius: 10;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 10;
+}
+
+.popup-root .table-view .column-header-background,
+.popup-root .table-view .filler {
+    -fx-background-color: #f3f4f6;
+}
+
+.popup-root .table-view .column-header .label {
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+}
+
+/* ---------- BUTTONS ---------- */
+.popup-primary-btn {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+}
+
+.popup-primary-btn:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.popup-success-btn {
+    -fx-background-color: #16a34a;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+}
+
+.popup-success-btn:hover {
+    -fx-background-color: #15803d;
+}
+
+.popup-danger-btn {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+}
+
+.popup-danger-btn:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.popup-secondary-btn {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+}
+
+.popup-secondary-btn:hover {
+    -fx-background-color: #d1d5db;
+}
+
+.popup-purple-btn {
+    -fx-background-color: #7c3aed;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+}
+
+.popup-purple-btn:hover {
+    -fx-background-color: #6d28d9;
+}
+
+/* Generic fallback so any un-classed Button in a popup still looks
+   modern instead of the default OS button */
+.popup-root .button {
+    -fx-background-radius: 8;
+    -fx-padding: 8 14;
+    -fx-cursor: hand;
+}

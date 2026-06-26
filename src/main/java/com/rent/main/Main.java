@@ -1,5 +1,6 @@
 package com.rent.main;
 
+import com.rent.util.AppIconUtil;
 import com.rent.util.AuthBootstrapService;
 import com.rent.util.AuthDBUtil;
 import com.rent.util.CurrentSession;
@@ -16,6 +17,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+
+        /*
+         * Applies the app icon to every window the app opens from now on —
+         * main stage, popups, modals, and Alert dialogs — automatically.
+         */
+        AppIconUtil.installGlobalIcon();
 
         /*
          * Auth DB is global and safe to initialize before login.

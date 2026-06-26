@@ -215,6 +215,8 @@ public class RentController {
                     new Image(getClass().getResourceAsStream("/images/app-icon.png"))
             );
             st.setScene(scene);
+            st.setMinWidth(460);
+            st.setMinHeight(420);
             st.showAndWait();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -232,6 +234,8 @@ public class RentController {
             st.initModality(Modality.APPLICATION_MODAL);
             st.setTitle("Payment");
             st.setScene(scene);
+            st.setMinWidth(520);
+            st.setMinHeight(440);
             st.showAndWait();
         } catch (Exception ex) {
             ex.printStackTrace();

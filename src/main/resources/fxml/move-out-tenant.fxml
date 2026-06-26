@@ -8,102 +8,110 @@
       fx:controller="com.rent.controller.MoveOutTenantController"
       spacing="16"
       prefWidth="500"
-      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+      prefHeight="600"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <Label text="🚪 Move Out Tenant"
-           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           styleClass="popup-title"
            maxWidth="Infinity"
            alignment="CENTER"/>
 
-    <VBox spacing="12"
-          style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="12" styleClass="popup-card">
 
-        <Label fx:id="tenantInfoLabel"
-               text="Tenant information"
-               wrapText="true"
-               style="-fx-font-weight:bold; -fx-text-fill:#111827;"/>
+                <Label fx:id="tenantInfoLabel"
+                       text="Tenant information"
+                       wrapText="true"
+                       style="-fx-font-weight:bold; -fx-text-fill:#111827;"/>
 
-        <Label fx:id="dueWarningLabel"
-               text=""
-               wrapText="true"
-               style="-fx-text-fill:#dc2626; -fx-font-weight:bold;"/>
+                <Label fx:id="dueWarningLabel"
+                       text=""
+                       wrapText="true"
+                       style="-fx-text-fill:#dc2626; -fx-font-weight:bold;"/>
 
-        <!-- Settlement Preview Only -->
-        <GridPane hgap="14"
-                  vgap="10"
-                  style="-fx-background-color:#f8fafc; -fx-padding:12; -fx-background-radius:10;">
+                <!-- Settlement Preview Only -->
+                <GridPane hgap="14"
+                          vgap="10"
+                          styleClass="popup-card-flat">
 
-            <Label text="Unpaid Due:"
-                   GridPane.rowIndex="0"
-                   GridPane.columnIndex="0"/>
+                    <Label text="Unpaid Due:"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="0"/>
 
-            <Label fx:id="unpaidDueLabel"
-                   text="৳ 0.00"
-                   GridPane.rowIndex="0"
-                   GridPane.columnIndex="1"
-                   style="-fx-font-weight:bold;"/>
+                    <Label fx:id="unpaidDueLabel"
+                           text="৳ 0.00"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="1"
+                           style="-fx-font-weight:bold;"/>
 
-            <Label text="Security Deposit:"
-                   GridPane.rowIndex="1"
-                   GridPane.columnIndex="0"/>
+                    <Label text="Security Deposit:"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="0"/>
 
-            <Label fx:id="securityDepositLabel"
-                   text="No deposit taken"
-                   GridPane.rowIndex="1"
-                   GridPane.columnIndex="1"
-                   style="-fx-font-weight:bold;"/>
+                    <Label fx:id="securityDepositLabel"
+                           text="No deposit taken"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="1"
+                           style="-fx-font-weight:bold;"/>
 
-            <Label text="Settlement Result:"
-                   GridPane.rowIndex="2"
-                   GridPane.columnIndex="0"/>
+                    <Label text="Settlement Result:"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="0"/>
 
-            <Label fx:id="settlementResultLabel"
-                   text="Fully Settled"
-                   wrapText="true"
-                   GridPane.rowIndex="2"
-                   GridPane.columnIndex="1"
-                   style="-fx-font-weight:bold;"/>
+                    <Label fx:id="settlementResultLabel"
+                           text="Fully Settled"
+                           wrapText="true"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="1"
+                           style="-fx-font-weight:bold;"/>
 
-        </GridPane>
+                </GridPane>
 
-        <!-- Move Out Form -->
-        <GridPane hgap="14" vgap="12">
+                <!-- Move Out Form -->
+                <GridPane hgap="14" vgap="12">
 
-            <Label text="Move Out Date:"
-                   GridPane.rowIndex="0"
-                   GridPane.columnIndex="0"/>
+                    <Label text="Move Out Date:"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="0"/>
 
-            <DatePicker fx:id="moveOutDatePicker"
-                        GridPane.rowIndex="0"
-                        GridPane.columnIndex="1"
-                        prefWidth="260"/>
+                    <DatePicker fx:id="moveOutDatePicker"
+                                GridPane.rowIndex="0"
+                                GridPane.columnIndex="1"
+                                prefWidth="260"/>
 
-            <Label text="Reason / Notes:"
-                   GridPane.rowIndex="1"
-                   GridPane.columnIndex="0"/>
+                    <Label text="Reason / Notes:"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="0"/>
 
-            <TextArea fx:id="reasonArea"
-                      GridPane.rowIndex="1"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"
-                      prefHeight="90"
-                      wrapText="true"/>
+                    <TextArea fx:id="reasonArea"
+                              GridPane.rowIndex="1"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"
+                              prefHeight="90"
+                              wrapText="true"/>
 
-        </GridPane>
+                </GridPane>
 
-        <Label text="This will mark the tenant as moved out and make the flat available. Rent/payment history will remain saved. Settlement can be completed later from Past Tenants."
-               wrapText="true"
-               style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
+                <Label text="This will mark the tenant as moved out and make the flat available. Rent/payment history will remain saved. Settlement can be completed later from Past Tenants."
+                       wrapText="true"
+                       styleClass="popup-subtitle"/>
 
-    </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancel"
-                onAction="#close"/>
+                onAction="#close"
+                styleClass="popup-secondary-btn"/>
 
         <Button text="Move Out"
                 onAction="#moveOut"
-                style="-fx-background-color:#dc2626; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                styleClass="popup-danger-btn"/>
     </HBox>
 
 </VBox>

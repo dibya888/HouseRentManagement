@@ -7,7 +7,8 @@
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.rent.controller.ViewTenantController"
-            style="-fx-background-color:#f8fafc;">
+            styleClass="popup-root"
+            stylesheets="@/css/popups.css">
 
     <!-- Header -->
     <top>
@@ -15,7 +16,7 @@
               spacing="10"
               style="-fx-padding:20; -fx-background-color:white;">
             <Label text="👤 Tenant Details"
-                   style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                   styleClass="popup-title"/>
         </HBox>
     </top>
 
@@ -31,10 +32,9 @@
                       style="-fx-padding:20; -fx-background-color:transparent;">
 
                     <!-- Personal Info Card -->
-                    <VBox spacing="10"
-                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                    <VBox spacing="10" styleClass="popup-card">
                         <Label text="Personal Information"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                               styleClass="popup-section-title"/>
 
                         <GridPane hgap="16" vgap="10">
                             <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -52,10 +52,9 @@
                     </VBox>
 
                     <!-- Flat & Rent Card -->
-                    <VBox spacing="10"
-                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                    <VBox spacing="10" styleClass="popup-card">
                         <Label text="Flat &amp; Rent"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                               styleClass="popup-section-title"/>
 
                         <GridPane hgap="16" vgap="10">
                             <Label text="Flat No:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -73,11 +72,10 @@
                     </VBox>
 
                     <!-- Tenancy & Deposit Card -->
-                    <VBox spacing="10"
-                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                    <VBox spacing="10" styleClass="popup-card">
 
                         <Label text="Tenancy &amp; Security Deposit"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                               styleClass="popup-section-title"/>
 
                         <GridPane hgap="16" vgap="10">
 
@@ -105,10 +103,10 @@
                     <!-- Move Out Info Card -->
                     <VBox fx:id="moveOutInfoBox"
                           spacing="10"
-                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                          styleClass="popup-card">
 
                         <Label text="Move Out Information"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                               styleClass="popup-section-title"/>
 
                         <GridPane hgap="16" vgap="10">
                             <Label text="Move Out Date:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -125,17 +123,18 @@
                     <!-- Documents Card -->
                     <VBox spacing="10"
                           fx:id="documentsBox"
-                          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+                          styleClass="popup-card">
 
                         <Label text="Documents"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                               styleClass="popup-section-title"/>
 
                         <!-- NID -->
                         <VBox fx:id="nidBox" spacing="4">
                             <Label fx:id="nidPathLabel"/>
                             <Button fx:id="openNidBtn"
                                     text="Open NID File"
-                                    onAction="#openNidFile"/>
+                                    onAction="#openNidFile"
+                                    styleClass="popup-secondary-btn"/>
                         </VBox>
 
                         <!-- Document -->
@@ -143,7 +142,8 @@
                             <Label fx:id="docPathLabel"/>
                             <Button fx:id="openDocBtn"
                                     text="Open Document"
-                                    onAction="#openDocFile"/>
+                                    onAction="#openDocFile"
+                                    styleClass="popup-secondary-btn"/>
                         </VBox>
 
                     </VBox>
@@ -159,7 +159,7 @@
               style="-fx-padding:20;">
             <Button text="Close"
                     onAction="#close"
-                    style="-fx-background-color:#e5e7eb;"/>
+                    styleClass="popup-secondary-btn"/>
         </HBox>
     </bottom>
 

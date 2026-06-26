@@ -8,101 +8,103 @@
             fx:controller="com.rent.controller.AddTenantController"
             fitToWidth="true"
             vbarPolicy="AS_NEEDED"
-            style="-fx-background:transparent;">
+            styleClass="popup-root"
+            stylesheets="@/css/popups.css">
 
     <content>
-        <VBox spacing="28"
-              style="-fx-padding: 32; -fx-pref-width: 720;">
+        <VBox spacing="22"
+              style="-fx-padding: 28; -fx-pref-width: 720; -fx-background-color: transparent;">
 
             <!-- TITLE -->
             <Label text="👤 Add New Tenant"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                   styleClass="popup-title"/>
 
             <!-- BASIC INFO -->
-            <VBox spacing="16">
+            <VBox spacing="16" styleClass="popup-card">
                 <Label text="Basic Information"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                       styleClass="popup-section-title"/>
 
                 <GridPane hgap="20" vgap="12">
 
                     <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
-                        <Label text="Full Name" style="-fx-font-size:12px;"/>
+                        <Label text="Full Name" styleClass="popup-field-label"/>
                         <TextField fx:id="nameField" promptText="John Doe"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                        <Label text="Phone" style="-fx-font-size:12px;"/>
+                        <Label text="Phone" styleClass="popup-field-label"/>
                         <TextField fx:id="phoneField" promptText="01XXXXXXXXX"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0">
-                        <Label text="Email" style="-fx-font-size:12px;"/>
+                        <Label text="Email" styleClass="popup-field-label"/>
                         <TextField fx:id="emailField" promptText="email@example.com"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="1">
-                        <Label text="NID Number" style="-fx-font-size:12px;"/>
+                        <Label text="NID Number" styleClass="popup-field-label"/>
                         <TextField fx:id="nidField" promptText="NID"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
-                        <Label text="Address" style="-fx-font-size:12px;"/>
+                        <Label text="Address" styleClass="popup-field-label"/>
                         <TextField fx:id="addressField" promptText="Permanent Address"/>
                     </VBox>
                 </GridPane>
             </VBox>
 
             <!-- FLAT INFO -->
-            <VBox spacing="16">
+            <VBox spacing="16" styleClass="popup-card">
                 <Label text="Flat Assignment"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                       styleClass="popup-section-title"/>
 
                 <GridPane hgap="20" vgap="12">
 
                     <VBox spacing="4" GridPane.columnIndex="0">
-                        <Label text="Select Flat" style="-fx-font-size:12px;"/>
+                        <Label text="Select Flat" styleClass="popup-field-label"/>
                         <ComboBox fx:id="flatComboBox" promptText="Available flats"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.columnIndex="1">
-                        <Label text="Monthly Rent" style="-fx-font-size:12px;"/>
+                        <Label text="Monthly Rent" styleClass="popup-field-label"/>
                         <TextField fx:id="rentField"
                                    promptText="Rent amount"
                                    editable="false"
-                                   focusTraversable="false"/>
+                                   focusTraversable="false"
+                                   styleClass="popup-readonly-field"/>
                     </VBox>
 
                 </GridPane>
             </VBox>
 
             <!-- DOCUMENTS -->
-            <VBox spacing="16">
+            <VBox spacing="16" styleClass="popup-card">
                 <Label text="Documents"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                       styleClass="popup-section-title"/>
 
                 <GridPane hgap="20" vgap="12">
 
                     <VBox spacing="6" GridPane.columnIndex="0">
-                        <Button text="📄 Upload NID" onAction="#uploadNidFile"/>
+                        <Button text="📄 Upload NID" onAction="#uploadNidFile" styleClass="popup-secondary-btn"/>
                         <Label fx:id="nidFileLabel"
                                text="No file selected"
-                               style="-fx-font-size:11px; -fx-text-fill:#94a3b8;"/>
+                               styleClass="popup-field-label"/>
                     </VBox>
 
                     <VBox spacing="6" GridPane.columnIndex="1">
-                        <Button text="📁 Upload Document" onAction="#uploadDocFile"/>
+                        <Button text="📁 Upload Document" onAction="#uploadDocFile" styleClass="popup-secondary-btn"/>
                         <Label fx:id="docFileLabel"
                                text="No file selected"
-                               style="-fx-font-size:11px; -fx-text-fill:#94a3b8;"/>
+                               styleClass="popup-field-label"/>
                     </VBox>
 
                 </GridPane>
             </VBox>
 
             <!-- SECURITY DEPOSIT -->
-            <VBox spacing="16">
+            <VBox spacing="16" styleClass="popup-card">
                 <Label text="Security Deposit"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                       styleClass="popup-section-title"/>
 
                 <CheckBox fx:id="depositCheckBox"
                           text="Security deposit taken"/>
@@ -110,18 +112,18 @@
                 <GridPane hgap="20" vgap="12">
 
                     <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
-                        <Label text="Deposit Amount" style="-fx-font-size:12px;"/>
+                        <Label text="Deposit Amount" styleClass="popup-field-label"/>
                         <TextField fx:id="depositAmountField"
                                    promptText="0.00"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                        <Label text="Deposit Date" style="-fx-font-size:12px;"/>
+                        <Label text="Deposit Date" styleClass="popup-field-label"/>
                         <DatePicker fx:id="depositDatePicker"/>
                     </VBox>
 
                     <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
-                        <Label text="Deposit Note" style="-fx-font-size:12px;"/>
+                        <Label text="Deposit Note" styleClass="popup-field-label"/>
                         <TextArea fx:id="depositNoteArea"
                                   promptText="Optional note"
                                   prefRowCount="3"
@@ -135,11 +137,8 @@
             <HBox alignment="CENTER_RIGHT">
                 <Button text="Save Tenant"
                         onAction="#saveTenant"
-                        style="-fx-background-color: #2563eb;
-                               -fx-text-fill: white;
-                               -fx-font-weight: bold;
-                               -fx-pref-height: 44;
-                               -fx-pref-width: 160;"/>
+                        styleClass="popup-primary-btn"
+                        style="-fx-pref-height: 44; -fx-pref-width: 160;"/>
             </HBox>
 
         </VBox>

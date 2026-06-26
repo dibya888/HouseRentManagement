@@ -7,98 +7,105 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.RepairFormController"
       spacing="16"
-      prefWidth="520"
-      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+      prefWidth="540"
+      prefHeight="620"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <Label fx:id="titleLabel"
            text="Add Repair"
-           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           styleClass="popup-title"
            maxWidth="Infinity"
            alignment="CENTER"/>
 
-    <VBox spacing="12"
-          style="-fx-background-color:white; -fx-padding:16; -fx-background-radius:10;">
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="12" styleClass="popup-card">
 
-        <GridPane hgap="14" vgap="12">
+                <GridPane hgap="14" vgap="12">
 
-            <Label text="Flat No:"/>
-            <ComboBox fx:id="flatCombo"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"/>
+                    <Label text="Flat No:"/>
+                    <ComboBox fx:id="flatCombo"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"/>
 
-            <Label text="Repair Date:" GridPane.rowIndex="1"/>
-            <DatePicker fx:id="repairDatePicker"
-                        GridPane.rowIndex="1"
-                        GridPane.columnIndex="1"
-                        prefWidth="260"/>
+                    <Label text="Repair Date:" GridPane.rowIndex="1"/>
+                    <DatePicker fx:id="repairDatePicker"
+                                GridPane.rowIndex="1"
+                                GridPane.columnIndex="1"
+                                prefWidth="260"/>
 
-            <Label text="Category:" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="categoryCombo"
-                      GridPane.rowIndex="2"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"/>
+                    <Label text="Category:" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="categoryCombo"
+                              GridPane.rowIndex="2"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"/>
 
-            <Label text="Cost:" GridPane.rowIndex="3"/>
-            <TextField fx:id="costField"
-                       GridPane.rowIndex="3"
-                       GridPane.columnIndex="1"
-                       prefWidth="260"/>
+                    <Label text="Cost:" GridPane.rowIndex="3"/>
+                    <TextField fx:id="costField"
+                               GridPane.rowIndex="3"
+                               GridPane.columnIndex="1"
+                               prefWidth="260"/>
 
-            <Label text="Paid By:" GridPane.rowIndex="4"/>
-            <ComboBox fx:id="paidByCombo"
-                      GridPane.rowIndex="4"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"/>
+                    <Label text="Paid By:" GridPane.rowIndex="4"/>
+                    <ComboBox fx:id="paidByCombo"
+                              GridPane.rowIndex="4"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"/>
 
-            <Label text="Status:" GridPane.rowIndex="5"/>
-            <ComboBox fx:id="statusCombo"
-                      GridPane.rowIndex="5"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"/>
+                    <Label text="Status:" GridPane.rowIndex="5"/>
+                    <ComboBox fx:id="statusCombo"
+                              GridPane.rowIndex="5"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"/>
 
-            <Label text="Vendor Name:" GridPane.rowIndex="6"/>
-            <TextField fx:id="vendorNameField"
-                       GridPane.rowIndex="6"
-                       GridPane.columnIndex="1"
-                       prefWidth="260"
-                       promptText="Vendor / contractor name"/>
+                    <Label text="Vendor Name:" GridPane.rowIndex="6"/>
+                    <TextField fx:id="vendorNameField"
+                               GridPane.rowIndex="6"
+                               GridPane.columnIndex="1"
+                               prefWidth="260"
+                               promptText="Vendor / contractor name"/>
 
-            <Label text="Vendor Phone:" GridPane.rowIndex="7"/>
-            <TextField fx:id="vendorPhoneField"
-                       GridPane.rowIndex="7"
-                       GridPane.columnIndex="1"
-                       prefWidth="260"
-                       promptText="Vendor phone number"/>
+                    <Label text="Vendor Phone:" GridPane.rowIndex="7"/>
+                    <TextField fx:id="vendorPhoneField"
+                               GridPane.rowIndex="7"
+                               GridPane.columnIndex="1"
+                               prefWidth="260"
+                               promptText="Vendor phone number"/>
 
-            <Label text="Invoice No:" GridPane.rowIndex="8"/>
-            <TextField fx:id="invoiceNoField"
-                       GridPane.rowIndex="8"
-                       GridPane.columnIndex="1"
-                       prefWidth="260"
-                       promptText="Invoice / bill no"/>
+                    <Label text="Invoice No:" GridPane.rowIndex="8"/>
+                    <TextField fx:id="invoiceNoField"
+                               GridPane.rowIndex="8"
+                               GridPane.columnIndex="1"
+                               prefWidth="260"
+                               promptText="Invoice / bill no"/>
 
-            <Label text="Description:" GridPane.rowIndex="9"/>
-            <TextArea fx:id="descriptionArea"
-                      GridPane.rowIndex="9"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"
-                      prefRowCount="3"/>
+                    <Label text="Description:" GridPane.rowIndex="9"/>
+                    <TextArea fx:id="descriptionArea"
+                              GridPane.rowIndex="9"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"
+                              prefRowCount="3"/>
 
-            <Label text="Notes:" GridPane.rowIndex="10"/>
-            <TextArea fx:id="notesArea"
-                      GridPane.rowIndex="10"
-                      GridPane.columnIndex="1"
-                      prefWidth="260"
-                      prefRowCount="2"/>
+                    <Label text="Notes:" GridPane.rowIndex="10"/>
+                    <TextArea fx:id="notesArea"
+                              GridPane.rowIndex="10"
+                              GridPane.columnIndex="1"
+                              prefWidth="260"
+                              prefRowCount="2"/>
 
-        </GridPane>
-    </VBox>
+                </GridPane>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <HBox alignment="CENTER_RIGHT" spacing="10">
-        <Button text="Cancel" onAction="#close"/>
+        <Button text="Cancel" onAction="#close" styleClass="popup-secondary-btn"/>
         <Button text="Save"
                 onAction="#save"
-                style="-fx-background-color:#16a34a; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                styleClass="popup-success-btn"/>
     </HBox>
 
 </VBox>

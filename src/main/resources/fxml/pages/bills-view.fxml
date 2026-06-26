@@ -6,23 +6,21 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.rent.controller.BillsController"
-            style="-fx-background-color:#f4f6f7;">
+            styleClass="popup-root"
+            stylesheets="@/css/popups.css">
 
     <center>
         <VBox spacing="18" style="-fx-padding:20;">
 
             <!-- Header -->
             <Label text="📌 Billing Defaults"
-                   style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+                   styleClass="popup-title"/>
 
             <!-- Card -->
-            <VBox spacing="16"
-                  style="-fx-background-color:white;
-                         -fx-padding:20;
-                         -fx-background-radius:10;">
+            <VBox spacing="16" styleClass="popup-card">
 
                 <Label text="These values will be applied to all future billing"
-                       style="-fx-text-fill:#4b5563;"/>
+                       styleClass="popup-subtitle"/>
 
                 <GridPane hgap="16" vgap="14">
 
@@ -50,12 +48,10 @@
 
             <!-- Footer -->
             <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button text="Close" onAction="#close"/>
+                <Button text="Close" onAction="#close" styleClass="popup-secondary-btn"/>
                 <Button text="Save Defaults"
                         onAction="#save"
-                        style="-fx-background-color:#16a34a;
-                               -fx-text-fill:white;
-                               -fx-font-weight:bold;"/>
+                        styleClass="popup-success-btn"/>
             </HBox>
 
         </VBox>

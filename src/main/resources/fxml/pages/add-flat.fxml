@@ -6,53 +6,63 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.AddFlatController"
-      spacing="15"
-      style="-fx-padding:20;">
+      spacing="16"
+      prefWidth="460"
+      prefHeight="520"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <Label text="➕ Add Flat"
-           style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+           styleClass="popup-title"/>
 
-    <GridPane hgap="10" vgap="10">
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="12" styleClass="popup-card">
 
-        <!-- NEW -->
-        <Label text="Property:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="propertyComboBox"
-                  promptText="Select Property"
-                  GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <GridPane hgap="14" vgap="10">
 
-        <Label text="Flat No:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="flatNoField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="Property:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="propertyComboBox"
+                              promptText="Select Property"
+                              GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-        <Label text="Meter No:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <TextField fx:id="meterNoField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label text="Flat No:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="flatNoField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="Bedrooms:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <Label text="Meter No:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="meterNoField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Bathrooms:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    <Label text="Bedrooms:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="bedroomSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Kitchens:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    <Label text="Bathrooms:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="bathroomSpinner" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Balconies:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <Spinner fx:id="balconySpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                    <Label text="Kitchens:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="kitchenSpinner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <Label text="Dining Rooms:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-        <Spinner fx:id="diningSpinner" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                    <Label text="Balconies:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="balconySpinner" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-        <Label text="Living Rooms:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-        <Spinner fx:id="livingSpinner" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                    <Label text="Dining Rooms:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="diningSpinner" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-        <Label text="Rent:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-        <TextField fx:id="rentField" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                    <Label text="Living Rooms:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                    <Spinner fx:id="livingSpinner" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
-    </GridPane>
+                    <Label text="Rent:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                    <TextField fx:id="rentField" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+
+                </GridPane>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Save" onAction="#handleSave"
-                style="-fx-background-color:#2563eb; -fx-text-fill:white;"/>
-        <Button text="Cancel" onAction="#handleCancel"/>
+        <Button text="Cancel" onAction="#handleCancel" styleClass="popup-secondary-btn"/>
+        <Button text="Save" onAction="#handleSave" styleClass="popup-primary-btn"/>
     </HBox>
 
 </VBox>

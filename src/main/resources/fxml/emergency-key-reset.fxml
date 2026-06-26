@@ -2,68 +2,84 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.EmergencyKeyResetController"
       spacing="16"
       prefWidth="500"
-      style="-fx-padding:24; -fx-background-color:#f8fafc;">
+      prefHeight="540"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
+
+    <ImageView fitWidth="80" preserveRatio="true">
+        <image>
+            <Image url="@/images/app-logo.png" />
+        </image>
+    </ImageView>
 
     <Label text="🗝 Reset Password with Emergency Key"
-           style="-fx-font-size:22px; -fx-font-weight:bold;"
+           styleClass="popup-title"
            maxWidth="Infinity"
            alignment="CENTER"/>
 
-    <VBox spacing="12"
-          style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:12;">
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="12" styleClass="popup-card">
 
-        <Label text="Use one unused emergency recovery key to reset your password."
-               wrapText="true"
-               style="-fx-text-fill:#374151;"/>
+                <Label text="Use one unused emergency recovery key to reset your password."
+                       wrapText="true"
+                       styleClass="popup-subtitle"/>
 
-        <GridPane hgap="14" vgap="12">
+                <GridPane hgap="14" vgap="12">
 
-            <Label text="Username:"/>
-            <TextField fx:id="usernameField"
-                       GridPane.columnIndex="1"
-                       prefWidth="270"/>
+                    <Label text="Username:"/>
+                    <TextField fx:id="usernameField"
+                               GridPane.columnIndex="1"
+                               prefWidth="270"/>
 
-            <Label text="Emergency Key:" GridPane.rowIndex="1"/>
-            <TextField fx:id="emergencyKeyField"
-                       GridPane.rowIndex="1"
-                       GridPane.columnIndex="1"
-                       prefWidth="270"
-                       promptText="XXXX-XXXX-XXXX"/>
+                    <Label text="Emergency Key:" GridPane.rowIndex="1"/>
+                    <TextField fx:id="emergencyKeyField"
+                               GridPane.rowIndex="1"
+                               GridPane.columnIndex="1"
+                               prefWidth="270"
+                               promptText="XXXX-XXXX-XXXX"/>
 
-            <Label text="New Password:" GridPane.rowIndex="2"/>
-            <PasswordField fx:id="newPasswordField"
-                           GridPane.rowIndex="2"
-                           GridPane.columnIndex="1"
-                           prefWidth="270"/>
+                    <Label text="New Password:" GridPane.rowIndex="2"/>
+                    <PasswordField fx:id="newPasswordField"
+                                   GridPane.rowIndex="2"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="270"/>
 
-            <Label text="Confirm Password:" GridPane.rowIndex="3"/>
-            <PasswordField fx:id="confirmPasswordField"
-                           GridPane.rowIndex="3"
-                           GridPane.columnIndex="1"
-                           prefWidth="270"
-                           onAction="#resetPassword"/>
+                    <Label text="Confirm Password:" GridPane.rowIndex="3"/>
+                    <PasswordField fx:id="confirmPasswordField"
+                                   GridPane.rowIndex="3"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="270"
+                                   onAction="#resetPassword"/>
 
-        </GridPane>
+                </GridPane>
 
-        <Label text="Each emergency key can be used only once. After use, it becomes invalid."
-               wrapText="true"
-               style="-fx-text-fill:#6b7280; -fx-font-size:12px;"/>
+                <Label text="Each emergency key can be used only once. After use, it becomes invalid."
+                       wrapText="true"
+                       styleClass="popup-subtitle"/>
 
-    </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancel"
-                onAction="#close"/>
+                onAction="#close"
+                styleClass="popup-secondary-btn"/>
 
         <Button text="Reset Password"
                 onAction="#resetPassword"
-                style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                styleClass="popup-purple-btn"/>
     </HBox>
 
 </VBox>

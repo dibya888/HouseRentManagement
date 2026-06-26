@@ -165,7 +165,8 @@ public class SettingsController {
             );
 
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setMinWidth(480);
+            stage.setMinHeight(420);
             stage.showAndWait();
 
         } catch (Exception e) {

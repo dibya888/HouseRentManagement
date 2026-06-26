@@ -2,6 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
@@ -9,83 +11,93 @@
       spacing="16"
       prefWidth="900"
       prefHeight="560"
-      style="-fx-padding:20; -fx-background-color:#f4f6f7;">
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <!-- Header -->
-    <VBox spacing="4">
-        <Label text="User Management"
-               style="-fx-font-size:24px; -fx-font-weight:bold; -fx-text-fill:#111827;"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+            <image>
+                <Image url="@/images/app-icon.png" />
+            </image>
+        </ImageView>
+        <VBox spacing="4">
+            <Label text="User Management"
+                   styleClass="popup-title"/>
 
-        <Label text="Manage application users. Each user has a separate secure database."
-               wrapText="true"
-               style="-fx-font-size:13px; -fx-text-fill:#6b7280;"/>
-    </VBox>
+            <Label text="Manage application users. Each user has a separate secure database."
+                   wrapText="true"
+                   styleClass="popup-subtitle"/>
+        </VBox>
+    </HBox>
 
     <!-- Actions -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button fx:id="addUserButton"
                 text="Add User"
                 onAction="#addUser"
-                styleClass="settings-primary-btn"/>
+                styleClass="popup-primary-btn"/>
 
         <Button fx:id="enableUserButton"
                 text="Enable"
                 onAction="#enableSelectedUser"
-                styleClass="settings-primary-btn"/>
+                styleClass="popup-primary-btn"/>
 
         <Button fx:id="disableUserButton"
                 text="Disable"
                 onAction="#disableSelectedUser"
-                styleClass="settings-primary-btn"/>
+                styleClass="popup-secondary-btn"/>
 
         <Button fx:id="deleteUserButton"
                 text="Delete"
                 onAction="#deleteSelectedUser"
-                styleClass="settings-danger-btn"/>
+                styleClass="popup-danger-btn"/>
 
         <Button fx:id="refreshButton"
                 text="Refresh"
                 onAction="#refreshUsers"
-                styleClass="settings-primary-btn"/>
+                styleClass="popup-secondary-btn"/>
     </HBox>
 
     <!-- User Table -->
-    <TableView fx:id="usersTable"
-               VBox.vgrow="ALWAYS">
+    <VBox styleClass="popup-card" VBox.vgrow="ALWAYS">
+        <TableView fx:id="usersTable"
+                   VBox.vgrow="ALWAYS">
 
-        <columns>
-            <TableColumn fx:id="usernameColumn"
-                         text="Username"
-                         prefWidth="130"/>
+            <columns>
+                <TableColumn fx:id="usernameColumn"
+                             text="Username"
+                             prefWidth="130"/>
 
-            <TableColumn fx:id="displayNameColumn"
-                         text="Display Name"
-                         prefWidth="150"/>
+                <TableColumn fx:id="displayNameColumn"
+                             text="Display Name"
+                             prefWidth="150"/>
 
-            <TableColumn fx:id="roleColumn"
-                         text="Role"
-                         prefWidth="100"/>
+                <TableColumn fx:id="roleColumn"
+                             text="Role"
+                             prefWidth="100"/>
 
-            <TableColumn fx:id="statusColumn"
-                         text="Status"
-                         prefWidth="100"/>
+                <TableColumn fx:id="statusColumn"
+                             text="Status"
+                             prefWidth="100"/>
 
-            <TableColumn fx:id="createdAtColumn"
-                         text="Created At"
-                         prefWidth="160"/>
+                <TableColumn fx:id="createdAtColumn"
+                             text="Created At"
+                             prefWidth="160"/>
 
-            <TableColumn fx:id="lastLoginColumn"
-                         text="Last Login"
-                         prefWidth="160"/>
-        </columns>
-    </TableView>
+                <TableColumn fx:id="lastLoginColumn"
+                             text="Last Login"
+                             prefWidth="160"/>
+            </columns>
+        </TableView>
+    </VBox>
 
     <!-- Footer -->
     <HBox alignment="CENTER_RIGHT">
         <Button fx:id="closeButton"
                 text="Close"
                 onAction="#closeWindow"
-                styleClass="settings-primary-btn"/>
+                styleClass="popup-secondary-btn"/>
     </HBox>
 
 </VBox>

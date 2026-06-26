@@ -187,7 +187,9 @@ public class TenantController {
             stage.getIcons().add(
                     new Image(getClass().getResourceAsStream("/images/app-icon.png"))
             );
-            stage.setScene(new Scene(root, 700, 500));
+            stage.setScene(new Scene(root, 500, 560));
+            stage.setMinWidth(440);
+            stage.setMinHeight(400);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
@@ -236,13 +238,6 @@ public class TenantController {
 
             Scene scene = new Scene(root, 850, 650);
 
-            // popup css
-            scene.getStylesheets().add(
-                    getClass()
-                            .getResource("/css/add-tenant.css")
-                            .toExternalForm()
-            );
-
             Stage stage = new Stage();
 
             stage.setTitle("Add New Tenant");
@@ -255,7 +250,8 @@ public class TenantController {
 
             stage.setScene(scene);
 
-            stage.setResizable(false);
+            stage.setMinWidth(560);
+            stage.setMinHeight(480);
 
             stage.showAndWait();
 
@@ -358,8 +354,9 @@ public class TenantController {
             );
 
             stage.setScene(new Scene(root));
+            stage.setMinWidth(460);
+            stage.setMinHeight(420);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
             stage.showAndWait();
 
         } catch (Exception e) {

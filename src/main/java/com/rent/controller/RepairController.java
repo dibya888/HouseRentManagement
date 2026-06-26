@@ -264,7 +264,8 @@ public class RepairController {
                     new Image(getClass().getResourceAsStream("/images/app-icon.png"))
             );
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setMinWidth(480);
+            stage.setMinHeight(420);
             stage.showAndWait();
 
             loadRepairs();

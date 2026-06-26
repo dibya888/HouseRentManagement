@@ -143,7 +143,9 @@ public class FlatController {
             Stage stage = new Stage();
             stage.setTitle("Flat Details");
             stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
-            stage.setScene(new Scene(loader.load(), 420, 520));
+            stage.setScene(new Scene(loader.load(), 460, 520));
+            stage.setMinWidth(420);
+            stage.setMinHeight(380);
             stage.initModality(Modality.APPLICATION_MODAL);
             ViewFlatController controller = loader.getController();
             controller.setFlat(flat);
@@ -159,7 +161,9 @@ public class FlatController {
             Stage stage = new Stage();
             stage.setTitle("Edit Flat");
             stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
-            stage.setScene(new Scene(loader.load(), 420, 520));
+            stage.setScene(new Scene(loader.load(), 460, 560));
+            stage.setMinWidth(420);
+            stage.setMinHeight(420);
             stage.initModality(Modality.APPLICATION_MODAL);
             EditFlatController controller = loader.getController();
             controller.setFlat(flat);
@@ -193,8 +197,9 @@ public class FlatController {
             Stage stage = new Stage();
             stage.setTitle("Add Flat");
             stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/app-icon.png")));
-            stage.setScene(new Scene(loader.load(), 400, 480));
-            stage.setResizable(false);
+            stage.setScene(new Scene(loader.load(), 440, 560));
+            stage.setMinWidth(420);
+            stage.setMinHeight(420);
             stage.setOnHidden(e -> loadFlatsFromDB());
             stage.show();
         } catch (Exception e) {

@@ -6,63 +6,71 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rent.controller.ViewFlatController"
-      spacing="14"
-      style="-fx-padding:20;">
+      spacing="16"
+      prefWidth="460"
+      prefHeight="520"
+      styleClass="popup-root"
+      stylesheets="@/css/popups.css">
 
     <Label fx:id="titleLabel"
-           style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+           styleClass="popup-title"/>
 
-    <Separator/>
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <content>
+            <VBox spacing="10" styleClass="popup-card">
 
-    <GridPane hgap="12" vgap="10">
+                <GridPane hgap="14" vgap="10">
 
-        <!-- ✅ PROPERTY INFO -->
-        <Label text="Property:" GridPane.rowIndex="0"/>
-        <Label fx:id="propertyNameLabel"
-               style="-fx-font-weight:bold;"
-               GridPane.rowIndex="0"
-               GridPane.columnIndex="1"/>
+                    <!-- PROPERTY INFO -->
+                    <Label text="Property:" GridPane.rowIndex="0"/>
+                    <Label fx:id="propertyNameLabel"
+                           style="-fx-font-weight:bold;"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="1"/>
 
-        <Label text="Address:" GridPane.rowIndex="1"/>
-        <Label fx:id="propertyAddressLabel"
-               wrapText="true"
-               GridPane.rowIndex="1"
-               GridPane.columnIndex="1"/>
+                    <Label text="Address:" GridPane.rowIndex="1"/>
+                    <Label fx:id="propertyAddressLabel"
+                           wrapText="true"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="1"/>
 
-        <!-- FLAT INFO -->
-        <Label text="Meter No:" GridPane.rowIndex="2"/>
-        <Label fx:id="meterLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <!-- FLAT INFO -->
+                    <Label text="Meter No:" GridPane.rowIndex="2"/>
+                    <Label fx:id="meterLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Bedrooms:" GridPane.rowIndex="3"/>
-        <Label fx:id="bedLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <Label text="Bedrooms:" GridPane.rowIndex="3"/>
+                    <Label fx:id="bedLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Bathrooms:" GridPane.rowIndex="4"/>
-        <Label fx:id="bathLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    <Label text="Bathrooms:" GridPane.rowIndex="4"/>
+                    <Label fx:id="bathLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Kitchens:" GridPane.rowIndex="5"/>
-        <Label fx:id="kitchenLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    <Label text="Kitchens:" GridPane.rowIndex="5"/>
+                    <Label fx:id="kitchenLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <Label text="Balconies:" GridPane.rowIndex="6"/>
-        <Label fx:id="balconyLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                    <Label text="Balconies:" GridPane.rowIndex="6"/>
+                    <Label fx:id="balconyLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-        <Label text="Dining Rooms:" GridPane.rowIndex="7"/>
-        <Label fx:id="diningLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                    <Label text="Dining Rooms:" GridPane.rowIndex="7"/>
+                    <Label fx:id="diningLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-        <Label text="Living Rooms:" GridPane.rowIndex="8"/>
-        <Label fx:id="livingLabel" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                    <Label text="Living Rooms:" GridPane.rowIndex="8"/>
+                    <Label fx:id="livingLabel" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
-        <Label text="Rent:" GridPane.rowIndex="9"/>
-        <Label fx:id="rentLabel" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                    <Label text="Rent:" GridPane.rowIndex="9"/>
+                    <Label fx:id="rentLabel" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
-        <Label text="Status:" GridPane.rowIndex="10"/>
-        <Label fx:id="statusLabel" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                    <Label text="Status:" GridPane.rowIndex="10"/>
+                    <Label fx:id="statusLabel" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
 
-    </GridPane>
-
-    <Separator/>
+                </GridPane>
+            </VBox>
+        </content>
+    </ScrollPane>
 
     <HBox alignment="CENTER_RIGHT">
-        <Button text="Close" onAction="#close"/>
+        <Button text="Close" onAction="#close" styleClass="popup-secondary-btn"/>
     </HBox>
 
 </VBox>
