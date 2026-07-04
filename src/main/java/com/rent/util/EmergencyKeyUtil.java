@@ -63,6 +63,7 @@ public class EmergencyKeyUtil {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Emergency Recovery Keys");
+        FileSaveUtil.defaultToDownloads(chooser);
 
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf")

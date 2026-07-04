@@ -3,6 +3,7 @@ package com.rent.controller;
 import com.rent.model.ReportRow;
 import com.rent.model.ReportSummary;
 import com.rent.util.FileOpenUtil;
+import com.rent.util.FileSaveUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -25,6 +26,7 @@ public class ReportExcelExporter {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Report Excel");
+        FileSaveUtil.defaultToDownloads(chooser);
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Excel Files", "*.xlsx")
         );

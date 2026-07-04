@@ -66,6 +66,7 @@ public class DatabaseBackupUtil {
 
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Save Portable Backup");
+            FileSaveUtil.defaultToDownloads(chooser);
 
             chooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("House Rent Backup", "*.hrmbak")

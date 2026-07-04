@@ -340,11 +340,11 @@ public class ReportsController {
 
         final String monthFinal = selectedMonth;
 
-        // These report types are pre-aggregated (grouped by flat / year / tenant
-        // across all time) by their DAO query, so each row does not carry a
-        // real per-row month or date value. Applying the Month/date-range
-        // filter to them would compare against an empty or year-only string
-        // and incorrectly drop every row. They are filtered only by type.
+        // Flat-wise Income and Tenant-wise Report are aggregated across all
+        // time per flat/tenant, so their rows carry no per-row month/date.
+        // Yearly Income's individual rows do carry a real bill_month, but
+        // filtering a yearly view down to one specific month doesn't match
+        // the report's purpose, so it's intentionally bypassed here too.
         boolean isAggregatedReport = type != null && (
                 type.equals("Flat-wise Income")
                         || type.equals("Yearly Income")
@@ -395,7 +395,11 @@ public class ReportsController {
             }
 
             if (type.equals("Monthly Income")) {
-                return row.getPaid() > 0;
+                // reportList already contains only Monthly Income rows
+                // (Paid Rent, Due Rent, and Total rows per month) from
+                // ReportDAO.getMonthlyIncomeRows(). Due-only rows can have
+                // paid == 0, so no extra paid>0 check is needed here.
+                return true;
             }
 
             if (type.equals("Flat-wise Income")) {
@@ -403,7 +407,8 @@ public class ReportsController {
             }
 
             if (type.equals("Yearly Income")) {
-                return row.getPaid() > 0;
+                // Same reasoning as Monthly Income above.
+                return true;
             }
 
             if (type.equals("Tenant-wise Report")) {

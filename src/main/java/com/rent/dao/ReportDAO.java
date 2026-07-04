@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ReportDAO {
 
@@ -350,29 +351,37 @@ public class ReportDAO {
     public static List<ReportRow> getMonthlyIncomeRows() {
         List<ReportRow> list = new ArrayList<>();
 
+        // Individual paid transactions
         String paidSql = """
             SELECT
-                bill_month,
-                SUM(MAX(house_rent - discount, 0)) AS total_amount,
-                SUM(MAX(house_rent - discount, 0)) AS paid_amount
-            FROM rent_archive
-            GROUP BY bill_month
+                ra.bill_month,
+                ra.payment_date AS report_date,
+                ra.flat_no,
+                t.name AS tenant_name,
+                MAX(ra.house_rent - ra.discount, 0) AS total,
+                MAX(ra.house_rent - ra.discount, 0) AS paid_amount,
+                0 AS due,
+                ra.status
+            FROM rent_archive ra
+            JOIN tenants t ON ra.tenant_id = t.id
             """;
 
-        // Outstanding rent for each month lives in rent_current, not
-        // rent_archive. Merged below into the same row as the paid total.
+        // Individual outstanding/current transactions
         String dueSql = """
             SELECT
-                bill_month,
-                SUM(total) AS total_amount,
-                SUM(paid_amount) AS paid_amount,
-                SUM(total - paid_amount) AS due_amount
-            FROM rent_current
-            WHERE (total - paid_amount) > 0
-            GROUP BY bill_month
+                rc.bill_month,
+                rc.due_date AS report_date,
+                rc.flat_no,
+                t.name AS tenant_name,
+                rc.total,
+                rc.paid_amount,
+                (rc.total - rc.paid_amount) AS due,
+                rc.status
+            FROM rent_current rc
+            JOIN tenants t ON rc.tenant_id = t.id
             """;
 
-        Map<String, double[]> merged = new LinkedHashMap<>(); // bill_month -> {total, paid, due}
+        List<ReportRow> rawRows = new ArrayList<>();
 
         try (Connection conn = DBUtil.connect()) {
 
@@ -380,9 +389,17 @@ public class ReportDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    double[] agg = merged.computeIfAbsent(rs.getString("bill_month"), k -> new double[3]);
-                    agg[0] += rs.getDouble("total_amount");
-                    agg[1] += rs.getDouble("paid_amount");
+                    rawRows.add(new ReportRow(
+                            "Paid Rent",
+                            rs.getString("bill_month"),
+                            rs.getString("report_date"),
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total"),
+                            rs.getDouble("paid_amount"),
+                            rs.getDouble("due"),
+                            rs.getString("status")
+                    ));
                 }
             }
 
@@ -390,32 +407,56 @@ public class ReportDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    double[] agg = merged.computeIfAbsent(rs.getString("bill_month"), k -> new double[3]);
-                    agg[0] += rs.getDouble("total_amount");
-                    agg[1] += rs.getDouble("paid_amount");
-                    agg[2] += rs.getDouble("due_amount");
+                    rawRows.add(new ReportRow(
+                            "Due Rent",
+                            rs.getString("bill_month"),
+                            rs.getString("report_date"),
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total"),
+                            rs.getDouble("paid_amount"),
+                            rs.getDouble("due"),
+                            rs.getString("status")
+                    ));
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            return list;
         }
 
-        List<String> months = new ArrayList<>(merged.keySet());
-        months.sort(Comparator.reverseOrder());
+        // Group by month (most recent first); each group lists every flat
+        // individually, followed by one Total row for that month.
+        Map<String, List<ReportRow>> byMonth = new TreeMap<>(Comparator.reverseOrder());
+        for (ReportRow r : rawRows) {
+            byMonth.computeIfAbsent(r.getMonth(), k -> new ArrayList<>()).add(r);
+        }
 
-        for (String month : months) {
-            double[] agg = merged.get(month);
+        for (Map.Entry<String, List<ReportRow>> entry : byMonth.entrySet()) {
+            List<ReportRow> monthRows = entry.getValue();
+            monthRows.sort(Comparator.comparing(
+                    r -> r.getFlatNo() == null ? "" : r.getFlatNo()));
+
+            double totalSum = 0, paidSum = 0, dueSum = 0;
+
+            for (ReportRow r : monthRows) {
+                list.add(r);
+                totalSum += r.getTotal();
+                paidSum += r.getPaid();
+                dueSum += r.getDue();
+            }
+
             list.add(new ReportRow(
-                    "Monthly Income",
-                    month,
+                    "Total",
+                    entry.getKey(),
                     "",
                     "",
                     "",
-                    agg[0],
-                    agg[1],
-                    agg[2],
-                    agg[2] > 0 ? "DUE" : "PAID"
+                    totalSum,
+                    paidSum,
+                    dueSum,
+                    dueSum > 0 ? "DUE" : "PAID"
             ));
         }
 
@@ -425,29 +466,37 @@ public class ReportDAO {
     public static List<ReportRow> getYearlyIncomeRows() {
         List<ReportRow> list = new ArrayList<>();
 
+        // Individual paid transactions
         String paidSql = """
             SELECT
-                substr(bill_month, 1, 4) AS report_year,
-                SUM(MAX(house_rent - discount, 0)) AS total_amount,
-                SUM(MAX(house_rent - discount, 0)) AS paid_amount
-            FROM rent_archive
-            GROUP BY substr(bill_month, 1, 4)
+                ra.bill_month,
+                ra.payment_date AS report_date,
+                ra.flat_no,
+                t.name AS tenant_name,
+                MAX(ra.house_rent - ra.discount, 0) AS total,
+                MAX(ra.house_rent - ra.discount, 0) AS paid_amount,
+                0 AS due,
+                ra.status
+            FROM rent_archive ra
+            JOIN tenants t ON ra.tenant_id = t.id
             """;
 
-        // Outstanding rent for each year lives in rent_current, not
-        // rent_archive. Merged below into the same row as the paid total.
+        // Individual outstanding/current transactions
         String dueSql = """
             SELECT
-                substr(bill_month, 1, 4) AS report_year,
-                SUM(total) AS total_amount,
-                SUM(paid_amount) AS paid_amount,
-                SUM(total - paid_amount) AS due_amount
-            FROM rent_current
-            WHERE (total - paid_amount) > 0
-            GROUP BY substr(bill_month, 1, 4)
+                rc.bill_month,
+                rc.due_date AS report_date,
+                rc.flat_no,
+                t.name AS tenant_name,
+                rc.total,
+                rc.paid_amount,
+                (rc.total - rc.paid_amount) AS due,
+                rc.status
+            FROM rent_current rc
+            JOIN tenants t ON rc.tenant_id = t.id
             """;
 
-        Map<String, double[]> merged = new LinkedHashMap<>(); // report_year -> {total, paid, due}
+        List<ReportRow> rawRows = new ArrayList<>();
 
         try (Connection conn = DBUtil.connect()) {
 
@@ -455,9 +504,17 @@ public class ReportDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    double[] agg = merged.computeIfAbsent(rs.getString("report_year"), k -> new double[3]);
-                    agg[0] += rs.getDouble("total_amount");
-                    agg[1] += rs.getDouble("paid_amount");
+                    rawRows.add(new ReportRow(
+                            "Paid Rent",
+                            rs.getString("bill_month"),
+                            rs.getString("report_date"),
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total"),
+                            rs.getDouble("paid_amount"),
+                            rs.getDouble("due"),
+                            rs.getString("status")
+                    ));
                 }
             }
 
@@ -465,32 +522,60 @@ public class ReportDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    double[] agg = merged.computeIfAbsent(rs.getString("report_year"), k -> new double[3]);
-                    agg[0] += rs.getDouble("total_amount");
-                    agg[1] += rs.getDouble("paid_amount");
-                    agg[2] += rs.getDouble("due_amount");
+                    rawRows.add(new ReportRow(
+                            "Due Rent",
+                            rs.getString("bill_month"),
+                            rs.getString("report_date"),
+                            rs.getString("flat_no"),
+                            rs.getString("tenant_name"),
+                            rs.getDouble("total"),
+                            rs.getDouble("paid_amount"),
+                            rs.getDouble("due"),
+                            rs.getString("status")
+                    ));
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            return list;
         }
 
-        List<String> years = new ArrayList<>(merged.keySet());
-        years.sort(Comparator.reverseOrder());
+        // Group by year (most recent first); each group lists every flat's
+        // monthly transaction individually, followed by one Total row.
+        Map<String, List<ReportRow>> byYear = new TreeMap<>(Comparator.reverseOrder());
+        for (ReportRow r : rawRows) {
+            String month = r.getMonth();
+            String year = (month != null && month.length() >= 4) ? month.substring(0, 4) : "";
+            byYear.computeIfAbsent(year, k -> new ArrayList<>()).add(r);
+        }
 
-        for (String year : years) {
-            double[] agg = merged.get(year);
+        for (Map.Entry<String, List<ReportRow>> entry : byYear.entrySet()) {
+            List<ReportRow> yearRows = entry.getValue();
+            yearRows.sort(
+                    Comparator.comparing((ReportRow r) -> r.getMonth() == null ? "" : r.getMonth())
+                            .thenComparing(r -> r.getFlatNo() == null ? "" : r.getFlatNo())
+            );
+
+            double totalSum = 0, paidSum = 0, dueSum = 0;
+
+            for (ReportRow r : yearRows) {
+                list.add(r);
+                totalSum += r.getTotal();
+                paidSum += r.getPaid();
+                dueSum += r.getDue();
+            }
+
             list.add(new ReportRow(
-                    "Yearly Income",
-                    year,
+                    "Total",
+                    entry.getKey(),
                     "",
                     "",
                     "",
-                    agg[0],
-                    agg[1],
-                    agg[2],
-                    agg[2] > 0 ? "DUE" : "PAID"
+                    totalSum,
+                    paidSum,
+                    dueSum,
+                    dueSum > 0 ? "DUE" : "PAID"
             ));
         }
 

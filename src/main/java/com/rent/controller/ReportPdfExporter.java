@@ -3,6 +3,7 @@ package com.rent.controller;
 import com.rent.model.ReportRow;
 import com.rent.model.ReportSummary;
 import com.rent.util.FileOpenUtil;
+import com.rent.util.FileSaveUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -66,6 +67,7 @@ public class ReportPdfExporter {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Report PDF");
+        FileSaveUtil.defaultToDownloads(chooser);
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
         );

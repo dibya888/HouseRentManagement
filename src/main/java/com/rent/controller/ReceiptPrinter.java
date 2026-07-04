@@ -3,6 +3,7 @@ package com.rent.controller;
 import com.rent.model.RentRow;
 import com.rent.util.DBUtil;
 import com.rent.util.FileOpenUtil;
+import com.rent.util.FileSaveUtil;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import com.rent.dao.AuditLogDAO;
@@ -53,6 +54,7 @@ public class ReceiptPrinter {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Receipt PDF");
+        FileSaveUtil.defaultToDownloads(chooser);
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
         );

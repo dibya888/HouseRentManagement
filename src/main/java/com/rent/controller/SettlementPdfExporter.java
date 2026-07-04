@@ -2,6 +2,7 @@ package com.rent.controller;
 
 import com.rent.model.MoveOutSettlement;
 import com.rent.util.FileOpenUtil;
+import com.rent.util.FileSaveUtil;
 
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
@@ -33,6 +34,7 @@ public class SettlementPdfExporter {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Settlement PDF");
+        FileSaveUtil.defaultToDownloads(chooser);
 
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
