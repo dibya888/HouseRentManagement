@@ -2,6 +2,7 @@ package com.rent.controller;
 
 import com.rent.model.ReportRow;
 import com.rent.model.ReportSummary;
+import com.rent.util.FileOpenUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -45,9 +46,10 @@ public class ReportExcelExporter {
         try {
             createExcel(summary, rows, context, file);
 
-            new Alert(Alert.AlertType.INFORMATION,
-                    "Excel report exported successfully:\n" + file.getAbsolutePath()
-            ).show();
+            FileOpenUtil.showSavedAlertWithOpen(
+                    "Excel report exported successfully:\n" + file.getAbsolutePath(),
+                    file
+            );
             return true;
 
         } catch (Exception e) {

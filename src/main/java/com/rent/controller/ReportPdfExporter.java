@@ -2,6 +2,7 @@ package com.rent.controller;
 
 import com.rent.model.ReportRow;
 import com.rent.model.ReportSummary;
+import com.rent.util.FileOpenUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -86,9 +87,10 @@ public class ReportPdfExporter {
         try {
             createPdf(summary, rows, context, file);
 
-            new Alert(Alert.AlertType.INFORMATION,
-                    "PDF report exported successfully:\n" + file.getAbsolutePath()
-            ).show();
+            FileOpenUtil.showSavedAlertWithOpen(
+                    "PDF report exported successfully:\n" + file.getAbsolutePath(),
+                    file
+            );
 
             return true;
 

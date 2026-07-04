@@ -83,9 +83,10 @@ public class EmergencyKeyUtil {
         try {
             createPdf(keys, file);
 
-            new Alert(Alert.AlertType.INFORMATION,
-                    "Recovery keys saved successfully:\n" + file.getAbsolutePath())
-                    .showAndWait();
+            FileOpenUtil.showSavedAlertWithOpen(
+                    "Recovery keys saved successfully:\n" + file.getAbsolutePath(),
+                    file
+            );
 
         } catch (Exception e) {
             e.printStackTrace();

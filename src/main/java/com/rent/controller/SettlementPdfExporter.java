@@ -1,6 +1,7 @@
 package com.rent.controller;
 
 import com.rent.model.MoveOutSettlement;
+import com.rent.util.FileOpenUtil;
 
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
@@ -57,10 +58,10 @@ public class SettlementPdfExporter {
         try {
             createPdf(s, file);
 
-            new Alert(
-                    Alert.AlertType.INFORMATION,
-                    "Settlement PDF saved successfully:\n" + file.getAbsolutePath()
-            ).showAndWait();
+            FileOpenUtil.showSavedAlertWithOpen(
+                    "Settlement PDF saved successfully:\n" + file.getAbsolutePath(),
+                    file
+            );
 
             return true;
 

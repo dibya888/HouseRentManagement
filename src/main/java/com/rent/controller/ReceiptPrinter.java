@@ -2,6 +2,7 @@ package com.rent.controller;
 
 import com.rent.model.RentRow;
 import com.rent.util.DBUtil;
+import com.rent.util.FileOpenUtil;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import com.rent.dao.AuditLogDAO;
@@ -88,10 +89,10 @@ public class ReceiptPrinter {
                             + file.getAbsolutePath()
             );
 
-            new Alert(
-                    Alert.AlertType.INFORMATION,
-                    "Receipt PDF saved successfully:\n" + file.getAbsolutePath()
-            ).show();
+            FileOpenUtil.showSavedAlertWithOpen(
+                    "Receipt PDF saved successfully:\n" + file.getAbsolutePath(),
+                    file
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
