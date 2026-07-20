@@ -32,7 +32,7 @@ public class RepairFormController {
     @FXML
     public void initialize() {
         flatCombo.setItems(FXCollections.observableArrayList(
-                FlatDAO.getOccupiedFlatNumbers()
+                FlatDAO.getAllFlatNumbers()
         ));
 
         categoryCombo.setItems(FXCollections.observableArrayList(

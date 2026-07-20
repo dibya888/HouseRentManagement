@@ -235,7 +235,7 @@
                     <Region VBox.vgrow="ALWAYS"/>
 
                     <VBox spacing="4">
-                        <Label text="Version 3.0"
+                        <Label text="Version 3.3"
                                style="-fx-text-fill:#111827; -fx-font-weight:bold;"/>
 
                         <Label text="What's New: Dashboard improvements, redesigned reports, enhanced exports, and performance optimizations."

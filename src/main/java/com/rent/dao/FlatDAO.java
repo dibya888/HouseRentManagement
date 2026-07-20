@@ -240,6 +240,22 @@ public class FlatDAO {
         return flats;
     }
 
+    public static List<String> getAllFlatNumbers() {
+        List<String> flats = new ArrayList<>();
+        String sql = "SELECT flat_no FROM flats ORDER BY flat_no";
+        try (Connection conn = DBUtil.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                flats.add(rs.getString("flat_no"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flats;
+    }
+
     public static Flat getFlatByFlatNo(String flatNo) {
         String sql = "SELECT * FROM flats WHERE flat_no=?";
         try (Connection conn = DBUtil.connect();
